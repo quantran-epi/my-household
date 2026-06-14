@@ -9,8 +9,8 @@ Requirements for this UI/UX refactor milestone. Each maps to roadmap phases. Thi
 
 ### Copy & Language
 
-- [ ] **COPY-01**: A single typed copy module (`AppCopy`) is the source of truth for user-facing Vietnamese strings, with a derived key union for build-time safety
-- [ ] **COPY-02**: A glossary enforces one Vietnamese term per concept (no synonym drift across screens)
+- [x] **COPY-01**: A single typed copy module (`AppCopy`) is the source of truth for user-facing Vietnamese strings, with a derived key union for build-time safety
+- [x] **COPY-02**: A glossary enforces one Vietnamese term per concept (no synonym drift across screens)
 - [ ] **COPY-03**: Inline user-facing strings across modules and navigation are migrated to reference `AppCopy`
 - [ ] **COPY-04**: All user-facing labels and descriptions read natural to a local Vietnamese user — no English or technical-jargon leftovers
 - [ ] **COPY-05**: Journey screens show inviting, friendly empty-states instead of blank or technical messages
@@ -73,17 +73,46 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ## Traceability
 
-Populated during roadmap creation.
+Each v1 requirement maps to exactly one phase. v2 requirements are carried in Phase 6 (deferred, post-validation) and are not counted in v1 coverage.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (to be filled by roadmap) | | |
+| COPY-01 | Phase 1 | Complete |
+| COPY-02 | Phase 1 | Complete |
+| FND-01 | Phase 2 | Pending |
+| FND-02 | Phase 2 | Pending |
+| FND-03 | Phase 3 | Pending |
+| WIZ-06 | Phase 3 | Pending |
+| WIZ-01 | Phase 4 | Pending |
+| WIZ-02 | Phase 4 | Pending |
+| WIZ-03 | Phase 4 | Pending |
+| WIZ-04 | Phase 4 | Pending |
+| WIZ-05 | Phase 4 | Pending |
+| WIZ-07 | Phase 4 | Pending |
+| NAV-01 | Phase 4 | Pending |
+| NAV-02 | Phase 4 | Pending |
+| NAV-03 | Phase 4 | Pending |
+| NAV-04 | Phase 4 | Pending |
+| MOB-01 | Phase 5 | Pending |
+| MOB-02 | Phase 5 | Pending |
+| MOB-03 | Phase 5 | Pending |
+| MOB-04 | Phase 5 | Pending |
+| COPY-03 | Phase 5 | Pending |
+| COPY-04 | Phase 5 | Pending |
+| COPY-05 | Phase 5 | Pending |
+| WIZ2-01 | Phase 6 (v2) | Deferred |
+| WIZ2-02 | Phase 6 (v2) | Deferred |
+| WIZ2-03 | Phase 6 (v2) | Deferred |
+| WIZ2-04 | Phase 6 (v2) | Deferred |
+| WIZ2-05 | Phase 6 (v2) | Deferred |
 
 **Coverage:**
-- v1 requirements: 22 total
-- Mapped to phases: TBD (roadmap)
-- Unmapped: TBD
+
+- v1 requirements: 23 total (COPY ×5, WIZ ×7, NAV ×4, MOB ×4, FND ×3)
+- Mapped to phases: 23/23 ✓
+- Unmapped: 0
+- v2 requirements (deferred to Phase 6): 5
 
 ---
 *Requirements defined: 2026-06-14*
-*Last updated: 2026-06-14 after initial definition*
+*Last updated: 2026-06-14 after roadmap creation (traceability populated)*

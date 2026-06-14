@@ -141,7 +141,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Copy Infrastructure | 1/1 | Complete   | 2026-06-14 |
+| 1. Copy Infrastructure | 1/1 | Complete    | 2026-06-14 |
 | 2. Shell Safety & Extraction | 0/TBD | Not started | - |
 | 3. Wizard State Slice | 0/TBD | Not started | - |
 | 4. Wizard UI & Hero Entry | 0/TBD | Not started | - |
