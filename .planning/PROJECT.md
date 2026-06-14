@@ -50,6 +50,7 @@ A local Vietnamese household member can open the app and go from "what do we eat
 
 ## Context
 
+- Phase 1 complete (2026-06-14): typed `AppCopy` copy foundation under `src/Common/Copy/` (`@common/Copy`) — source of truth, build-gated `CopyKey` union, review-only glossary. App-wide copy *migration* is Phase 5.
 - Brownfield project. Existing codebase mapped under `.planning/codebase/` (ARCHITECTURE, STACK, STRUCTURE, CONVENTIONS, INTEGRATIONS, TESTING, CONCERNS).
 - Stack: React 18, Redux Toolkit, React Router 6, Ant Design 5, TypeScript, CRACO build, Workbox PWA. UI is built on local wrappers in `src/Components` over Ant Design.
 - Feature modules (vertical slices) live in `src/Modules`: Dishes, Ingredient, ShoppingList, ScheduledMeal, DishSuggester, Home.
@@ -74,6 +75,9 @@ A local Vietnamese household member can open the app and go from "what do we eat
 | Meal planning ("what to cook") is the first journey to make intuitive | It's the journey that hurts most today | — Pending |
 | Use a guided wizard flow as the "customer journey" model | Reframes admin-style screens into ask-and-answer steps | — Pending |
 | App-wide Vietnamese copy pass this milestone (not just meal planning) | Friendly, familiar language is a cross-cutting need | — Pending |
+| Typed `AppCopy` module as single source of truth for copy (build-gated keys, named-arg interpolation, review-only glossary) | Avoids hand-editing ~408 inline strings twice; makes a bad key a build error | ✓ Built in Phase 1 |
+
+| Adopt a typed `AppCopy` source of truth before rewording any screens | Avoid hand-editing ~408 inline strings twice; make a bad key a build error | Validated in Phase 1: Copy Infrastructure |
 
 ## Evolution
 
@@ -93,4 +97,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 after initialization*
+*Last updated: 2026-06-14 after Phase 1: Copy Infrastructure*
