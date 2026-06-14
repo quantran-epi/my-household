@@ -1,0 +1,95 @@
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+status: planning
+stopped_at: Phase 1 context gathered
+last_updated: "2026-06-14T14:20:46.891Z"
+last_activity: 2026-06-14 — Roadmap created from requirements + research
+progress:
+  total_phases: 6
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
+---
+
+# Project State
+
+## Project Reference
+
+See: .planning/PROJECT.md (updated 2026-06-14)
+
+**Core value:** A local Vietnamese household member can open the app and go from "what do we eat?" to a planned meal quickly, in familiar language, without it feeling like an admin tool.
+**Current focus:** Phase 1 — Copy Infrastructure
+
+## Current Position
+
+Phase: 1 of 6 (Copy Infrastructure)
+Plan: 0 of TBD in current phase
+Status: Ready to plan
+Last activity: 2026-06-14 — Roadmap created from requirements + research
+
+Progress: [░░░░░░░░░░] 0%
+
+## Performance Metrics
+
+**Velocity:**
+
+- Total plans completed: 0
+- Average duration: — min
+- Total execution time: 0.0 hours
+
+**By Phase:**
+
+| Phase | Plans | Total | Avg/Plan |
+|-------|-------|-------|----------|
+| - | - | - | - |
+
+**Recent Trend:**
+
+- Last 5 plans: —
+- Trend: —
+
+*Updated after each plan completion*
+
+## Accumulated Context
+
+### Decisions
+
+Decisions are logged in PROJECT.md Key Decisions table.
+Recent decisions affecting current work:
+
+- [Roadmap]: Brownfield refactor — phases reframe/extend existing capability, no rewrite, no capability loss, preserve `shared`/`personal` persist roots.
+- [Roadmap]: Build typed `AppCopy` module before rewording any of the ~408 inline strings (avoids double-edit and JSX breakage).
+- [Roadmap]: Separate "pure move, verified identical" from behavior change when extracting `MasterPage.tsx`; add error boundary before shell surgery.
+- [Roadmap]: Wizard state in an RTK slice under the existing `personal` root, persisted per-step commit to survive forced reloads.
+
+### Pending Todos
+
+[From .planning/todos/pending/ — ideas captured during sessions]
+
+None yet.
+
+### Blockers/Concerns
+
+[Issues that affect future work]
+
+- Phase 4: Confirm `Dishes` catalog/empty-data behavior and the cold-start fallback path (full catalog → else "add first dish"); confirm `ScheduledMeal` assembly against `ScheduledMealAdd.widget.tsx`.
+- Phase 5/copy: Validate native Vietnamese phrasing/tone with a target household user; enforce one term per concept via the glossary.
+- Phase 6: Confirm inventory granularity supports "can cook now"; confirm whether dishes carry a time/effort attribute (decides "nấu nhanh/nấu kỹ" feasibility).
+
+## Deferred Items
+
+Items acknowledged and carried forward from previous milestone close:
+
+| Category | Item | Status | Deferred At |
+|----------|------|--------|-------------|
+| Wizard step | "Time/effort" step (nấu nhanh/nấu kỹ) — blocked on dish data | Deferred (v2+/P3) | 2026-06-14 |
+| Differentiators | WIZ2-01..05 (portions, fridge filter, inline shopping, remembered defaults, "why this dish") | Phase 6, post-validation | 2026-06-14 |
+
+## Session Continuity
+
+Last session: 2026-06-14T14:20:46.883Z
+Stopped at: Phase 1 context gathered
+Resume file: .planning/phases/01-copy-infrastructure/01-CONTEXT.md
