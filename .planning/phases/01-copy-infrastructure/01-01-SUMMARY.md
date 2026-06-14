@@ -107,3 +107,8 @@ None - plan executed exactly as written. (No Rule 1-4 deviations: no bugs, missi
 - `@common/Copy` resolves and is ready: Phases 2-4 can author copy through `AppCopy` from day one (wizard + empty-states namespaces seeded).
 - Seed Vietnamese phrasing is `[ASSUMED]` placeholder content pending Phase 5 household-user validation; the structure (namespaces, function shapes, CopyKey, glossary, barrel, alias) is locked.
 - Phase 5 has a documented ripgrep entry point for migrating the ~408 inline strings; should also run single-quote/JSX-text variants beyond the double-quote primary pass.
+
+## Self-Check: PASSED
+
+- Files verified on disk: `AppCopy.ts`, `Glossary.ts`, `index.ts`, `01-01-SUMMARY.md` — all FOUND.
+- Commits verified in git log: `0bb2516`, `930c2db`, `72d6f84`, `c42dcfe` — all FOUND.
