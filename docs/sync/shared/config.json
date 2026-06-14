@@ -1,0 +1,135 @@
+{
+  "inventory": {
+    "expirationDefaults": {
+      "long": {
+        "cool_dry": 21,
+        "freezer": 90,
+        "fridge": 21,
+        "room_temperature": 14
+      },
+      "medium": {
+        "cool_dry": 7,
+        "freezer": 60,
+        "fridge": 10,
+        "room_temperature": 5
+      },
+      "short": {
+        "cool_dry": 3,
+        "freezer": 30,
+        "fridge": 5,
+        "room_temperature": 2
+      },
+      "very_long": {
+        "cool_dry": 90,
+        "freezer": 180,
+        "fridge": 90,
+        "room_temperature": 60
+      },
+      "very_short": {
+        "cool_dry": 1,
+        "freezer": 14,
+        "fridge": 2,
+        "room_temperature": 1
+      }
+    },
+    "lowStockAmount": 2,
+    "urgentExpiryDays": 3
+  },
+  "nutrition": {
+    "goals": [
+      {
+        "color": "#7436dc",
+        "criteria": [
+          {
+            "direction": "between",
+            "id": "balanced-calories",
+            "max": 650,
+            "min": 350,
+            "nutrient": "calories"
+          },
+          {
+            "direction": "at_least",
+            "id": "balanced-protein",
+            "min": 18,
+            "nutrient": "protein"
+          },
+          {
+            "direction": "at_most",
+            "id": "balanced-fat",
+            "max": 28,
+            "nutrient": "fat"
+          },
+          {
+            "direction": "at_least",
+            "id": "balanced-fiber",
+            "min": 4,
+            "nutrient": "fiber"
+          }
+        ],
+        "description": "Kcal vừa phải, đủ đạm và có chất xơ cho một khẩu phần.",
+        "id": "balanced-meal",
+        "name": "Bữa cân bằng"
+      },
+      {
+        "color": "#1677ff",
+        "criteria": [
+          {
+            "direction": "at_least",
+            "id": "high-protein-protein",
+            "min": 28,
+            "nutrient": "protein"
+          },
+          {
+            "direction": "at_most",
+            "id": "high-protein-calories",
+            "max": 750,
+            "nutrient": "calories"
+          }
+        ],
+        "description": "Ưu tiên món có lượng protein cao cho mỗi khẩu phần.",
+        "id": "high-protein",
+        "name": "Giàu đạm"
+      },
+      {
+        "color": "#389e0d",
+        "criteria": [
+          {
+            "direction": "at_most",
+            "id": "light-calories-calories",
+            "max": 450,
+            "nutrient": "calories"
+          },
+          {
+            "direction": "at_least",
+            "id": "light-calories-protein",
+            "min": 12,
+            "nutrient": "protein"
+          }
+        ],
+        "description": "Ưu tiên món nhẹ năng lượng nhưng vẫn có đạm cơ bản.",
+        "id": "light-calories",
+        "name": "Nhẹ kcal"
+      },
+      {
+        "color": "#d48806",
+        "criteria": [
+          {
+            "direction": "at_least",
+            "id": "high-fiber-fiber",
+            "min": 7,
+            "nutrient": "fiber"
+          },
+          {
+            "direction": "at_most",
+            "id": "high-fiber-calories",
+            "max": 700,
+            "nutrient": "calories"
+          }
+        ],
+        "description": "Ưu tiên món có nhiều rau củ, đậu, ngũ cốc hoặc chất xơ.",
+        "id": "high-fiber",
+        "name": "Nhiều chất xơ"
+      }
+    ]
+  }
+}

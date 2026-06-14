@@ -1,0 +1,341 @@
+import { CheckCircleOutlined, DeleteOutlined, EditOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { NutritionGoalHelper } from '@common/Helpers/NutritionGoalHelper';
+import { ActionButton, Button } from '@components/Button';
+import { Image } from '@components/Image';
+import { Box } from '@components/Layout/Box';
+import { Stack } from '@components/Layout/Stack';
+import { useMessage } from '@components/Message';
+import { Modal } from '@components/Modal';
+import { useModal } from '@components/Modal/ModalProvider';
+import { Tag } from '@components/Tag';
+import { Typography } from '@components/Typography';
+import { useAdminMode, useScreenTitle } from '@hooks';
+import { usePageActions } from '@routing/PageActionsContext';
+import { NutritionGoal, NutritionGoalCriterion, NutritionGoalCriteriaDirection, NutritionGoalNutrientKey } from '@store/Models/SharedConfig';
+import { removeNutritionGoal, resetNutritionGoals, upsertNutritionGoal } from '@store/Reducers/SharedConfigReducer';
+import { selectNutritionGoals } from '@store/Selectors';
+import { Input, Select } from 'antd';
+import { NumberStepper } from '@components/Form/NumberStepper';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import NutritionPlanIcon from '../../../../assets/icons/nutrition-plan.png';
+import { NutritionCalculatorWidget } from './NutritionCalculator.widget';
+
+const goalColors = ['#7436dc', '#1677ff', '#389e0d', '#d48806', '#cf1322', '#13a8a8'];
+
+const createId = (prefix: string) => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+
+const createCriterion = (): NutritionGoalCriterion => ({
+    id: createId('criterion'),
+    nutrient: 'calories',
+    direction: 'at_most',
+    max: 600,
+});
+
+const createDraftGoal = (): NutritionGoal => ({
+    id: createId('nutrition-goal'),
+    name: '',
+    description: '',
+    color: goalColors[0],
+    criteria: [createCriterion()],
+});
+
+const criterionNeedsMin = (direction: NutritionGoalCriteriaDirection) => direction === 'at_least' || direction === 'between';
+const criterionNeedsMax = (direction: NutritionGoalCriteriaDirection) => direction === 'at_most' || direction === 'between';
+
+const validateGoal = (goal: NutritionGoal): string | null => {
+    if (!goal.name.trim()) return 'Nhập tên mục tiêu.';
+    if (goal.criteria.length === 0) return 'Thêm ít nhất một tiêu chí dinh dưỡng.';
+    for (const criterion of goal.criteria) {
+        if (criterionNeedsMin(criterion.direction) && (criterion.min === undefined || criterion.min < 0)) return 'Nhập giá trị tối thiểu hợp lệ.';
+        if (criterionNeedsMax(criterion.direction) && (criterion.max === undefined || criterion.max < 0)) return 'Nhập giá trị tối đa hợp lệ.';
+        if (criterion.direction === 'between' && (criterion.min ?? 0) > (criterion.max ?? 0)) return 'Khoảng dinh dưỡng cần có tối thiểu nhỏ hơn tối đa.';
+    }
+    return null;
+};
+
+const normalizeNumber = (value: number | null): number | undefined => typeof value === 'number' && Number.isFinite(value) ? Math.round(value * 10) / 10 : undefined;
+
+const getCriterionTone = (nutrient: NutritionGoalNutrientKey): string => {
+    if (nutrient === 'calories') return '#d46b08';
+    if (nutrient === 'protein') return '#1677ff';
+    if (nutrient === 'fiber') return '#389e0d';
+    if (nutrient === 'fat' || nutrient === 'saturatedFat') return '#fa8c16';
+    if (nutrient === 'sugar' || nutrient === 'sodium' || nutrient === 'cholesterol') return '#cf1322';
+    return '#13a8a8';
+};
+
+const getCriterionDirectionLabel = (criterion: NutritionGoalCriterion): string => {
+    if (criterion.direction === 'at_most') return 'Tối đa';
+    if (criterion.direction === 'between') return 'Khoảng';
+    return 'Tối thiểu';
+};
+
+const getCriterionValueLabel = (criterion: NutritionGoalCriterion): string => {
+    if (criterion.direction === 'at_most') return NutritionGoalHelper.formatNutrientValue(criterion.nutrient, criterion.max);
+    if (criterion.direction === 'between') return `${NutritionGoalHelper.formatNutrientValue(criterion.nutrient, criterion.min)} - ${NutritionGoalHelper.formatNutrientValue(criterion.nutrient, criterion.max)}`;
+    return NutritionGoalHelper.formatNutrientValue(criterion.nutrient, criterion.min);
+};
+
+const getGoalMixLabel = (goal: NutritionGoal): string => {
+    const minimumCount = goal.criteria.filter(item => item.direction === 'at_least').length;
+    const maximumCount = goal.criteria.filter(item => item.direction === 'at_most').length;
+    const rangeCount = goal.criteria.filter(item => item.direction === 'between').length;
+    return [`${goal.criteria.length} tiêu chí`, minimumCount > 0 ? `${minimumCount} tối thiểu` : '', maximumCount > 0 ? `${maximumCount} tối đa` : '', rangeCount > 0 ? `${rangeCount} khoảng` : ''].filter(Boolean).join(' · ');
+};
+
+const GoalCriterionTile: React.FunctionComponent<{ criterion: NutritionGoalCriterion }> = ({ criterion }) => {
+    const tone = getCriterionTone(criterion.nutrient);
+    return <Box style={{ border: `1px solid ${tone}22`, borderRadius: 8, background: `${tone}08`, padding: 9, minWidth: 0 }}>
+        <Stack justify='space-between' align='flex-start' gap={6} style={{ marginBottom: 5 }}>
+            <Typography.Text style={{ color: '#111827', fontSize: 12, lineHeight: '16px', fontWeight: 760, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{NutritionGoalHelper.getNutrientLabel(criterion.nutrient)}</Typography.Text>
+            <span style={{ flexShrink: 0, borderRadius: 999, padding: '1px 7px', background: '#fff', color: tone, border: `1px solid ${tone}26`, fontSize: 10, lineHeight: '15px', fontWeight: 800 }}>{getCriterionDirectionLabel(criterion)}</span>
+        </Stack>
+        <Typography.Text strong style={{ display: 'block', color: tone, fontSize: 15, lineHeight: '20px', overflowWrap: 'anywhere' }}>{getCriterionValueLabel(criterion)}</Typography.Text>
+        <Typography.Text type='secondary' style={{ display: 'block', fontSize: 10, lineHeight: '14px', marginTop: 1 }}>/ khẩu phần</Typography.Text>
+    </Box>;
+};
+
+const NutritionGoalCard: React.FunctionComponent<{ goal: NutritionGoal; isAdmin: boolean; onEdit: (goal: NutritionGoal) => void; onDelete: (goal: NutritionGoal) => void }> = ({ goal, isAdmin, onEdit, onDelete }) => {
+    const tone = goal.color ?? '#7436dc';
+    return <Box style={{ border: `1px solid ${tone}22`, borderRadius: 8, background: '#fff', boxShadow: '0 12px 28px rgba(74,48,130,0.09)', minWidth: 0, overflow: 'hidden' }}>
+        <div style={{ height: 4, background: `linear-gradient(90deg, ${tone} 0%, #13a8a8 100%)` }} />
+        <div style={{ padding: 12 }}>
+            <Stack justify='space-between' align='flex-start' gap={10} style={{ marginBottom: 10 }}>
+                <Stack align='flex-start' gap={9} style={{ minWidth: 0 }}>
+                    <span style={{ width: 38, height: 38, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: tone, background: `${tone}14`, border: `1px solid ${tone}24`, flexShrink: 0 }}><Image src={NutritionPlanIcon} preview={false} width={24} alt="" /></span>
+                    <div style={{ minWidth: 0 }}>
+                        <Stack align='center' gap={6} wrap='wrap' style={{ marginBottom: 2 }}>
+                            <Typography.Text strong style={{ display: 'block', fontSize: 16, lineHeight: '21px', color: '#111827', overflowWrap: 'anywhere' }}>{goal.name}</Typography.Text>
+                            <Tag color='purple' style={{ marginInlineEnd: 0 }}>{goal.criteria.length} tiêu chí</Tag>
+                        </Stack>
+                        <Typography.Text type='secondary' style={{ display: 'block', fontSize: 12, lineHeight: '16px' }}>{goal.description || 'Chưa có mô tả mục tiêu.'}</Typography.Text>
+                    </div>
+                </Stack>
+                {isAdmin && <Stack gap={4} style={{ flexShrink: 0 }}>
+                    <ActionButton aria-label={`Sửa ${goal.name}`} icon={<EditOutlined />} shape='circle' onClick={() => onEdit(goal)} style={{ color: tone }} />
+                    <ActionButton tone='danger' aria-label={`Xoá ${goal.name}`} icon={<DeleteOutlined />} shape='circle' onClick={() => onDelete(goal)} />
+                </Stack>}
+            </Stack>
+
+            <Box style={{ border: `1px solid ${tone}16`, borderRadius: 8, background: `${tone}08`, padding: '8px 9px', marginBottom: 10 }}>
+                <Stack align='center' gap={7}>
+                    <CheckCircleOutlined style={{ color: tone, flexShrink: 0 }} />
+                    <Typography.Text style={{ color: '#2f2545', fontSize: 11, lineHeight: '15px', fontWeight: 700 }}>{getGoalMixLabel(goal)}</Typography.Text>
+                </Stack>
+            </Box>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(136px, 1fr))', gap: 8 }}>
+                {goal.criteria.map(criterion => <GoalCriterionTile key={criterion.id} criterion={criterion} />)}
+            </div>
+        </div>
+    </Box>;
+};
+
+export const NutritionGoalsScreen = () => {
+    const dispatch = useDispatch();
+    const goals = useSelector(selectNutritionGoals);
+    const { isAdmin } = useAdminMode();
+    const message = useMessage();
+    const modal = useModal();
+    const [editorOpen, setEditorOpen] = React.useState(false);
+    const [editingGoal, setEditingGoal] = React.useState<NutritionGoal | null>(null);
+    const [draftGoal, setDraftGoal] = React.useState<NutritionGoal>(createDraftGoal);
+    useScreenTitle({ value: 'Dinh dưỡng', deps: [] });
+
+    const openCreate = () => {
+        setDraftGoal(createDraftGoal());
+        setEditingGoal(null);
+        setEditorOpen(true);
+    };
+
+    const openEdit = (goal: NutritionGoal) => {
+        setDraftGoal({ ...goal, criteria: goal.criteria.map(item => ({ ...item })) });
+        setEditingGoal(goal);
+        setEditorOpen(true);
+    };
+
+    const closeEditor = () => {
+        setEditorOpen(false);
+        setEditingGoal(null);
+        setDraftGoal(createDraftGoal());
+    };
+
+    const updateCriterion = (criterionId: string, patch: Partial<NutritionGoalCriterion>) => {
+        setDraftGoal(prev => ({
+            ...prev,
+            criteria: prev.criteria.map(criterion => criterion.id === criterionId ? { ...criterion, ...patch } : criterion),
+        }));
+    };
+
+    const updateCriterionDirection = (criterionId: string, direction: NutritionGoalCriteriaDirection) => {
+        setDraftGoal(prev => ({
+            ...prev,
+            criteria: prev.criteria.map(criterion => {
+                if (criterion.id !== criterionId) return criterion;
+                if (direction === 'at_least') return { ...criterion, direction, min: criterion.min ?? criterion.max ?? 10, max: undefined };
+                if (direction === 'at_most') return { ...criterion, direction, max: criterion.max ?? criterion.min ?? 10, min: undefined };
+                return { ...criterion, direction, min: criterion.min ?? 10, max: criterion.max ?? 20 };
+            }),
+        }));
+    };
+
+    const removeCriterion = (criterionId: string) => {
+        setDraftGoal(prev => ({ ...prev, criteria: prev.criteria.filter(item => item.id !== criterionId) }));
+    };
+
+    const saveGoal = () => {
+        const error = validateGoal(draftGoal);
+        if (error) {
+            message.error(error);
+            return;
+        }
+
+        const now = new Date().toISOString();
+        dispatch(upsertNutritionGoal({
+            ...draftGoal,
+            name: draftGoal.name.trim(),
+            description: draftGoal.description?.trim(),
+            createdAt: editingGoal?.createdAt ?? now,
+            updatedAt: now,
+        }));
+        message.success(editingGoal ? 'Đã cập nhật mục tiêu dinh dưỡng' : 'Đã thêm mục tiêu dinh dưỡng');
+        closeEditor();
+    };
+
+    const confirmDelete = (goal: NutritionGoal) => {
+        modal.confirm({
+            title: 'Xoá mục tiêu dinh dưỡng',
+            content: `Bạn có chắc muốn xoá mục tiêu "${goal.name}"?`,
+            okText: 'Xoá',
+            cancelText: 'Huỷ',
+            centered: true,
+            onOk: () => {
+                dispatch(removeNutritionGoal(goal.id));
+                message.success('Đã xoá mục tiêu dinh dưỡng');
+            },
+        });
+    };
+
+    const confirmReset = () => {
+        modal.confirm({
+            title: 'Khôi phục mục tiêu mặc định',
+            content: 'Thao tác này sẽ thay danh sách mục tiêu hiện tại bằng bộ mặc định.',
+            okText: 'Khôi phục',
+            cancelText: 'Huỷ',
+            centered: true,
+            onOk: () => {
+                dispatch(resetNutritionGoals());
+                message.success('Đã khôi phục mục tiêu mặc định');
+            },
+        });
+    };
+
+    usePageActions(isAdmin ? [
+        { key: 'add-goal', label: 'Thêm mục tiêu', icon: <PlusOutlined />, onClick: openCreate },
+        { key: 'reset-goals', label: 'Khôi phục mặc định', icon: <ReloadOutlined />, onClick: confirmReset },
+    ] : [], [isAdmin]);
+
+    return <Box style={{ display: 'flex', flexDirection: 'column', gap: 12, padding: '0 0 14px', maxWidth: 980, margin: '0 auto' }}>
+        <Box style={{ borderRadius: 8, padding: 14, background: 'linear-gradient(135deg, #8f46f7 0%, #7436dc 58%, #5e2bbf 100%)', color: '#fff', boxShadow: '0 18px 36px rgba(74,48,130,0.24)' }}>
+            <Stack justify='space-between' align='flex-start' gap={12}>
+                <div style={{ minWidth: 0 }}>
+                    <Typography.Text style={{ display: 'block', color: 'rgba(255,255,255,0.82)', fontSize: 12, lineHeight: '16px', fontWeight: 650 }}>My Recipes</Typography.Text>
+                    <Typography.Text strong style={{ display: 'block', color: '#fff', fontSize: 22, lineHeight: '28px' }}>Dinh dưỡng</Typography.Text>
+                    <Typography.Text style={{ display: 'block', color: 'rgba(255,255,255,0.78)', fontSize: 12, lineHeight: '17px', marginTop: 4 }}>Tạo các bộ tiêu chí để gợi ý món ăn theo kcal, đạm, chất béo, chất xơ và vi chất.</Typography.Text>
+                </div>
+            </Stack>
+        </Box>
+
+        <NutritionCalculatorWidget />
+
+        {!isAdmin && <Box style={{ border: '1px solid rgba(116,54,220,0.12)', borderRadius: 8, background: '#fff', padding: 11 }}>
+            <Typography.Text type='secondary' style={{ fontSize: 12, lineHeight: '17px' }}>Bạn có thể xem mục tiêu. Đăng nhập admin để thêm, sửa hoặc xoá mục tiêu dùng chung.</Typography.Text>
+        </Box>}
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))', gap: 12 }}>
+            {goals.map(goal => <NutritionGoalCard key={goal.id} goal={goal} isAdmin={isAdmin} onEdit={openEdit} onDelete={confirmDelete} />)}
+        </div>
+
+        <Modal
+            title={editingGoal ? 'Sửa mục tiêu dinh dưỡng' : 'Thêm mục tiêu dinh dưỡng'}
+            open={editorOpen && isAdmin}
+            onCancel={closeEditor}
+            footer={<Stack justify='flex-end' gap={8}><Button onClick={closeEditor}>Huỷ</Button><Button type='primary' onClick={saveGoal}>Lưu</Button></Stack>}
+            width='min(720px, calc(100vw - 24px))'
+            destroyOnClose={false}
+        >
+            <Stack direction='column' align='stretch' gap={12}>
+                <div>
+                    <Typography.Text strong style={{ display: 'block', fontSize: 12, marginBottom: 5 }}>Tên mục tiêu</Typography.Text>
+                    <Input value={draftGoal.name} onChange={event => setDraftGoal(prev => ({ ...prev, name: event.target.value }))} placeholder='Ví dụ: Giảm mỡ, Giàu đạm buổi trưa...' />
+                </div>
+                <div>
+                    <Typography.Text strong style={{ display: 'block', fontSize: 12, marginBottom: 5 }}>Mô tả</Typography.Text>
+                    <Input.TextArea value={draftGoal.description} onChange={event => setDraftGoal(prev => ({ ...prev, description: event.target.value }))} rows={2} placeholder='Mô tả ngắn để dễ nhớ mục tiêu này dùng khi nào.' />
+                </div>
+                <div>
+                    <Typography.Text strong style={{ display: 'block', fontSize: 12, marginBottom: 6 }}>Màu nhận diện</Typography.Text>
+                    <Stack wrap='wrap' gap={7}>
+                        {goalColors.map(color => <button key={color} type='button' aria-label={`Chọn màu ${color}`} onClick={() => setDraftGoal(prev => ({ ...prev, color }))} style={{ width: 30, height: 30, borderRadius: 999, border: draftGoal.color === color ? '3px solid #111827' : '1px solid #d9d9d9', background: color, cursor: 'pointer' }} />)}
+                    </Stack>
+                </div>
+
+                <Stack justify='space-between' align='center' gap={8}>
+                    <Typography.Text strong>Tiêu chí dinh dưỡng / khẩu phần</Typography.Text>
+                    <ActionButton tone='primary' icon={<PlusOutlined />} onClick={() => setDraftGoal(prev => ({ ...prev, criteria: [...prev.criteria, createCriterion()] }))}>Thêm tiêu chí</ActionButton>
+                </Stack>
+
+                <Stack direction='column' align='stretch' gap={8}>
+                    {draftGoal.criteria.map(criterion => (
+                        <Box key={criterion.id} style={{ border: '1px solid #f0f0f0', borderRadius: 8, padding: 9, background: '#fbf9ff' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(118px, 1fr))', gap: 8, alignItems: 'end' }}>
+                                <div>
+                                    <Typography.Text type='secondary' style={{ display: 'block', fontSize: 11, marginBottom: 3 }}>Chỉ số</Typography.Text>
+                                    <Select
+                                        value={criterion.nutrient}
+                                        onChange={(value: NutritionGoalNutrientKey) => updateCriterion(criterion.id, { nutrient: value })}
+                                        style={{ width: '100%' }}
+                                        options={NutritionGoalHelper.nutrientOptions.map(item => ({ value: item.value, label: item.label }))}
+                                    />
+                                </div>
+                                <div>
+                                    <Typography.Text type='secondary' style={{ display: 'block', fontSize: 11, marginBottom: 3 }}>Điều kiện</Typography.Text>
+                                    <Select
+                                        value={criterion.direction}
+                                        onChange={value => updateCriterionDirection(criterion.id, value)}
+                                        style={{ width: '100%' }}
+                                        options={NutritionGoalHelper.directionOptions.map(item => ({ value: item.value, label: item.label }))}
+                                    />
+                                </div>
+                                <div>
+                                    <Typography.Text type='secondary' style={{ display: 'block', fontSize: 11, marginBottom: 3 }}>Tối thiểu</Typography.Text>
+                                    <NumberStepper
+                                        min={0}
+                                        step={0.5}
+                                        disabled={!criterionNeedsMin(criterion.direction)}
+                                        value={criterion.min}
+                                        onChange={value => updateCriterion(criterion.id, { min: normalizeNumber(value) })}
+                                        style={{ width: '100%' }}
+                                    />
+                                </div>
+                                <div>
+                                    <Typography.Text type='secondary' style={{ display: 'block', fontSize: 11, marginBottom: 3 }}>Tối đa</Typography.Text>
+                                    <NumberStepper
+                                        min={0}
+                                        step={0.5}
+                                        disabled={!criterionNeedsMax(criterion.direction)}
+                                        value={criterion.max}
+                                        onChange={value => updateCriterion(criterion.id, { max: normalizeNumber(value) })}
+                                        style={{ width: '100%' }}
+                                    />
+                                </div>
+                                <ActionButton tone='danger' shape='circle' icon={<DeleteOutlined />} aria-label='Xoá tiêu chí' onClick={() => removeCriterion(criterion.id)} height={34} />
+                            </div>
+                        </Box>
+                    ))}
+                </Stack>
+            </Stack>
+        </Modal>
+    </Box>;
+};

@@ -1,0 +1,56 @@
+import { Image } from "@components/Image";
+import { Box } from "@components/Layout/Box";
+import { Typography } from "@components/Typography";
+import { useScreenTitle } from "@hooks";
+import { DishExpensePlannerWidget } from "@modules/Dishes/Screens/DishesManageIngredient/DishExpensePlanner.widget";
+import { selectDishesById } from "@store/Selectors";
+import React from "react";
+import { useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
+import BudgetIcon from "../../../../assets/icons/budget.png";
+
+export const DishExpensePlannerScreen = () => {
+    useScreenTitle({ value: "Tính chi phí", deps: [] });
+    const dishesById = useSelector(selectDishesById);
+    const [searchParams] = useSearchParams();
+    const initialDishId = searchParams.get("dish") ?? undefined;
+    const initialDishIdsParam = searchParams.get("dishes") ?? "";
+    const initialDishIds = React.useMemo(() => initialDishIdsParam
+        .split(",")
+        .map(item => item.trim())
+        .filter(Boolean), [initialDishIdsParam]);
+    const initialTargetServings = Number(searchParams.get("servings"));
+    const initialDish = initialDishId ? dishesById.get(initialDishId) : undefined;
+    const initialDishes = React.useMemo(() => initialDishIds
+        .map(id => dishesById.get(id))
+        .filter((dish): dish is NonNullable<typeof dish> => Boolean(dish)), [dishesById, initialDishIds]);
+    const normalizedInitialServings = isFinite(initialTargetServings) && initialTargetServings > 0 ? initialTargetServings : undefined;
+
+    return <div data-testid="expense-planner-screen" style={{ display: "flex", flexDirection: "column", gap: 12, paddingBottom: 20 }}>
+        <Box style={{
+            padding: "12px 14px",
+            border: "1px solid #e6f4ff",
+            borderRadius: 8,
+            background: "#f7fbff",
+        }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
+                <Image src={BudgetIcon} preview={false} width={24} />
+                <div style={{ minWidth: 0 }}>
+                    <Typography.Text strong style={{ display: "block", fontSize: 16, lineHeight: "22px" }}>
+                        Tính chi phí
+                    </Typography.Text>
+                    <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "16px" }}>
+                        Ước tính tiền cần mua thêm cho nhiều món theo khẩu phần và tồn kho hiện tại.
+                    </Typography.Text>
+                </div>
+            </div>
+        </Box>
+
+        <DishExpensePlannerWidget
+            initialDish={initialDish}
+            initialDishes={initialDishes}
+            initialTargetServings={normalizedInitialServings}
+            allowDishSelection
+        />
+    </div>
+}

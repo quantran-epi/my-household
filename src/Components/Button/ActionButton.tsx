@@ -1,0 +1,93 @@
+import React, { FC, ReactNode } from 'react';
+import { Button as AntButton } from 'antd';
+
+export type ActionButtonTone = 'default' | 'primary' | 'success' | 'warning' | 'danger';
+
+const TONE_PALETTE: Record<ActionButtonTone, { color: string; border: string }> = {
+    default: { color: '#475569', border: 'rgba(15,23,42,0.18)' },
+    primary: { color: '#0958d9', border: 'rgba(9,88,217,0.30)' },
+    success: { color: '#389e0d', border: 'rgba(56,158,13,0.30)' },
+    warning: { color: '#d46b08', border: 'rgba(212,107,8,0.30)' },
+    danger: { color: '#cf1322', border: 'rgba(207,19,34,0.30)' },
+};
+
+interface ActionButtonProps {
+    tone?: ActionButtonTone;
+    icon?: ReactNode;
+    onClick?: (event: React.MouseEvent<HTMLElement>) => void;
+    disabled?: boolean;
+    loading?: boolean;
+    block?: boolean;
+    children?: ReactNode;
+    height?: number;
+    fontSize?: number;
+    shape?: 'circle';
+    style?: React.CSSProperties;
+    className?: string;
+    'aria-label'?: string;
+    'aria-expanded'?: boolean;
+    htmlType?: 'button' | 'submit' | 'reset';
+}
+
+/**
+ * Standard compact action button used in repeated item action rows.
+ * Compact pill action button with semantic-color-tinted border and neutral background.
+ *
+ * USE for: inline actions inside list items and repeated item rows.
+ *
+ * DO NOT use for: page header primary CTAs, search/filter input affordances,
+ * modal footer buttons, close/cancel/save actions, form submit buttons, section CTAs,
+ * mid-flow primary actions, page-header buttons, search affordances.
+ *
+ * See `.planning/quick/260612-uxn-ui-ux-list-and-button-normalization/` for the contract.
+ */
+export const ActionButton: FC<ActionButtonProps> = ({
+    tone = 'default',
+    icon,
+    onClick,
+    disabled,
+    loading,
+    block,
+    children,
+    height = 28,
+    fontSize = 11,
+    shape,
+    style,
+    className,
+    htmlType,
+    'aria-label': ariaLabel,
+    'aria-expanded': ariaExpanded,
+}) => {
+    const palette = TONE_PALETTE[tone];
+    const iconOnly = Boolean(icon) && React.Children.count(children) === 0;
+    const circleStyle = iconOnly && shape === 'circle'
+        ? { width: height, padding: 0, borderRadius: 999 }
+        : {};
+    return <AntButton
+        onClick={onClick}
+        disabled={disabled}
+        loading={loading}
+        block={block}
+        icon={icon}
+        className={className}
+        htmlType={htmlType}
+        aria-label={ariaLabel}
+        aria-expanded={ariaExpanded}
+        style={{
+            height,
+            padding: '0 9px',
+            borderRadius: 999,
+            color: palette.color,
+            borderColor: palette.border,
+            fontWeight: 650,
+            fontSize,
+            lineHeight: '16px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 5,
+            ...circleStyle,
+            ...style,
+        }}
+    >{children}</AntButton>;
+};
