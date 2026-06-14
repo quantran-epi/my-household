@@ -7,6 +7,7 @@ This milestone reframes existing capability — it does not build a new app. The
 ## Phases
 
 **Phase Numbering:**
+
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
@@ -22,92 +23,115 @@ Decimal phases appear between their surrounding integers in numeric order.
 ## Phase Details
 
 ### Phase 1: Copy Infrastructure
+
 **Goal**: A single typed source of truth for user-facing Vietnamese copy exists and enforces consistent terminology, so every later screen is written through it instead of hand-editing ~408 inline strings twice.
 **Depends on**: Nothing (first phase)
 **Requirements**: COPY-01, COPY-02
 **Success Criteria** (what must be TRUE):
+
   1. A typed `AppCopy` module is the source of truth for user-facing Vietnamese strings, with a derived key union that fails the build on an unknown key.
   2. Interpolated strings are exposed as functions so dynamic values cannot be dropped during migration.
   3. A glossary defines one Vietnamese term per concept, and reviewing it surfaces any synonym conflicts before screens are reworded.
-**Plans**: 1 plan
 
+**Plans**: 1 plan
 Plans:
+
 - [ ] 01-01-PLAN.md — Typed `AppCopy` module (nested namespaces, derived `CopyKey` union, named-arg interpolation), review-only `COPY_GLOSSARY`, `@common/Copy` barrel + ripgrep migration recipe + build-gate proof
 
 ### Phase 2: Shell Safety & Extraction
+
 **Goal**: The app shell is crash-contained and decomposed so journey, nav, and mobile work can proceed without destabilizing the whole app — separating "pure move, verified identical" from any behavior change.
 **Depends on**: Phase 1 (sequenced; no hard dependency)
 **Requirements**: FND-01, FND-02
 **Success Criteria** (what must be TRUE):
+
   1. A top-level error boundary catches a thrown render error and shows a recovery UI instead of white-screening the whole app.
   2. The bottom-tab navigator, cooking pill, and data backup are extracted from `MasterPage.tsx` into `src/Routing/Shell/`, with pill, nav, drawer, search, and backup behaving identically to before.
   3. A reachability inventory lists every pre-refactor route and its entry path, ready to gate later nav changes.
   4. A `@components/Sheet` wrapper over antd `Drawer placement="bottom"` is available for pickers and confirmations.
+
 **Plans**: TBD
 
 Plans:
+
 - [ ] 02-01: TBD
 
 ### Phase 3: Wizard State Slice
+
 **Goal**: Wizard progress and answers live in persisted state that survives the app's forced reloads, exposed only through selectors and testable before any UI exists.
 **Depends on**: Phase 2
 **Requirements**: FND-03, WIZ-06
 **Success Criteria** (what must be TRUE):
+
   1. Wizard step and answers live in an RTK slice under the existing `personal` persisted root (no new persisted root), read via selectors with no raw state access.
   2. Each answer is committed to the slice per step, so a forced reload (Gist sync or service-worker update) mid-flow preserves prior answers.
   3. On mount the wizard rehydrates and resumes from the last committed step.
   4. Characterization tests pin current `DishScorer` output so later changes cannot silently regress suggestions.
+
 **Plans**: TBD
 
 Plans:
+
 - [ ] 03-01: TBD
 
 ### Phase 4: Wizard UI & Hero Entry
+
 **Goal**: A first-time user can go from Home to a scheduled meal through a guided, skippable wizard — the milestone's named success metric — while every existing route stays reachable.
 **Depends on**: Phase 3
 **Requirements**: WIZ-01, WIZ-02, WIZ-03, WIZ-04, WIZ-05, WIZ-07, NAV-01, NAV-02, NAV-03, NAV-04
 **Success Criteria** (what must be TRUE):
+
   1. Home shows one obvious "Hôm nay ăn gì?" hero entry that starts meal planning, and primary entry points are reframed from admin-style screens to the guided journey.
   2. Planning runs one question per screen with visible progress and a back action, and every step is skippable with a sensible "Tùy bạn" default.
   3. The result step always yields at least one actionable dish (full-catalog fallback, or routes to "add your first dish" on an empty catalog), and the user can add the chosen dish to today's meals.
   4. A first-timer with empty data reaches a scheduled meal unaided, verified by a cold-start end-to-end run (empty IndexedDB → wizard → scheduled meal).
   5. Every pre-refactor route stays reachable within ~3 taps or via global search; the bottom-nav center action opens the wizard while the existing suggester stays reachable.
+
 **Plans**: TBD
 **UI hint**: yes
 
 Plans:
+
 - [ ] 04-01: TBD
 
 ### Phase 5: Mobile Tuning & Copy Rollout
+
 **Goal**: The guided journey is comfortable on a phone and all user-facing copy reads natural in Vietnamese, without regressing the desktop experience.
 **Depends on**: Phase 4
 **Requirements**: MOB-01, MOB-02, MOB-03, MOB-04, COPY-03, COPY-04, COPY-05
 **Success Criteria** (what must be TRUE):
+
   1. Journey screens use a phone-first layout with primary CTAs in the thumb zone and interactive controls at ~44px touch targets.
   2. Pickers and confirmations use the bottom-sheet pattern, and the desktop layout shows no regression.
   3. Inline user-facing strings across modules and navigation reference `AppCopy`, with no remaining hardcoded user-facing strings.
   4. All labels and descriptions read natural to a local Vietnamese user, with no English or technical-jargon leftovers.
   5. Journey screens show inviting, friendly empty-states instead of blank or technical messages.
+
 **Plans**: TBD
 **UI hint**: yes
 
 Plans:
+
 - [ ] 05-01: TBD
 
 ### Phase 6: Differentiator Enhancements
+
 **Goal**: After the base journey is validated, add optional steps and conveniences that deepen the journey, reusing the same selectors and components. Carries v2 requirements only — not part of v1 coverage; gated behind v1 validation.
 **Depends on**: Phase 5
 **Requirements**: WIZ2-01, WIZ2-02, WIZ2-03, WIZ2-04, WIZ2-05 (v2 — deferred, post-validation)
 **Success Criteria** (what must be TRUE):
+
   1. User can set "who's eating?" portions, reusing household config.
   2. User can optionally filter to "can cook now" using current inventory.
   3. From the result, user can add a missing ingredient to Đi chợ inline.
   4. The wizard remembers last session's answers as defaults.
   5. Each suggestion shows a one-line "why this dish" reason. (Defer the "time/effort" step — blocked on a dish attribute that may not exist.)
+
 **Plans**: TBD
 **UI hint**: yes
 
 Plans:
+
 - [ ] 06-01: TBD
 
 ## Progress
