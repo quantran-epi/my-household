@@ -50,11 +50,21 @@ Plans:
   3. A reachability inventory lists every pre-refactor route and its entry path, ready to gate later nav changes.
   4. A `@components/Sheet` wrapper over antd `Drawer placement="bottom"` is available for pickers and confirmations.
 
-**Plans**: TBD
-
+**Plans**: 5 plans
 Plans:
+**Wave 1**
 
-- [ ] 02-01: TBD
+- [ ] 02-01-PLAN.md — Wave 0: repair the stale shell e2e baseline + add cooking-pill/bottom-tab coverage so the before/after identity proof is trustworthy (FND-02)
+- [ ] 02-02-PLAN.md — Top-level error boundary around RootRouter with a themed Vietnamese reload fallback, proven by a render-throw e2e spec (FND-01)
+- [ ] 02-03-PLAN.md — `@components/Sheet` bottom-sheet wrapper on the FastOverlay system (D-09) + jest smoke proof, no consumer migration (MOB-03 build-only)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 02-04-PLAN.md — Pure-move extraction of PageActionsMenu, BottomTabNavigator, CookingPill + shared shellStyles into `src/Routing/Shell/`, verified identical by the 02-01 baseline (FND-02)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 02-05-PLAN.md — Move SidebarDrawer intact + dead DataBackup (flagged), collapse MasterPage to a thin composition root, write ROUTE-INVENTORY.md, full baseline re-run (FND-02)
 
 ### Phase 3: Wizard State Slice
 
@@ -142,7 +152,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Copy Infrastructure | 1/1 | Complete    | 2026-06-14 |
-| 2. Shell Safety & Extraction | 0/TBD | Not started | - |
+| 2. Shell Safety & Extraction | 0/5 | Not started | - |
 | 3. Wizard State Slice | 0/TBD | Not started | - |
 | 4. Wizard UI & Hero Entry | 0/TBD | Not started | - |
 | 5. Mobile Tuning & Copy Rollout | 0/TBD | Not started | - |
