@@ -109,6 +109,10 @@ export const RootRoutes = {
     StaticRoutes: {
         Error: '/error',
         NotFound: '*',
-        Unauthorized: "/unauthorized"
+        Unauthorized: "/unauthorized",
+        // Test-only: renders a component that throws during render so the e2e suite
+        // can prove the top-level ErrorBoundary shows the recovery UI (FND-01).
+        // Not linked from any user-facing nav (threat T-02-CT).
+        CrashTest: '/__crash-test'
     }
 }
