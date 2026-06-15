@@ -29,7 +29,13 @@ export const seedApp = async (page: Page, options: SeedAppOptions = {}) => {
   await page.goto('/');
   await page.evaluate(async ({ shared, personal, syncCheckState, syncCheckIntervalMs }) => {
     const openAppDb = () => new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open('my-recipes', 1);
+      // Open at the DB's current version (no fixed version): the app boots during the
+      // preceding page.goto('/') and localforage lazily bumps the IndexedDB version when
+      // it creates the blob-support store, so a hard-coded `version 1` open races into a
+      // VersionError ("requested version (1) is less than the existing version (2)").
+      // Omitting the version opens whatever exists, and still creates the stores on a
+      // brand-new DB (onupgradeneeded fires at version 1).
+      const request = indexedDB.open('my-recipes');
       request.onupgradeneeded = () => {
         const db = request.result;
         if (!db.objectStoreNames.contains('app_storage')) db.createObjectStore('app_storage');
@@ -54,6 +60,13 @@ export const seedApp = async (page: Page, options: SeedAppOptions = {}) => {
 
     localStorage.clear();
     sessionStorage.clear();
+
+    // MasterPage redirects to the welcome/onboarding screen on every navigation until this
+    // flag is set (isUserGuideWelcomeComplete reads it from localStorage). Because the seed
+    // clears localStorage above, every seeded page would otherwise boot into onboarding and
+    // never reach the requested route. Mark the welcome flow complete so specs land on their
+    // target route directly. Keep in sync with USER_GUIDE_WELCOME_STORAGE_KEY.
+    localStorage.setItem('my-recipes-welcome-complete-v1', '1');
 
     const sharedPersist = JSON.stringify({
       ingredient: JSON.stringify(shared.ingredient),
