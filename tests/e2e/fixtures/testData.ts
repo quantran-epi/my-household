@@ -73,6 +73,9 @@ export const TEST_IDS = {
   scheduledMeals: {
     today: 'meal-today-regression',
   },
+  cookingSessions: {
+    active: 'cooking-session-com-ga-regression',
+  },
 } as const;
 
 const todayAtNoon = (offsetDays = 0): string => {
@@ -348,7 +351,20 @@ export const createRegressionSeed = () => {
         }],
         selectedMeals: [],
       },
-      cookingSession: { sessions: [] },
+      cookingSession: {
+        sessions: [{
+          id: TEST_IDS.cookingSessions.active,
+          dishId: TEST_IDS.dishes.comGa,
+          dishName: 'Com ga regression',
+          baseServings: 2,
+          targetServings: 2,
+          startedAt: todayAtNoon(0),
+          status: 'cooking',
+          steps: ['So che ga va uop gia vi.', 'Nau com va ap chao ga den khi chin.'],
+          currentStepIndex: 0,
+          completedStepIndexes: [],
+        }],
+      },
     },
   };
 };
