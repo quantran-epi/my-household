@@ -14,7 +14,7 @@ This milestone reframes existing capability — it does not build a new app. The
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Copy Infrastructure** - Typed `AppCopy` source of truth + glossary, before any rewording (completed 2026-06-14)
-- [ ] **Phase 2: Shell Safety & Extraction** - Error boundary, decompose `MasterPage.tsx`, route reachability inventory, `Sheet` wrapper
+- [x] **Phase 2: Shell Safety & Extraction** - Error boundary, decompose `MasterPage.tsx`, route reachability inventory, `Sheet` wrapper (completed 2026-06-15)
 - [ ] **Phase 3: Wizard State Slice** - Resume-safe RTK slice in the `personal` root, selectors, scorer characterization tests
 - [ ] **Phase 4: Wizard UI & Hero Entry** - Guided journey from Home to a scheduled meal, nav reframe with no lost routes
 - [ ] **Phase 5: Mobile Tuning & Copy Rollout** - Phone-first journey + app-wide Vietnamese copy migration, desktop intact
@@ -64,7 +64,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 02-05-PLAN.md — Move SidebarDrawer intact + dead DataBackup (flagged), collapse MasterPage to a thin composition root, write ROUTE-INVENTORY.md, full baseline re-run (FND-02)
+- [x] 02-05-PLAN.md — Move SidebarDrawer intact + dead DataBackup (flagged), collapse MasterPage to a thin composition root, write ROUTE-INVENTORY.md, full baseline re-run (FND-02)
 
 ### Phase 3: Wizard State Slice
 
@@ -152,7 +152,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Copy Infrastructure | 1/1 | Complete    | 2026-06-14 |
-| 2. Shell Safety & Extraction | 4/5 | In Progress|  |
+| 2. Shell Safety & Extraction | 5/5 | Complete   | 2026-06-15 |
 | 3. Wizard State Slice | 0/TBD | Not started | - |
 | 4. Wizard UI & Hero Entry | 0/TBD | Not started | - |
 | 5. Mobile Tuning & Copy Rollout | 0/TBD | Not started | - |
