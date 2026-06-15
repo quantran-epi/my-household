@@ -64,6 +64,16 @@
       "react-app/jest"
     ]
   },
+  "jest": {
+    "moduleNameMapper": {
+      "^@components/(.*)$": "<rootDir>/src/Components/$1",
+      "^@modules/(.*)$": "<rootDir>/src/Modules/$1",
+      "^@routing/(.*)$": "<rootDir>/src/Routing/$1",
+      "^@store/(.*)$": "<rootDir>/src/Store/$1",
+      "^@common/(.*)$": "<rootDir>/src/Common/$1",
+      "^@hooks$": "<rootDir>/src/Hooks/index"
+    }
+  },
   "browserslist": {
     "production": [
       ">0.2%",

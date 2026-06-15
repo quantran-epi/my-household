@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 
 type FastOverlaySize = number | string;
 
-type FastOverlayBaseProps = {
+export type FastOverlayBaseProps = {
     open: boolean;
     title: React.ReactNode;
     onClose: () => void;
@@ -14,6 +14,10 @@ type FastOverlayBaseProps = {
     closable?: boolean;
     keyboard?: boolean;
     "data-testid"?: string;
+};
+
+export type SheetProps = FastOverlayBaseProps & {
+    height?: FastOverlaySize;
 };
 
 type FastModalShellProps = FastOverlayBaseProps & {
@@ -44,6 +48,7 @@ const overlayMotionEase = "cubic-bezier(0.16, 1, 0.3, 1)";
 const backdropInAnimation = `my-recipes-fast-overlay-fade-in 120ms ${overlayMotionEase} both`;
 const modalInAnimation = `my-recipes-fast-modal-in 150ms ${overlayMotionEase} both`;
 const drawerInAnimation = `my-recipes-fast-drawer-in 150ms ${overlayMotionEase} both`;
+const sheetInAnimation = `my-recipes-fast-sheet-in 180ms ${overlayMotionEase} both`;
 let nextOverlayStackToken = 1;
 let activeOverlayStackTokens: number[] = [];
 
@@ -108,6 +113,7 @@ const overlayMotionStyles = <style>{`
 @keyframes my-recipes-fast-overlay-fade-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes my-recipes-fast-modal-in { from { opacity: 0; transform: translate3d(0, 8px, 0) scale(0.986); } to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); } }
 @keyframes my-recipes-fast-drawer-in { from { opacity: 0.96; transform: translate3d(-14px, 0, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
+@keyframes my-recipes-fast-sheet-in { from { opacity: 0; transform: translate3d(0, 24px, 0); } to { opacity: 1; transform: translate3d(0, 0, 0); } }
 @media (prefers-reduced-motion: reduce) {
   .my-recipes-fast-overlay,
   .my-recipes-fast-overlay * { animation-duration: 1ms !important; transition-duration: 1ms !important; }
@@ -298,6 +304,79 @@ export const FastDrawerShell: React.FunctionComponent<FastDrawerShellProps> = ({
                     {children}
                 </div>
             </aside>
+        </div>,
+        document.body,
+    );
+};
+
+export const Sheet: React.FunctionComponent<SheetProps> = ({
+    open,
+    title,
+    onClose,
+    children,
+    height,
+    zIndex,
+    maskClosable = true,
+    closable = true,
+    keyboard = true,
+    "data-testid": testId,
+}) => {
+    useBodyScrollLock(open);
+    useEscapeClose(open && keyboard, onClose);
+    const resolvedZIndex = useResolvedOverlayZIndex(open, zIndex, 1200);
+
+    if (!open) return null;
+
+    return createPortal(
+        <div
+            className="my-recipes-fast-overlay"
+            style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: resolvedZIndex,
+                display: "flex",
+                alignItems: "flex-end",
+                justifyContent: "center",
+                background: "rgba(16, 24, 40, 0.30)",
+                animation: backdropInAnimation,
+                willChange: "opacity",
+            }}
+            onMouseDown={(event) => {
+                if (maskClosable && event.target === event.currentTarget) onClose();
+            }}
+        >
+            {overlayMotionStyles}
+            <section
+                role="dialog"
+                aria-modal="true"
+                data-testid={testId}
+                style={{
+                    width: "100%",
+                    maxWidth: 720,
+                    maxHeight: toCssSize(height, "min(85vh, 720px)"),
+                    display: "flex",
+                    flexDirection: "column",
+                    overflow: "hidden",
+                    borderTop: "1px solid rgba(232, 237, 245, 0.96)",
+                    borderRadius: "18px 18px 0 0",
+                    background: "linear-gradient(180deg, #f5f0ff 0%, #ffffff 42%)",
+                    boxShadow: "0 -16px 48px rgba(74, 48, 130, 0.24)",
+                    animation: sheetInAnimation,
+                    transformOrigin: "bottom center",
+                    willChange: "opacity, transform",
+                }}
+                onMouseDown={(event) => event.stopPropagation()}
+            >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "14px 14px 12px 16px", borderBottom: "1px solid rgba(116, 54, 220, 0.10)", background: "rgba(255,255,255,0.72)" }}>
+                    <div style={shellTitleStyle}>{title}</div>
+                    {closable && <button type="button" aria-label="Đóng" onClick={onClose} style={closeButtonStyle}>
+                        <CloseOutlined />
+                    </button>}
+                </div>
+                <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: 16, display: "flex", flexDirection: "column" }}>
+                    {children}
+                </div>
+            </section>
         </div>,
         document.body,
     );
