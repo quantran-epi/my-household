@@ -101,6 +101,10 @@ None - no external service configuration required.
 - `ROUTE-INVENTORY.md` is ready as the Phase 4 reachability gate (NAV-02 / NAV-03). Programmatic-only routes (`/smart-meal-planner`, `/scheduledMeal/dish-count-templates`, the three detail routes, the guide redirects) are flagged as depending on ~3-tap / search reachability.
 - Carried-forward (out of scope this phase): the dead `DataBackup` hardcoded GitHub raw URL (T-02-DB) and reload-as-recovery idiom remain flagged for a separate follow-up.
 
+## Self-Check: PASSED
+
+All created files verified present on disk (`src/Routing/Shell/SidebarDrawer.tsx`, `src/Routing/Shell/DataBackup.tsx`, `src/Routing/MasterPage.tsx`, `ROUTE-INVENTORY.md`, `02-05-SUMMARY.md`) and all task commits verified in git history (`a7e3347`, `7dd31f2`, `76e43cd`, `80089f2`).
+
 ---
 *Phase: 02-shell-safety-extraction*
 *Completed: 2026-06-15*
