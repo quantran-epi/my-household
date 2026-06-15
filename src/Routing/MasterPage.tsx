@@ -1,4 +1,4 @@
-import { CloudDownloadOutlined, CloudUploadOutlined, DatabaseOutlined, ExportOutlined, ImportOutlined, LockOutlined, MedicineBoxOutlined, MenuOutlined, MoreOutlined, UnlockOutlined, FireOutlined, QuestionCircleOutlined, SearchOutlined, LoadingOutlined, SyncOutlined, SettingOutlined } from "@ant-design/icons";
+import { CloudDownloadOutlined, CloudUploadOutlined, DatabaseOutlined, ExportOutlined, ImportOutlined, LockOutlined, MedicineBoxOutlined, MenuOutlined, UnlockOutlined, FireOutlined, QuestionCircleOutlined, SearchOutlined, LoadingOutlined, SyncOutlined, SettingOutlined } from "@ant-design/icons";
 import { ObjectPropertyHelper } from "@common/Helpers/ObjectProperty";
 import { getStorageString, setStorageString } from "@common/Storage/AppStorage";
 import { SharedSyncModal } from "@components/AppInitializer/SharedSyncModal";
@@ -26,7 +26,7 @@ import { GlobalSearchScreen } from "@modules/Home/Screens/GlobalSearch.screen";
 import { isUserGuideWelcomeComplete } from "@modules/Home/Screens/UserGuideOnboardingStorage";
 import { selectCookingSessions, selectCurrentFeatureName, selectDishesById, selectInventoryHealthConfig } from "@store/Selectors";
 import { NumberStepper } from "@components/Form/NumberStepper";
-import { Flex, Input as AntInput, Layout, Divider, Dropdown } from "antd";
+import { Flex, Input as AntInput, Layout, Divider } from "antd";
 import React, { useState } from "react";
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useDispatch, useSelector } from "react-redux";
@@ -52,8 +52,9 @@ import { INGREDIENT_PRESERVATION_OPTIONS, INGREDIENT_SHELF_LIFE_OPTIONS, Ingredi
 import { DEFAULT_INVENTORY_HEALTH_CONFIG, InventoryHealthConfig, normalizeInventoryHealthConfig } from "@store/Models/SharedConfig";
 import { updateInventoryConfig } from "@store/Reducers/SharedConfigReducer";
 import { AppShellNavigationProvider, useAppShellNavigation, useAppShellNavigationController } from "./AppShellNavigationContext";
-import { usePageActionsState } from "./PageActionsContext";
 import { RootRoutes } from "./RootRoutes";
+import { PageActionsMenu } from "./Shell/PageActionsMenu";
+import { headerActionButtonStyle } from "./Shell/shellStyles";
 
 const layoutStyles: React.CSSProperties = {
     height: "100%"
@@ -89,19 +90,6 @@ const sidebarNavSectionLabelStyle: React.CSSProperties = {
 };
 
 const APP_CONFIRM_Z_INDEX = 5200;
-
-const headerActionButtonStyle: React.CSSProperties = {
-    width: 38,
-    height: 38,
-    borderRadius: 999,
-    background: "rgba(255,255,255,0.16)",
-    border: "1px solid rgba(255,255,255,0.24)",
-    color: "#fff",
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "inset 0 1px 0 rgba(255,255,255,0.18)",
-};
 
 type HeaderVisual = {
     tone: string;
@@ -294,33 +282,6 @@ export const MasterPage = () => {
             {toggleSearch.value && <GlobalSearchScreen open={toggleSearch.value} onClose={toggleSearch.hide} onNavigate={appShellNavigation.navigateWithFeedback} />}
         </Layout>
     </AppShellNavigationProvider>
-}
-
-const PageActionsMenu = () => {
-    const actions = usePageActionsState();
-    if (actions.length === 0) return null;
-    return <Dropdown
-        trigger={["click"]}
-        placement="bottomRight"
-        menu={{
-            items: actions.map(action => ({
-                key: action.key,
-                label: action.label,
-                icon: action.icon,
-                danger: action.danger,
-                disabled: action.disabled,
-                onClick: action.onClick,
-            })),
-        }}
-    >
-        <Button
-            type="text"
-            aria-label="Thao tác trang"
-            data-testid="page-actions-button"
-            icon={<MoreOutlined style={{ fontSize: 20 }} />}
-            style={headerActionButtonStyle}
-        />
-    </Dropdown>;
 }
 
 const SidebarDrawer = ({ buttonStyle }: { buttonStyle?: React.CSSProperties }) => {
