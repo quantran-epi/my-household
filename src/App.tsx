@@ -12,6 +12,7 @@ import 'moment/locale/vi';
 import { MessageProvider } from '@components/Message';
 import { ModalProvider } from '@components/Modal/ModalProvider';
 import { AppInitializer } from '@components/AppInitializer/AppInitializer';
+import { ErrorBoundary } from '@components/ErrorBoundary';
 
 dayjs.locale('vi');
 moment.locale('vi');
@@ -44,7 +45,9 @@ function App() {
           <Provider store={store}>
             <PersistGate loading={null} persistor={persistor}>
               <AppInitializer>
-                <RootRouter />
+                <ErrorBoundary>
+                  <RootRouter />
+                </ErrorBoundary>
               </AppInitializer>
             </PersistGate>
           </Provider>

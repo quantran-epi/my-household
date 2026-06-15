@@ -37,6 +37,15 @@ const UserGuideWelcomeScreen = React.lazy(() => import("@modules/Home/Screens/Us
 
 const RouteLoadingFallback = () => <div style={{ padding: 12, color: '#6b6478', fontSize: 13 }}>Đang mở hướng dẫn...</div>;
 
+// Test-only component: throws during render (not in an event handler) so the e2e
+// suite can prove the top-level ErrorBoundary shows the recovery UI (FND-01).
+// React error boundaries only catch render/lifecycle errors, so the throw must
+// happen in the render body. Registered inside the MasterPage layout tree to
+// prove shell containment; NOT linked from any user-facing nav (threat T-02-CT).
+const CrashTestScreen = () => {
+    throw new Error('crash-test');
+};
+
 export const RootRouter = () => {
     return <BrowserRouter basename="/my-recipes">
         <Routes>
@@ -73,6 +82,7 @@ export const RootRouter = () => {
                     <Route path={RootRoutes.AuthorizedRoutes.ScheduledMealRoutes.PrepTasks()} element={<PrepTasksScreen />} />
                     <Route path={RootRoutes.AuthorizedRoutes.ScheduledMealRoutes.Templates()} element={<SmartPlannerTemplatesScreen />} />
                 </Route>
+                <Route path={RootRoutes.StaticRoutes.CrashTest} element={<CrashTestScreen />} />
             </Route>
         </Routes>
     </BrowserRouter>
