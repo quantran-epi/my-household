@@ -376,14 +376,16 @@ See Pattern 1 (error boundary) and Pattern 2 (`Sheet` on `FastOverlay`) above �
 | A2 | Co-locating `Sheet` in `FastOverlay.tsx` (vs exporting the singletons) is acceptable given Claude's discretion over `Sheet`'s layout | Pattern 2 / Pitfall 3 | Low — both options preserve the shared stack; this is a structural preference, not a correctness issue. |
 | A3 | `DataBackup` is genuinely dead (safe to flag rather than wire up) | D-06 finding | Low — grep across `src/` returned exactly one match (the definition). If a dynamic/string-based import existed it would not show, but none is plausible for a named React export. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Is the `app-shell-navigation.spec.ts` mismatch a stale spec or an intended target design?**
+   - **RESOLVED — fix spec-to-source per the phase's "verified identical" contract; baseline observed first in 02-01 Task 1.** The extraction proves behavioral identity against current source, so source is the source of truth. 02-01 Task 1 runs the spec on a clean checkout to observe the real pass/fail baseline, then repairs the stale assertions to match source before any extraction begins.
    - What we know: The spec's expected strings ("Kế hoạch chi phí", tools-region backup labels) do not match current `MasterPage.tsx` source.
    - What's unclear: Whether the spec was written against a previous shell version, or against a design that was never implemented.
    - Recommendation: Wave 0 runs `yarn test:e2e tests/e2e/app-shell-navigation.spec.ts` on the clean checkout to observe actual failures, then the planner adds a `checkpoint:human-verify` (or reconciliation task) to decide fix-spec-to-source vs source-to-spec before extraction. Default assumption: fix spec to match source (extraction is "verified identical", so source is the source of truth).
 
 2. **`DataBackup` disposition (D-06).**
+   - **RESOLVED — keep + flag per locked decision D-06 (implemented in 02-05 Task 2).** Move `DataBackup` into `Shell/DataBackup.tsx` preserving the export, add a code comment flagging it as currently-unused with a hardcoded GitHub raw URL, and note it in ROUTE-INVENTORY.md; do NOT delete this phase.
    - What we know: Dead export, hardcoded GitHub raw URL, only self-reference in the tree.
    - What's unclear: Whether the owner wants it kept (move + preserve export, flag URL for follow-up) or removed.
    - Recommendation: Per D-06, move it to `Shell/DataBackup.tsx` preserving the export and add a code comment + inventory note flagging it as unused with a hardcoded URL; do NOT delete in this phase. A `checkpoint:human-verify` to confirm "keep vs delete" is appropriate.
