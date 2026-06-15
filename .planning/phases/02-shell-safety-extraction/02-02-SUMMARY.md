@@ -118,6 +118,16 @@ None - no external service configuration required.
 - Crash containment (FND-01) is in place: shell chrome render errors now show a recovery UI instead of white-screening, so subsequent journey/nav/mobile and extraction work can proceed under a safety net.
 - Heads-up for the extraction plans: resolve the `seedApp` IndexedDB version race before relying on the seeded shell specs as the D-07 green baseline.
 
+## Self-Check: PASSED
+
+- FOUND: src/Components/ErrorBoundary/ErrorBoundary.tsx
+- FOUND: src/Components/ErrorBoundary/index.ts
+- FOUND: tests/e2e/error-boundary.spec.ts
+- FOUND: .planning/phases/02-shell-safety-extraction/02-02-SUMMARY.md
+- FOUND commit: 3f3f367 (Task 1)
+- FOUND commit: 40873f1 (Task 2)
+- FOUND commit: e6d64ae (SUMMARY)
+
 ---
 *Phase: 02-shell-safety-extraction*
 *Completed: 2026-06-15*
