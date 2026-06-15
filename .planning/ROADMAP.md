@@ -78,11 +78,17 @@ Plans:
   3. On mount the wizard rehydrates and resumes from the last committed step.
   4. Characterization tests pin current `DishScorer` output so later changes cannot silently regress suggestions.
 
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
+**Wave 1**
 
-- [ ] 03-01: TBD
+- [ ] 03-01-PLAN.md — `WizardState` model + `WizardReducer` RTK slice (per-step commit, advance/back, resume no-op, restart, complete) + reducer unit tests (FND-03, WIZ-06)
+- [ ] 03-02-PLAN.md — `DishScorer` characterization tests pinning current output of all 5 methods against deterministic fixtures (WIZ-06)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-03-PLAN.md — Register `wizard` under `personalReducer` (no new persist root) + `selectWizard*` selector family with defensive defaults — sole read path (FND-03)
 
 ### Phase 4: Wizard UI & Hero Entry
 
@@ -153,7 +159,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Copy Infrastructure | 1/1 | Complete    | 2026-06-14 |
 | 2. Shell Safety & Extraction | 5/5 | Complete   | 2026-06-15 |
-| 3. Wizard State Slice | 0/TBD | Not started | - |
+| 3. Wizard State Slice | 0/3 | Not started | - |
 | 4. Wizard UI & Hero Entry | 0/TBD | Not started | - |
 | 5. Mobile Tuning & Copy Rollout | 0/TBD | Not started | - |
 | 6. Differentiator Enhancements | 0/TBD | Deferred | - |
