@@ -1,5 +1,5 @@
-import Compact from 'antd/es/space/Compact';
-import React, { FunctionComponent } from 'react';
+import { Space as AntSpace } from 'antd';
+import React from 'react';
 import { ISpaceProps, Space } from '../Space';
 
 interface IStackProps {
@@ -17,7 +17,7 @@ interface IStackProps {
 }
 
 type StackCompoundComponent = React.FunctionComponent<IStackProps> & {
-    Compact: typeof Compact;
+    Compact: typeof AntSpace.Compact;
 }
 
 const Stack: StackCompoundComponent = ({
@@ -51,6 +51,6 @@ const Stack: StackCompoundComponent = ({
     </Space>
 }
 
-Stack.Compact = Compact
+Stack.Compact = AntSpace.Compact
 
 export { Stack }
