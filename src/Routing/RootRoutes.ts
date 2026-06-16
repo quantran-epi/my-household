@@ -2,6 +2,7 @@ import IngredientRoutes from '@modules/Ingredient/Routing/IngredientRouteConfig'
 import DishesRoutes from '@modules/Dishes/Routing/DishesRouteConfig';
 import ShoppingListRoutes from '@modules/ShoppingList/Routing/ShoppingListRouteConfig';
 import ScheduledMealRoutes from '@modules/ScheduledMeal/Routing/ScheduledMealRouteConfig';
+import MealPlanningRoutes from '@modules/MealPlanning/Routing/MealPlanningRouteConfig';
 import { RouteHelpers } from '@common/Helpers/RouteHelper';
 
 const ExpensePlanner = (dishId?: string | string[], targetServings?: number) => {
@@ -101,7 +102,8 @@ const AuthorizedRoutes = {
     IngredientRoutes,
     DishesRoutes,
     ShoppingListRoutes,
-    ScheduledMealRoutes
+    ScheduledMealRoutes,
+    MealPlanningRoutes
 }
 
 export const RootRoutes = {
