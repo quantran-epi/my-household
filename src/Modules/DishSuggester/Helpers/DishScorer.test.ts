@@ -1,5 +1,7 @@
 import { DishScorer, ScoredDish } from './DishScorer';
 import type { Dishes, DishesIngredientAmount } from '@store/Models/Dishes';
+import type { Ingredient, IngredientInventory } from '@store/Models/Ingredient';
+import { DEFAULT_HOUSEHOLD_PREFERENCE_PROFILE } from '@store/Reducers/AppContextReducer';
 
 const emptyDuration = {
     unfreeze: null,
@@ -64,6 +66,75 @@ const makeScoredDish = (id: string, score: number, missingIngredientIds: string[
     missingIngredientIds,
     ...(cookNowScore === undefined ? {} : { cookNowScore }),
 });
+
+const makeIngredient = (partial: Partial<Ingredient> & Pick<Ingredient, 'id' | 'name'>): Ingredient => ({
+    baseUnit: 'g',
+    inventoryUnits: ['g'],
+    recipeUnitConversions: { g: 1 },
+    ...partial,
+});
+
+const inventoryBatch = (id: string, amount: number, expiresAt?: string): IngredientInventory => ({
+    lastUpdated: new Date('2026-06-15T00:00:00.000Z'),
+    batches: [
+        {
+            id,
+            amount,
+            unit: 'g',
+            ...(expiresAt ? { expiresAt } : {}),
+        },
+    ],
+});
+
+const inventoryIngredients = [
+    makeIngredient({
+        id: 'ing-1',
+        name: 'Urgent stocked ingredient',
+        shelfLife: 'short',
+        priceEstimate: { min: 10000, max: 12000, amount: 1000, unit: 'g', currency: 'VND' },
+    }),
+    makeIngredient({
+        id: 'ing-2',
+        name: 'Stable stocked ingredient',
+        shelfLife: 'medium',
+        priceEstimate: { min: 20000, max: 24000, amount: 1000, unit: 'g', currency: 'VND' },
+    }),
+    makeIngredient({
+        id: 'ing-4',
+        name: 'Partial stocked ingredient',
+        shelfLife: 'medium',
+        priceEstimate: { min: 1000, max: 1200, amount: 100, unit: 'g', currency: 'VND' },
+    }),
+];
+
+const inventoryItems: Record<string, IngredientInventory> = {
+    'ing-1': inventoryBatch('batch-ing-1', 200, '2026-06-17T00:00:00.000Z'),
+    'ing-2': inventoryBatch('batch-ing-2', 100, '2026-06-25T00:00:00.000Z'),
+    'ing-4': inventoryBatch('batch-ing-4', 30),
+};
+
+const inventoryDishes = [
+    makeDish({
+        id: 'inventory-partial',
+        name: 'Inventory partial',
+        ingredients: [ingredient('ing-1'), ingredient('ing-4')],
+        duration: { ...emptyDuration, prepare: 15, cooking: 20 },
+        tags: ['budget'],
+    }),
+    makeDish({
+        id: 'inventory-ready',
+        name: 'Inventory ready',
+        ingredients: [ingredient('ing-1'), ingredient('ing-2', '50')],
+        duration: { ...emptyDuration, prepare: 10, cooking: 10 },
+        tags: ['quick', 'family'],
+    }),
+    makeDish({
+        id: 'inventory-side',
+        name: 'Inventory side',
+        ingredients: [ingredient('ing-1')],
+        isAccompaniment: true,
+    }),
+];
 
 describe('DishScorer', () => {
     describe('score', () => {
@@ -153,6 +224,101 @@ describe('DishScorer', () => {
 
             expect(DishScorer.groupCookNow([makeScoredDish('only-ready', 1, [], 0.8)]).map(group => group.label))
                 .toEqual(['Nấu ngay']);
+        });
+    });
+
+    describe('scoreWithInventory', () => {
+        it('pins inventory scoring, matched/missing/stocked IDs, and priority ordering', () => {
+            const scored = DishScorer.scoreWithInventory(inventoryDishes, inventoryItems, inventoryDishes, inventoryIngredients);
+
+            expect(scored.map(item => ({
+                id: item.dish.id,
+                score: item.score,
+                matchedIngredientIds: item.matchedIngredientIds,
+                missingIngredientIds: item.missingIngredientIds,
+                stockedIngredientIds: item.stockedIngredientIds,
+                partialIngredientIds: item.partialIngredientIds,
+                urgentIngredients: item.urgentIngredients,
+                extraShoppingCost: item.extraShoppingCost,
+                missingPriceCount: item.missingPriceCount,
+            }))).toEqual([
+                {
+                    id: 'inventory-ready',
+                    score: 1,
+                    matchedIngredientIds: ['ing-1', 'ing-2'],
+                    missingIngredientIds: [],
+                    stockedIngredientIds: ['ing-1', 'ing-2'],
+                    partialIngredientIds: [],
+                    urgentIngredients: [{ ingredientId: 'ing-1', daysLeft: 1 }],
+                    extraShoppingCost: null,
+                    missingPriceCount: 0,
+                },
+                {
+                    id: 'inventory-partial',
+                    score: 0.5,
+                    matchedIngredientIds: ['ing-1'],
+                    missingIngredientIds: ['ing-4'],
+                    stockedIngredientIds: ['ing-1', 'ing-4'],
+                    partialIngredientIds: ['ing-4'],
+                    urgentIngredients: [{ ingredientId: 'ing-1', daysLeft: 1 }],
+                    extraShoppingCost: { min: 700, max: 840, currency: 'VND' },
+                    missingPriceCount: 0,
+                },
+            ]);
+            expect(scored.some(item => item.dish.id === 'inventory-side')).toBe(false);
+        });
+
+        it('pins empty-inventory guard', () => {
+            expect(DishScorer.scoreWithInventory(inventoryDishes, {}, inventoryDishes, inventoryIngredients)).toEqual([]);
+        });
+    });
+
+    describe('scoreCookNow', () => {
+        it('pins cook-now ordering and weighted scores against the current scorer output', () => {
+            const profile = {
+                ...DEFAULT_HOUSEHOLD_PREFERENCE_PROFILE,
+                servingCount: 2,
+                maxCookMinutes: 30,
+                maxExtraCost: 5000,
+                preferredTags: ['quick'],
+                avoidedTags: ['heavy'],
+            };
+
+            const scored = DishScorer.scoreCookNow(inventoryDishes, inventoryItems, inventoryDishes, inventoryIngredients, profile);
+
+            expect(scored.map(item => item.dish.id)).toEqual(['inventory-ready', 'inventory-partial']);
+            scored.forEach(item => {
+                expect(typeof item.cookNowScore).toBe('number');
+                expect(item.cookNowScore).toBeGreaterThanOrEqual(0);
+                expect(item.cookNowScore).toBeLessThanOrEqual(1);
+            });
+            expect(scored[0].cookNowScore).toBeCloseTo(1, 5);
+            expect(scored[1].cookNowScore).toBeCloseTo(0.73829, 5);
+            expect(scored.map(item => ({
+                id: item.dish.id,
+                totalMinutes: item.totalMinutes,
+                preferenceMatchedTags: item.preferenceMatchedTags,
+                preferenceAvoidedTags: item.preferenceAvoidedTags,
+                householdMatches: item.householdMatches,
+                householdWarnings: item.householdWarnings,
+            }))).toEqual([
+                {
+                    id: 'inventory-ready',
+                    totalMinutes: 20,
+                    preferenceMatchedTags: ['quick'],
+                    preferenceAvoidedTags: [],
+                    householdMatches: ['Thích quick'],
+                    householdWarnings: [],
+                },
+                {
+                    id: 'inventory-partial',
+                    totalMinutes: 35,
+                    preferenceMatchedTags: [],
+                    preferenceAvoidedTags: [],
+                    householdMatches: [],
+                    householdWarnings: [],
+                },
+            ]);
         });
     });
 });
