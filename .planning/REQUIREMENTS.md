@@ -22,7 +22,7 @@ Requirements for this UI/UX refactor milestone. Each maps to roadmap phases. Thi
 - [ ] **WIZ-03**: Every wizard step is skippable with a sensible default ("Tùy bạn")
 - [ ] **WIZ-04**: The result step always yields at least one actionable dish suggestion, even on cold-start/empty data (falls back to full catalog, or routes to "add your first dish" if the catalog is empty)
 - [ ] **WIZ-05**: From the result, the user can add the chosen dish to today's meals (`addScheduledMeal`)
-- [ ] **WIZ-06**: Wizard answers persist per step and resume after reload or interruption (survives the app's sync/service-worker reload)
+- [x] **WIZ-06**: Wizard answers persist per step and resume after reload or interruption (survives the app's sync/service-worker reload)
 - [ ] **WIZ-07**: A first-time user with empty data can reach a scheduled meal unaided
 
 ### Navigation & Reframe
@@ -43,7 +43,7 @@ Requirements for this UI/UX refactor milestone. Each maps to roadmap phases. Thi
 
 - [ ] **FND-01**: A top-level error boundary prevents a shell crash from white-screening the whole app
 - [ ] **FND-02**: Shell pieces (bottom-tab navigator, cooking pill, data backup) are extracted from `MasterPage.tsx` with behavior verified identical
-- [ ] **FND-03**: Wizard state lives in an RTK slice under the existing `personal` persisted root, read via selectors (no raw state access, no new persisted root)
+- [x] **FND-03**: Wizard state lives in an RTK slice under the existing `personal` persisted root, read via selectors (no raw state access, no new persisted root)
 
 ## v2 Requirements
 
@@ -81,8 +81,8 @@ Each v1 requirement maps to exactly one phase. v2 requirements are carried in Ph
 | COPY-02 | Phase 1 | Complete |
 | FND-01 | Phase 2 | Pending |
 | FND-02 | Phase 2 | Pending |
-| FND-03 | Phase 3 | Pending |
-| WIZ-06 | Phase 3 | Pending |
+| FND-03 | Phase 3 | Complete |
+| WIZ-06 | Phase 3 | Complete |
 | WIZ-01 | Phase 4 | Pending |
 | WIZ-02 | Phase 4 | Pending |
 | WIZ-03 | Phase 4 | Pending |
