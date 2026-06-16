@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Shell Safety & Extraction** - Error boundary, decompose `MasterPage.tsx`, route reachability inventory, `Sheet` wrapper (completed 2026-06-15)
 - [x] **Phase 3: Wizard State Slice** - Resume-safe RTK slice in the `personal` root, selectors, scorer characterization tests (completed 2026-06-16)
 - [x] **Phase 4: Wizard UI & Hero Entry** - Guided journey from Home to a scheduled meal, nav reframe with no lost routes (completed 2026-06-16)
-- [ ] **Phase 5: Mobile Tuning & Copy Rollout** - Phone-first journey + app-wide Vietnamese copy migration, desktop intact
+- [ ] **Phase 5: Mobile Tuning & Copy Rollout** - Phone-first journey + journey/high-traffic Vietnamese copy migration (phone-only; desktop no longer gated)
 - [ ] **Phase 6: Differentiator Enhancements** - Post-validation v2 steps and conveniences (deferred)
 
 ## Phase Details
@@ -126,23 +126,45 @@ Plans:
 
 ### Phase 5: Mobile Tuning & Copy Rollout
 
-**Goal**: The guided journey is comfortable on a phone and all user-facing copy reads natural in Vietnamese, without regressing the desktop experience.
+**Goal**: The guided journey is comfortable on a phone and all user-facing copy reads natural in Vietnamese (journey + high-traffic scope).
 **Depends on**: Phase 4
-**Requirements**: MOB-01, MOB-02, MOB-03, MOB-04, COPY-03, COPY-04, COPY-05
+**Requirements**: MOB-01, MOB-02, MOB-03, COPY-03, COPY-04, COPY-05 (MOB-04 retired as written — phone-only user, desktop no longer protected/regression-gated per Phase 5 CONTEXT D-07)
 **Success Criteria** (what must be TRUE):
 
   1. Journey screens use a phone-first layout with primary CTAs in the thumb zone and interactive controls at ~44px touch targets.
-  2. Pickers and confirmations use the bottom-sheet pattern, and the desktop layout shows no regression.
-  3. Inline user-facing strings across modules and navigation reference `AppCopy`, with no remaining hardcoded user-facing strings.
+  2. Pickers and confirmations use the bottom-sheet pattern (desktop no-regression superseded by D-07 — not gated).
+  3. Inline user-facing strings across the journey + high-traffic modules and navigation reference `AppCopy` (scoped, not the full 566-string sweep — D-01).
   4. All labels and descriptions read natural to a local Vietnamese user, with no English or technical-jargon leftovers.
   5. Journey screens show inviting, friendly empty-states instead of blank or technical messages.
 
-**Plans**: TBD
+**Plans**: 7 plans
 **UI hint**: yes
 
 Plans:
+**Wave 1**
 
-- [ ] 05-01: TBD
+- [ ] 05-01-PLAN.md — Journey copy migration to AppCopy + friendly empty-states + 44px touch polish (COPY-03, COPY-05, MOB-01, MOB-02)
+- [ ] 05-02-PLAN.md — App-wide bottom-sheet sweep, long-tail picker/confirmation files (MOB-03)
+
+**Wave 2** *(blocked on 05-01: shared AppCopy.ts)*
+
+- [ ] 05-03-PLAN.md — Shell + nav cluster: MasterPage/SidebarDrawer copy + PIN/Backup Modal→Sheet + chrome touch targets (COPY-03, MOB-03, MOB-01, MOB-02)
+
+**Wave 3** *(blocked on 05-03)*
+
+- [ ] 05-04-PLAN.md — ShoppingList cluster: copy + picker/delete-confirm Sheet + thumb-zone CTAs (COPY-03, MOB-03, MOB-01, MOB-02)
+
+**Wave 4** *(blocked on 05-04)*
+
+- [ ] 05-05-PLAN.md — ScheduledMeal cluster: copy + Modal sweep + ScheduledMealAdd footer CTA retune (COPY-03, MOB-03, MOB-01, MOB-02)
+
+**Wave 5** *(blocked on 05-05)*
+
+- [ ] 05-06-PLAN.md — DishSuggester/Dishes/Ingredient list cluster: copy + picker Sheet + 44px targets (COPY-03, MOB-03, MOB-01, MOB-02)
+
+**Wave 6** *(blocked on all copy-migration plans)*
+
+- [ ] 05-07-PLAN.md — Vietnamese voice refinement in AppCopy with iterative user-review loop (COPY-04)
 
 ### Phase 6: Differentiator Enhancements
 
@@ -175,5 +197,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Shell Safety & Extraction | 5/5 | Complete   | 2026-06-15 |
 | 3. Wizard State Slice | 3/3 | Complete    | 2026-06-16 |
 | 4. Wizard UI & Hero Entry | 6/6 | Complete   | 2026-06-16 |
-| 5. Mobile Tuning & Copy Rollout | 0/TBD | Not started | - |
+| 5. Mobile Tuning & Copy Rollout | 0/7 | Not started | - |
 | 6. Differentiator Enhancements | 0/TBD | Deferred | - |
