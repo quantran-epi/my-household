@@ -11,7 +11,33 @@ const SYNC_CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000;
 export type SeedAppOptions = PerformanceNetworkOptions & {
   dataset?: PerformanceDatasetName;
   syncCheckState?: SyncCheckState;
+  /**
+   * When true, seeds a cold-start catalog with NO dishes and NO ingredients (and no
+   * scheduled meals) so WIZ-07's empty-catalog branch can be exercised. The
+   * welcome-complete flag is still set (see below) so the app does NOT redirect to
+   * /guide/welcome — a first-timer lands directly on the requested route with empty data.
+   */
+  emptyCatalog?: boolean;
 };
+
+// Empty cold-start dataset (planner decision 6): mirrors the createRegressionSeed shape
+// but with empty shared catalog arrays and empty personal collections. Used by the
+// WIZ-07 cold-start E2E. Kept structurally identical to the regression seed so the
+// persist:shared / persist:personal writes below treat it as synced-but-empty rather
+// than unfetched.
+const createEmptyCatalogSeed = () => ({
+  shared: {
+    ingredient: { ingredients: [] },
+    dishes: { dishes: [], searchText: '', currentPage: 1 },
+  },
+  personal: {
+    appContext: { loading: false, currentFeatureName: '' },
+    inventory: { items: {} },
+    shoppingList: { shoppingLists: [] },
+    scheduledMeal: { scheduledMeals: [], selectedMeals: [] },
+    cookingSession: { sessions: [] },
+  },
+});
 
 const persistRoot = (slices: PersistSlices): string => {
   return JSON.stringify({
@@ -21,7 +47,11 @@ const persistRoot = (slices: PersistSlices): string => {
 };
 
 export const seedApp = async (page: Page, options: SeedAppOptions = {}) => {
-  const seed = options.dataset ? createPerformanceSeed(options.dataset) : createRegressionSeed();
+  const seed = options.emptyCatalog
+    ? createEmptyCatalogSeed()
+    : options.dataset
+    ? createPerformanceSeed(options.dataset)
+    : createRegressionSeed();
   const syncCheckState = options.syncCheckState ?? 'fresh';
 
   const networkMode = await applyPerformanceNetworkMode(page, options);
