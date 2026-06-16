@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: complete
 phase: 04-wizard-ui-hero-entry
 source: [04-VERIFICATION.md]
 started: 2026-06-16T14:10:00Z
-updated: 2026-06-16T15:00:00Z
+updated: 2026-06-16T16:30:00Z
 ---
 
 ## Current Test
@@ -18,15 +18,13 @@ result: pass
 
 ### 2. Full wizard walk — guided feel, progress, back
 expected: center tab → ingredient → preference → result → add a dish. One question per screen, segmented progress advances, back returns to the prior step, add toast fires; flow feels guided, not admin-like.
-result: issue
-reported: "the walkthrough not has complete button"
-severity: major
+result: pass
+note: Re-verified after 04-06 — explicit "Xong" finish control present; flow guided, progress/back work.
 
 ### 3. WR-01 — re-entry after completing the wizard
 expected: Product ruling. Complete the wizard once, then tap the center "Nấu gì?" tab again. Currently it resumes on the stale completed result (restartWizard exists in the reducer but is never dispatched from the UI). Decide: restart at ingredient step vs. resume on stale result. First-time-user goal is unaffected; this is returning-user behavior.
-result: issue
-reported: "finish and open again not reset"
-severity: major
+result: pass
+note: Re-verified after 04-06 — re-entry restarts fresh at ingredients step with cleared answers.
 
 ### 4. WR-02 — duplicate back control on preferences step
 expected: UX ruling. The preferences step shows two back affordances (circular wizard-back from WizardProgress + inline wizard-preference-back), both wired to goBack and functional. Decide: acceptable, or consolidate to one.
@@ -38,15 +36,14 @@ result: pass
 
 ### 6. Result step — action buttons overflow
 expected: On the result step, each dish row's action buttons ("Thêm vào hôm nay" / "Chọn ngày khác") fit within the card on a phone-width viewport without spilling past the edge.
-result: issue
-reported: "button overflow"
-severity: minor
+result: pass
+note: Re-verified after 04-06 — action buttons stack vertically full-width and fit within the card.
 
 ## Summary
 
 total: 6
-passed: 3
-issues: 3
+passed: 6
+issues: 0
 pending: 0
 skipped: 0
 blocked: 0
@@ -54,7 +51,7 @@ blocked: 0
 ## Gaps
 
 - truth: "The wizard provides an explicit complete/finish affordance to end the flow"
-  status: failed
+  status: resolved
   reason: "User reported: the walkthrough not has complete button"
   severity: major
   test: 2
@@ -67,7 +64,7 @@ blocked: 0
   debug_session: ""
 
 - truth: "Finishing the wizard and reopening it starts a fresh flow at the first step"
-  status: failed
+  status: resolved
   reason: "User reported: finish and open again not reset"
   severity: major
   test: 3
@@ -82,7 +79,7 @@ blocked: 0
   debug_session: ""
 
 - truth: "Result-step action buttons fit within the card on phone-width without overflowing"
-  status: failed
+  status: resolved
   reason: "User reported: button overflow"
   severity: minor
   root_cause: "ResultRow (WizardResult.widget.tsx:56) places both action buttons in a Stack with no direction prop. Stack defaults flexDirection to undefined → CSS row with no flexWrap, so the two buttons (each paddingInline:20) sum wider than a narrow card and overflow horizontally."
