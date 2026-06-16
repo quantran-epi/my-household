@@ -257,7 +257,8 @@ const DashboardHero: React.FunctionComponent<{
     mainValue: number;
     mainLabel: string;
     metrics: DashboardHeroMetric[];
-}> = ({ item, dateLabel, mainValue, mainLabel, metrics }) => {
+    onStartJourney?: () => void;
+}> = ({ item, dateLabel, mainValue, mainLabel, metrics, onStartJourney }) => {
     const [activeMetricKey, setActiveMetricKey] = React.useState(metrics[0]?.key ?? '');
     const activeMetric = metrics.find(metric => metric.key === activeMetricKey) ?? metrics[0];
 
@@ -272,6 +273,25 @@ const DashboardHero: React.FunctionComponent<{
     }}>
         <div style={{ position: 'absolute', top: -34, right: -24, width: 112, height: 112, borderRadius: '50%', background: 'rgba(255,255,255,0.14)' }} />
         <div style={{ position: 'absolute', bottom: -48, left: -28, width: 128, height: 128, borderRadius: '50%', background: 'rgba(255,255,255,0.08)' }} />
+        {onStartJourney && <Button
+            onClick={onStartJourney}
+            data-testid="hero-start-journey"
+            style={{
+                position: 'relative',
+                width: '100%',
+                height: 'auto',
+                padding: '12px 16px',
+                borderRadius: 999,
+                background: '#fff',
+                borderColor: '#fff',
+                color: '#5e2bbf',
+                fontSize: 28,
+                fontWeight: 600,
+                lineHeight: 1.2,
+                boxShadow: '0 10px 22px rgba(34,17,83,0.18)',
+                marginBottom: 14,
+            }}
+        >Hôm nay ăn gì?</Button>}
         <Stack justify='space-between' align='center' gap={8} style={{ position: 'relative', marginBottom: 12 }}>
             <div style={{ minWidth: 0 }}>
                 <Typography.Text style={{ display: 'block', color: 'rgba(255,255,255,0.82)', fontSize: 12, lineHeight: '16px', fontWeight: 650 }}>My Recipes</Typography.Text>
@@ -759,6 +779,7 @@ export const DashboardScreen = () => {
             mainValue={todayActionCount}
             mainLabel='việc cần nhìn trong hôm nay'
             metrics={heroMetrics}
+            onStartJourney={() => openRoute(RootRoutes.AuthorizedRoutes.MealPlanningRoutes.Wizard())}
         />
 
         <WeeklyOverviewCard items={weekOverview} />
