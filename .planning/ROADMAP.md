@@ -174,6 +174,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Copy Infrastructure | 1/1 | Complete    | 2026-06-14 |
 | 2. Shell Safety & Extraction | 5/5 | Complete   | 2026-06-15 |
 | 3. Wizard State Slice | 3/3 | Complete    | 2026-06-16 |
-| 4. Wizard UI & Hero Entry | 5/5 | Complete   | 2026-06-16 |
+| 4. Wizard UI & Hero Entry | 6/6 | Complete   | 2026-06-16 |
 | 5. Mobile Tuning & Copy Rollout | 0/TBD | Not started | - |
 | 6. Differentiator Enhancements | 0/TBD | Deferred | - |
