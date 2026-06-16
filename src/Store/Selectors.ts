@@ -4,6 +4,7 @@
  */
 import { RootState } from "@store/Store";
 import { DEFAULT_SHARED_CONFIG, normalizeSharedConfig } from "@store/Models/SharedConfig";
+import { DEFAULT_WIZARD_STATE, WIZARD_FIRST_STEP, WizardState, WizardStatus, WizardStepKey } from "@store/Models/Wizard";
 import { buildHouseholdPreferenceProfile, getSelectedHouseholdMembers, normalizeHouseholdMembers, normalizeKind, normalizeMealSlotTimes } from "@store/Reducers/AppContextReducer";
 import { normalizeHouseholdHealthState } from "@store/Reducers/HouseholdHealthReducer";
 import type { HouseholdHealthRecord } from "@store/Reducers/HouseholdHealthReducer";
@@ -52,6 +53,15 @@ export const selectDishFeedbackHistory = (state: RootState) => state.personal.co
 export const selectAppContext = (state: RootState) => state.personal.appContext;
 // `?? []` tolerates devices whose persisted personal blob predates the smartPlannerTemplate slice.
 export const selectSmartPlannerTemplates = (state: RootState) => state.personal.smartPlannerTemplate?.templates ?? [];
+// `?? DEFAULT_WIZARD_STATE` tolerates devices whose persisted personal blob predates the wizard slice.
+export const selectWizard = (state: RootState): WizardState => state.personal.wizard ?? DEFAULT_WIZARD_STATE;
+export const selectWizardStep = (state: RootState): WizardStepKey => state.personal.wizard?.currentStep ?? WIZARD_FIRST_STEP;
+export const selectWizardAnswers = (state: RootState): WizardState['answers'] => state.personal.wizard?.answers ?? DEFAULT_WIZARD_STATE.answers;
+export const selectWizardStatus = (state: RootState): WizardStatus => state.personal.wizard?.status ?? 'idle';
+export const selectIsWizardResumable = createSelector(
+    [selectWizardStatus],
+    status => status === 'in_progress'
+);
 export const selectHouseholdHealthState = createSelector(
     [(state: RootState) => state.personal.householdHealth],
     householdHealth => normalizeHouseholdHealthState(householdHealth)
