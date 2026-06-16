@@ -49,7 +49,7 @@ const CrashTestScreen = () => {
 };
 
 export const RootRouter = () => {
-    return <BrowserRouter basename="/my-recipes">
+    return <BrowserRouter basename="/my-household">
         <Routes>
             <Route path={RootRoutes.AuthorizedRoutes.UserGuideWelcome()} element={<React.Suspense fallback={<RouteLoadingFallback />}><UserGuideWelcomeScreen /></React.Suspense>} />
             <Route path={RootRoutes.AuthorizedRoutes.UserGuideTour()} element={<React.Suspense fallback={<RouteLoadingFallback />}><UserGuideTourScreen /></React.Suspense>} />
