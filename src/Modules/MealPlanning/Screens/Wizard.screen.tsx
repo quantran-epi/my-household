@@ -4,9 +4,9 @@ import { WizardIngredientStep } from "@modules/MealPlanning/Screens/WizardIngred
 import { WizardPreferenceStep } from "@modules/MealPlanning/Screens/WizardPreferenceStep.widget";
 import { WizardResult } from "@modules/MealPlanning/Screens/WizardResult.widget";
 import { WizardAnswers, WizardStepKey } from "@store/Models/Wizard";
-import { advanceWizardStep, commitWizardAnswer, goBackWizardStep } from "@store/Reducers/WizardReducer";
-import { selectWizardStep } from "@store/Selectors";
-import React from "react";
+import { advanceWizardStep, commitWizardAnswer, goBackWizardStep, restartWizard } from "@store/Reducers/WizardReducer";
+import { selectWizardStatus, selectWizardStep } from "@store/Selectors";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 // Lean flow for this phase (planner D-03/D-05): the `servings`/`time` keys exist
@@ -17,6 +17,16 @@ const WIZARD_STEPS: WizardStepKey[] = ['ingredients', 'preferences', 'result'];
 export const WizardScreen: React.FC = () => {
     const dispatch = useDispatch();
     const step = useSelector(selectWizardStep);
+    const status = useSelector(selectWizardStatus);
+
+    // Re-entering the flow after finishing must start fresh, not resume on the
+    // stale completed result (UAT gap 2). restartWizard flips status to
+    // 'in_progress' and resets to the ingredients step, so this fires once on
+    // mount and cannot loop.
+    useEffect(() => {
+        if (status === 'completed') dispatch(restartWizard());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
     // Clamp unknown/tampered persisted step keys to the first step rather than
     // rendering nothing (threat T-04-06). The body renders off `currentStep`
     // (the clamped key), so a corrupted or not-yet-built key can never produce
