@@ -107,6 +107,15 @@ Each task was committed atomically:
 - The container exposes `wizard-screen`, `wizard-progress`, and `wizard-back` testids for downstream E2E.
 
 ## Self-Check: PASSED
+- `src/Modules/MealPlanning/Components/WizardProgress.tsx` — FOUND
+- `src/Modules/MealPlanning/Screens/Wizard.screen.tsx` — FOUND
+- `src/Modules/MealPlanning/Screens/Wizard.screen.test.tsx` — FOUND
+- `src/Routing/RootRouter.tsx` — FOUND
+- `.planning/phases/04-wizard-ui-hero-entry/04-03-SUMMARY.md` — FOUND
+- Commit `de9df95` (Task 1) — FOUND
+- Commit `ba1ceda` (Task 2) — FOUND
+- Commit `0a5363f` (Task 3) — FOUND
+- Commit `900f241` (plan metadata) — FOUND
 
 ---
 *Phase: 04-wizard-ui-hero-entry*
