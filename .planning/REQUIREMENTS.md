@@ -23,14 +23,14 @@ Requirements for this UI/UX refactor milestone. Each maps to roadmap phases. Thi
 - [ ] **WIZ-04**: The result step always yields at least one actionable dish suggestion, even on cold-start/empty data (falls back to full catalog, or routes to "add your first dish" if the catalog is empty)
 - [ ] **WIZ-05**: From the result, the user can add the chosen dish to today's meals (`addScheduledMeal`)
 - [x] **WIZ-06**: Wizard answers persist per step and resume after reload or interruption (survives the app's sync/service-worker reload)
-- [ ] **WIZ-07**: A first-time user with empty data can reach a scheduled meal unaided
+- [x] **WIZ-07**: A first-time user with empty data can reach a scheduled meal unaided
 
 ### Navigation & Reframe
 
 - [ ] **NAV-01**: Primary entry points are reframed from admin-style screens to a guided journey (ask-and-answer)
-- [ ] **NAV-02**: Every route reachable before the refactor remains reachable afterward (within ~3 taps or via search)
-- [ ] **NAV-03**: Global search continues to reach all features
-- [ ] **NAV-04**: The bottom-nav center action routes into the guided meal-planning journey while keeping the existing suggester reachable
+- [x] **NAV-02**: Every route reachable before the refactor remains reachable afterward (within ~3 taps or via search)
+- [x] **NAV-03**: Global search continues to reach all features
+- [x] **NAV-04**: The bottom-nav center action routes into the guided meal-planning journey while keeping the existing suggester reachable
 
 ### Mobile (Phone-First)
 
@@ -88,11 +88,11 @@ Each v1 requirement maps to exactly one phase. v2 requirements are carried in Ph
 | WIZ-03 | Phase 4 | Pending |
 | WIZ-04 | Phase 4 | Pending |
 | WIZ-05 | Phase 4 | Pending |
-| WIZ-07 | Phase 4 | Pending |
+| WIZ-07 | Phase 4 | Complete |
 | NAV-01 | Phase 4 | Pending |
-| NAV-02 | Phase 4 | Pending |
-| NAV-03 | Phase 4 | Pending |
-| NAV-04 | Phase 4 | Pending |
+| NAV-02 | Phase 4 | Complete |
+| NAV-03 | Phase 4 | Complete |
+| NAV-04 | Phase 4 | Complete |
 | MOB-01 | Phase 5 | Pending |
 | MOB-02 | Phase 5 | Pending |
 | MOB-03 | Phase 5 | Pending |

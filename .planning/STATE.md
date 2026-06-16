@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 4 UI-SPEC approved
-last_updated: "2026-06-16T04:16:45.841Z"
+last_updated: "2026-06-16T06:04:42.518Z"
 last_activity: 2026-06-16 -- Phase 04 execution started
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 14
-  completed_plans: 9
-  percent: 50
+  completed_plans: 14
+  percent: 67
 ---
 
 # Project State
@@ -26,8 +26,8 @@ See: .planning/PROJECT.md (updated 2026-06-14)
 ## Current Position
 
 Phase: 04 (wizard-ui-hero-entry) — EXECUTING
-Plan: 1 of 5
-Status: Executing Phase 04
+Plan: 2 of 5
+Status: Ready to execute
 Last activity: 2026-06-16 -- Phase 04 execution started
 
 Progress: [░░░░░░░░░░] 0%
@@ -56,6 +56,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03 P01 | 7 min | 3 tasks | 3 files |
 | Phase 03 P02 | 6 min | 2 tasks | 1 files |
 | Phase 03 P03 | 5 min | 2 tasks | 2 files |
+| Phase 04 P05 | 8min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,7 @@ Recent decisions affecting current work:
 - [Roadmap]: Build typed `AppCopy` module before rewording any of the ~408 inline strings (avoids double-edit and JSX breakage).
 - [Roadmap]: Separate "pure move, verified identical" from behavior change when extracting `MasterPage.tsx`; add error boundary before shell surgery.
 - [Roadmap]: Wizard state in an RTK slice under the existing `personal` root, persisted per-step commit to survive forced reloads.
+- [Phase ?]: 04-05: empty-catalog cold-start uses a seedApp variant (preserving the welcome-complete flag) rather than a raw IndexedDB clear, so first-timers reach the wizard without an onboarding redirect
 
 ### Pending Todos
 
@@ -94,6 +96,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-16T03:35:10.237Z
+Last session: 2026-06-16T06:03:44.427Z
 Stopped at: Phase 4 UI-SPEC approved
 Resume file: .planning/phases/04-wizard-ui-hero-entry/04-UI-SPEC.md
