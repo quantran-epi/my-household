@@ -103,12 +103,26 @@ Plans:
   4. A first-timer with empty data reaches a scheduled meal unaided, verified by a cold-start end-to-end run (empty IndexedDB → wizard → scheduled meal).
   5. Every pre-refactor route stays reachable within ~3 taps or via global search; the bottom-nav center action opens the wizard while the existing suggester stays reachable.
 
-**Plans**: TBD
+**Plans**: 5 plans
 **UI hint**: yes
 
 Plans:
+**Wave 1**
 
-- [ ] 04-01: TBD
+- [ ] 04-01-PLAN.md — MealPlanning route scaffold + ingredient & preference step widgets (WIZ-02, WIZ-03)
+- [ ] 04-02-PLAN.md — Result step: WIZ-04 fallback ladder + WIZ-05 add-to-meal via addScheduledMeal
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 04-03-PLAN.md — Wizard container (persisted step-key state machine) + progress chrome + RootRouter registration (WIZ-02)
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 04-04-PLAN.md — Entry-point reframe: Home hero CTA + bottom-nav center repoint, suggester stays reachable (WIZ-01, NAV-01, NAV-02, NAV-04)
+
+**Wave 4** *(blocked on Wave 3)*
+
+- [ ] 04-05-PLAN.md — WIZ-07 cold-start E2E + dish-suggester spec migration + global-search reachability (WIZ-07, NAV-02, NAV-03, NAV-04)
 
 ### Phase 5: Mobile Tuning & Copy Rollout
 
