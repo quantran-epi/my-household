@@ -53,18 +53,18 @@ const ResultRow: React.FunctionComponent<ResultRowProps> = ({ dish, meta, onAddT
         {meta && <Typography.Text type="secondary" style={{ fontSize: 16, lineHeight: 1.5 }}>
             {`${meta.matched} đủ · ${meta.missing} thiếu`}
         </Typography.Text>}
-        <Stack gap={8} style={{ marginTop: 4 }}>
+        <Stack direction="column" gap={8} fullwidth style={{ marginTop: 4 }}>
             <Button
                 type="primary"
                 data-testid={`wizard-add-today-${dish.id}`}
                 onClick={onAddToday}
-                style={{ borderRadius: 20, paddingInline: 20 }}
+                style={{ width: "100%", borderRadius: 20, paddingInline: 20 }}
             >
                 Thêm vào hôm nay
             </Button>
             <Button
                 onClick={onPickDay}
-                style={{ borderRadius: 20, paddingInline: 20 }}
+                style={{ width: "100%", borderRadius: 20, paddingInline: 20 }}
             >
                 Chọn ngày khác
             </Button>
@@ -181,6 +181,18 @@ export const WizardResult: React.FunctionComponent = () => {
                     />
                 ))}
             </>}
+
+        <Button
+            type="primary"
+            data-testid="wizard-finish"
+            onClick={() => {
+                dispatch(completeWizard());
+                navigate(RootRoutes.AuthorizedRoutes.Root());
+            }}
+            style={{ width: "100%", borderRadius: 20, paddingInline: 20 }}
+        >
+            Xong
+        </Button>
 
         <Sheet
             open={pickerDish !== null}
