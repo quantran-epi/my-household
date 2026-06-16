@@ -18,8 +18,11 @@ export const WizardScreen: React.FC = () => {
     const dispatch = useDispatch();
     const step = useSelector(selectWizardStep);
     // Clamp unknown/tampered persisted step keys to the first step rather than
-    // rendering nothing (threat T-04-06).
+    // rendering nothing (threat T-04-06). The body renders off `currentStep`
+    // (the clamped key), so a corrupted or not-yet-built key can never produce
+    // a contentless dead-end.
     const idx = Math.max(0, WIZARD_STEPS.indexOf(step));
+    const currentStep = WIZARD_STEPS[idx];
 
     const goNext = (answer: Partial<WizardAnswers>) => {
         dispatch(commitWizardAnswer(answer));
@@ -40,9 +43,9 @@ export const WizardScreen: React.FC = () => {
                 onBack={idx > 0 ? goBack : undefined}
             />
 
-            {step === 'ingredients' && <WizardIngredientStep onNext={goNext} />}
-            {step === 'preferences' && <WizardPreferenceStep onNext={goNext} onBack={goBack} />}
-            {step === 'result' && <WizardResult />}
+            {currentStep === 'ingredients' && <WizardIngredientStep onNext={goNext} />}
+            {currentStep === 'preferences' && <WizardPreferenceStep onNext={goNext} onBack={goBack} />}
+            {currentStep === 'result' && <WizardResult />}
         </Box>
     );
 };
