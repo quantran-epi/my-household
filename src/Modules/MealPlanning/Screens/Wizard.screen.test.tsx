@@ -11,7 +11,7 @@ import { Provider } from "react-redux";
 import { MemoryRouter } from "react-router-dom";
 import IngredientReducer from "@store/Reducers/IngredientReducer";
 import DishesReducer, { addDishes } from "@store/Reducers/DishesReducer";
-import WizardReducer, { advanceWizardStep } from "@store/Reducers/WizardReducer";
+import WizardReducer, { advanceWizardStep, completeWizard } from "@store/Reducers/WizardReducer";
 import type { Dishes } from "@store/Models/Dishes";
 import { WizardScreen } from "@modules/MealPlanning/Screens/Wizard.screen";
 
@@ -84,5 +84,17 @@ describe("WizardScreen", () => {
         renderWizard(store);
 
         expect(screen.getByTestId("wizard-step-result")).toBeInTheDocument();
+    });
+
+    it("restarts a completed wizard at the ingredients step on re-entry", () => {
+        const store = makeTestStore();
+        store.dispatch(addDishes(makeDish()));
+        store.dispatch(advanceWizardStep("result"));
+        store.dispatch(completeWizard());
+        renderWizard(store);
+
+        expect(screen.getByTestId("wizard-step-ingredients")).toBeInTheDocument();
+        expect(screen.queryByTestId("wizard-step-result")).not.toBeInTheDocument();
+        expect(store.getState().personal.wizard.status).toBe("in_progress");
     });
 });
