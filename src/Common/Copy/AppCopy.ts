@@ -36,11 +36,41 @@ export const AppCopy = {
         resultTitle: "Gợi ý cho nhà mình",
         addToToday: "Thêm vào hôm nay",
         addedToToday: (args: { dishName: string }) => `Đã thêm ${args.dishName} vào hôm nay`,
+        // Ingredient step
+        ingredientStepTitle: "Bạn có sẵn nguyên liệu gì?",
+        ingredientPickerTrigger: "Chọn nguyên liệu",
+        ingredientSheetTitle: "Chọn nguyên liệu",
+        selectedIngredients: (args: { count: number }) => `Đã chọn ${args.count} nguyên liệu`,
+        // Preference step
+        preferenceStepTitle: "Bạn thích món kiểu nào?",
+        preferencePickerTrigger: "Chọn sở thích",
+        preferenceSheetTitle: "Sở thích",
+        selectedPreferences: (args: { count: number }) => `Đã chọn ${args.count} sở thích`,
+        // Shared step actions
+        editAction: "Sửa",
+        chooseAction: "Chọn",
+        continueAction: "Tiếp tục",
+        // Result step
+        pickOtherDay: "Chọn ngày khác",
+        daySheetTitle: "Chọn ngày khác",
+        addToDay: "Thêm vào ngày này",
+        finishAction: "Xong",
+        matchFull: "Đủ đồ",
+        matchPartial: "Gần đủ",
+        matchLow: "Cần mua",
+        ingredientMatchSummary: (args: { matched: number; missing: number }) => `${args.matched} đủ · ${args.missing} thiếu`,
+        fullCatalogFallback: "Chưa có món khớp — đây là vài gợi ý từ toàn bộ món của bạn",
+        addedToTodayToast: "Đã thêm vào thực đơn",
+        progressStep: (args: { current: number; total: number }) => `Bước ${args.current}/${args.total}`,
     },
     emptyStates: {
         noDishes: "Chưa có món nào — thêm món đầu tiên nhé",
         noSchedule: "Chưa có bữa nào được lên lịch — bắt đầu nhé",
         noInventory: "Chưa có nguyên liệu nào trong bếp",
+        emptyCatalogTitle: "Chưa có món nào",
+        emptyCatalogBody: "Thêm món đầu tiên để bắt đầu lên thực đơn.",
+        emptyCatalogCta: "Thêm món đầu tiên",
+        noPreferences: "Chưa có sở thích để chọn. Bạn có thể bỏ qua bước này.",
     },
 } as const;
 
