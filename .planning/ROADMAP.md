@@ -84,7 +84,7 @@ Plans:
 **Wave 1**
 
 - [x] 03-01-PLAN.md — `WizardState` model + `WizardReducer` RTK slice (per-step commit, advance/back, resume no-op, restart, complete) + reducer unit tests (FND-03, WIZ-06)
-- [ ] 03-02-PLAN.md — `DishScorer` characterization tests pinning current output of all 5 methods against deterministic fixtures (WIZ-06)
+- [x] 03-02-PLAN.md — `DishScorer` characterization tests pinning current output of all 5 methods against deterministic fixtures (WIZ-06)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -159,7 +159,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Copy Infrastructure | 1/1 | Complete    | 2026-06-14 |
 | 2. Shell Safety & Extraction | 5/5 | Complete   | 2026-06-15 |
-| 3. Wizard State Slice | 1/3 | In Progress|  |
+| 3. Wizard State Slice | 2/3 | In Progress|  |
 | 4. Wizard UI & Hero Entry | 0/TBD | Not started | - |
 | 5. Mobile Tuning & Copy Rollout | 0/TBD | Not started | - |
 | 6. Differentiator Enhancements | 0/TBD | Deferred | - |
