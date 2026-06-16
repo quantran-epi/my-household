@@ -1,7 +1,5 @@
 import { Image } from "@components/Image";
 import { Typography } from "@components/Typography";
-import { useToggle } from "@hooks";
-import { DishSuggesterScreen } from "@modules/DishSuggester/Screens/DishSuggester.screen";
 import React from "react";
 import { useLocation } from "react-router-dom";
 import DietPlanIcon from "../../../assets/icons/diet-plan.png";
@@ -14,18 +12,19 @@ import { RootRoutes } from "../RootRoutes";
 
 export const BottomTabNavigator = () => {
     const location = useLocation();
-    const toggleSuggester = useToggle();
     const { navigateWithFeedback, isRouteFeedbackActive, pendingDestination } = useAppShellNavigation();
     const dishesRoute = RootRoutes.AuthorizedRoutes.DishesRoutes.List();
     const mealsRoute = RootRoutes.AuthorizedRoutes.ScheduledMealRoutes.List();
     const shoppingRoute = RootRoutes.AuthorizedRoutes.ShoppingListRoutes.List();
     const budgetRoute = RootRoutes.AuthorizedRoutes.ExpensePlanner();
+    const wizardRoute = RootRoutes.AuthorizedRoutes.MealPlanningRoutes.Wizard();
     const pendingRoute = isRouteFeedbackActive ? pendingDestination : null;
     const isRouteActive = (href: string) => location.pathname === href || pendingRoute === href;
     const dishesActive = isRouteActive(dishesRoute);
     const mealsActive = isRouteActive(mealsRoute);
     const shoppingActive = isRouteActive(shoppingRoute);
     const budgetActive = isRouteActive(budgetRoute);
+    const wizardActive = isRouteActive(wizardRoute);
 
     const _containerStyles = (): React.CSSProperties => {
         return {
@@ -227,13 +226,13 @@ export const BottomTabNavigator = () => {
                 </button>
                 <button
                     type="button"
-                    aria-pressed={toggleSuggester.value}
+                    aria-pressed={wizardActive}
                     aria-label="Nấu gì?"
                     data-testid="bottom-tab-suggester"
                     style={_suggesterButtonStyles()}
-                    onClick={toggleSuggester.show}
+                    onClick={() => onNavigate(wizardRoute)}
                 >
-                    <span style={_centerIconShellStyles(toggleSuggester.value)}>
+                    <span style={_centerIconShellStyles(wizardActive)}>
                         <Image src={SuggesterIcon} preview={false} width={27} alt="" />
                     </span>
                     <Typography.Text style={_centerLabelStyles()}>Nấu gì?</Typography.Text>
@@ -266,6 +265,5 @@ export const BottomTabNavigator = () => {
                 </button>
             </div>
         </div>
-        {toggleSuggester.value && <DishSuggesterScreen open={toggleSuggester.value} onClose={toggleSuggester.hide} />}
     </>
 }
