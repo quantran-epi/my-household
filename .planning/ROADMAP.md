@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Copy Infrastructure** - Typed `AppCopy` source of truth + glossary, before any rewording (completed 2026-06-14)
 - [x] **Phase 2: Shell Safety & Extraction** - Error boundary, decompose `MasterPage.tsx`, route reachability inventory, `Sheet` wrapper (completed 2026-06-15)
-- [ ] **Phase 3: Wizard State Slice** - Resume-safe RTK slice in the `personal` root, selectors, scorer characterization tests
+- [x] **Phase 3: Wizard State Slice** - Resume-safe RTK slice in the `personal` root, selectors, scorer characterization tests (completed 2026-06-16)
 - [ ] **Phase 4: Wizard UI & Hero Entry** - Guided journey from Home to a scheduled meal, nav reframe with no lost routes
 - [ ] **Phase 5: Mobile Tuning & Copy Rollout** - Phone-first journey + app-wide Vietnamese copy migration, desktop intact
 - [ ] **Phase 6: Differentiator Enhancements** - Post-validation v2 steps and conveniences (deferred)
@@ -88,7 +88,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03-03-PLAN.md — Register `wizard` under `personalReducer` (no new persist root) + `selectWizard*` selector family with defensive defaults — sole read path (FND-03)
+- [x] 03-03-PLAN.md — Register `wizard` under `personalReducer` (no new persist root) + `selectWizard*` selector family with defensive defaults — sole read path (FND-03)
 
 ### Phase 4: Wizard UI & Hero Entry
 
@@ -159,7 +159,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Copy Infrastructure | 1/1 | Complete    | 2026-06-14 |
 | 2. Shell Safety & Extraction | 5/5 | Complete   | 2026-06-15 |
-| 3. Wizard State Slice | 2/3 | In Progress|  |
+| 3. Wizard State Slice | 3/3 | Complete   | 2026-06-16 |
 | 4. Wizard UI & Hero Entry | 0/TBD | Not started | - |
 | 5. Mobile Tuning & Copy Rollout | 0/TBD | Not started | - |
 | 6. Differentiator Enhancements | 0/TBD | Deferred | - |
