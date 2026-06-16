@@ -29,6 +29,8 @@ A local Vietnamese household member can open the app and go from "what do we eat
 - ✓ PWA install + offline caching (Workbox) — existing (`service-worker.ts`)
 - ✓ Client-side admin mode (PIN gate) — existing (`useAdminMode`)
 - ✓ Vietnamese locale (Ant Design `viVN`) — existing (`App.tsx`)
+- ✓ Typed copy foundation — Phase 1 (`@common/Copy`, `CopyKey`, glossary)
+- ✓ Resume-safe wizard state foundation — Phase 3 (`wizard` RTK slice under `personal`, `selectWizard*` selectors)
 
 ### Active
 
@@ -51,6 +53,7 @@ A local Vietnamese household member can open the app and go from "what do we eat
 ## Context
 
 - Phase 1 complete (2026-06-14): typed `AppCopy` copy foundation under `src/Common/Copy/` (`@common/Copy`) — source of truth, build-gated `CopyKey` union, review-only glossary. App-wide copy *migration* is Phase 5.
+- Phase 3 complete (2026-06-16): wizard progress/answers persist under the existing `personal` redux-persist root through a `wizard` RTK slice, with `selectWizard*` as the defensive read path and DishScorer characterization tests pinning result behavior before UI wiring.
 - Brownfield project. Existing codebase mapped under `.planning/codebase/` (ARCHITECTURE, STACK, STRUCTURE, CONVENTIONS, INTEGRATIONS, TESTING, CONCERNS).
 - Stack: React 18, Redux Toolkit, React Router 6, Ant Design 5, TypeScript, CRACO build, Workbox PWA. UI is built on local wrappers in `src/Components` over Ant Design.
 - Feature modules (vertical slices) live in `src/Modules`: Dishes, Ingredient, ShoppingList, ScheduledMeal, DishSuggester, Home.
@@ -76,6 +79,7 @@ A local Vietnamese household member can open the app and go from "what do we eat
 | Use a guided wizard flow as the "customer journey" model | Reframes admin-style screens into ask-and-answer steps | — Pending |
 | App-wide Vietnamese copy pass this milestone (not just meal planning) | Friendly, familiar language is a cross-cutting need | — Pending |
 | Typed `AppCopy` module as single source of truth for copy (build-gated keys, named-arg interpolation, review-only glossary) | Avoids hand-editing ~408 inline strings twice; makes a bad key a build error | ✓ Built in Phase 1 |
+| Keep wizard state under the existing `personal` persisted root and expose it through selectors | Preserves local user data and avoids a new persist root while making Phase 4 UI reload-safe | ✓ Built in Phase 3 |
 
 | Adopt a typed `AppCopy` source of truth before rewording any screens | Avoid hand-editing ~408 inline strings twice; make a bad key a build error | Validated in Phase 1: Copy Infrastructure |
 
@@ -97,4 +101,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-14 after Phase 1: Copy Infrastructure*
+*Last updated: 2026-06-16 after Phase 3: Wizard State Slice*
