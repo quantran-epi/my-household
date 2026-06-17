@@ -137,6 +137,14 @@ const inventoryDishes = [
 ];
 
 describe('DishScorer', () => {
+    beforeAll(() => {
+        jest.useFakeTimers().setSystemTime(new Date('2026-06-16T12:00:00.000Z'));
+    });
+
+    afterAll(() => {
+        jest.useRealTimers();
+    });
+
     describe('score', () => {
         it('pins selected-ingredient scoring, ordering, and accompaniment filtering', () => {
             const scored = DishScorer.score(scoreFixtureDishes, ['ing-1', 'ing-2'], scoreFixtureDishes);
