@@ -164,7 +164,7 @@ Plans:
 
 **Wave 6** *(blocked on all copy-migration plans)*
 
-- [ ] 05-07-PLAN.md — Vietnamese voice refinement in AppCopy with iterative user-review loop (COPY-04)
+- [x] 05-07-PLAN.md — Vietnamese voice refinement in AppCopy with iterative user-review loop (COPY-04)
 
 ### Phase 6: Differentiator Enhancements
 
