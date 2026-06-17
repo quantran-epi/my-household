@@ -1,5 +1,6 @@
 import { BarChartOutlined, CheckCircleOutlined, ClockCircleOutlined, CopyOutlined, DeleteOutlined, EditOutlined, ExclamationCircleOutlined, FileTextOutlined, MoreOutlined, PlusOutlined, FireOutlined } from "@ant-design/icons";
 import { DishDurationBreakdownItem, DishDurationHelper } from "@common/Helpers/DishDurationHelper";
+import { AppCopy } from "@common/Copy";
 import { Button, ActionButton } from "@components/Button";
 import { Dropdown } from "@components/Dropdown";
 import { FastModalShell } from "@components/FastOverlay";
@@ -12,6 +13,7 @@ import { List, scrollVirtualListToTop, VirtualListRowFrame, VirtualListScrollTop
 import { useMessage } from "@components/Message";
 import { DeferredModalContent, Modal } from "@components/Modal";
 import { Popover } from "@components/Popover";
+import { Sheet } from "@components/Sheet";
 import { Tag } from "@components/Tag";
 import { Typography } from "@components/Typography";
 import { useScreenTitle, useToggle, useAdminMode, usePagedVirtualItems, useScheduledCalculation } from "@hooks";
@@ -71,11 +73,11 @@ type DishFilterData = {
 }
 
 const DISH_STATUS_FILTERS: { value: DishStatusFilter; label: string }[] = [
-    { value: "all", label: "Tất cả" },
-    { value: "ready", label: "Hoàn thiện" },
-    { value: "needs_update", label: "Cần cập nhật" },
-    { value: "has_ingredients", label: "Có nguyên liệu" },
-    { value: "has_steps", label: "Có bước nấu" },
+    { value: "all", label: AppCopy.dishes.statusAll },
+    { value: "ready", label: AppCopy.dishes.statusReady },
+    { value: "needs_update", label: AppCopy.dishes.statusNeedsUpdate },
+    { value: "has_ingredients", label: AppCopy.dishes.statusHasIngredients },
+    { value: "has_steps", label: AppCopy.dishes.statusHasSteps },
 ];
 
 const filterRowStyle: React.CSSProperties = {
@@ -173,7 +175,7 @@ const DeferredSearchInput = React.memo(({ onCommit }: { onCommit: (value: string
 
     useEffect(() => () => commitSearch.cancel(), [commitSearch]);
 
-    return <Input allowClear data-testid="dish-search-input" placeholder="Tìm kiếm" value={value} onChange={onChange} style={searchInputStyle} />;
+    return <Input allowClear data-testid="dish-search-input" placeholder={AppCopy.dishes.searchPlaceholder} value={value} onChange={onChange} style={searchInputStyle} />;
 });
 
 const DishDurationDetail: React.FunctionComponent<{ dish: Dishes; dishesById: Map<string, Dishes> }> = ({ dish, dishesById }) => {
@@ -192,7 +194,7 @@ const DishDurationDetail: React.FunctionComponent<{ dish: Dishes; dishesById: Ma
 
     if (items.length === 0) {
         return <Box style={{ width: 220, padding: 4 }}>
-            <Typography.Text type="secondary">Chưa nhập thời lượng cho món này.</Typography.Text>
+            <Typography.Text type="secondary">{AppCopy.dishes.durationEmpty}</Typography.Text>
         </Box>;
     }
 
@@ -205,13 +207,13 @@ const DishDurationDetail: React.FunctionComponent<{ dish: Dishes; dishesById: Ma
         </Box>
         {ownItem && <Box style={{ border: "1px solid #f0f0f0", borderRadius: 8, background: "#fff", padding: 8, marginBottom: includedItems.length > 0 ? 8 : 0 }}>
             <Stack fullwidth justify="space-between" gap={8} style={{ marginBottom: 6 }}>
-                <Typography.Text strong style={{ fontSize: 13 }}>Món chính</Typography.Text>
+                <Typography.Text strong style={{ fontSize: 13 }}>{AppCopy.dishes.durationOwnDishLabel}</Typography.Text>
                 <Tag style={{ marginRight: 0 }}>{DishDurationHelper.formatMinutes(ownItem.ownMinutes)}</Tag>
             </Stack>
             {renderPhases(ownItem)}
         </Box>}
         {includedItems.length > 0 && <Box>
-            <Typography.Text strong style={{ display: "block", fontSize: 12, lineHeight: "16px", marginBottom: 5 }}>Món bao gồm</Typography.Text>
+            <Typography.Text strong style={{ display: "block", fontSize: 12, lineHeight: "16px", marginBottom: 5 }}>{AppCopy.dishes.durationIncludedDishesLabel}</Typography.Text>
             <List size="small" dataSource={includedItems} renderItem={item => <List.Item style={{ paddingInline: 0, display: "block" }}>
                 <Box style={{ border: "1px solid #f0f0f0", borderRadius: 8, background: "#fff", padding: 8, marginLeft: Math.min(item.depth, 3) * 8 }}>
                     <Stack fullwidth justify="space-between" gap={8} style={{ marginBottom: 6 }}>
@@ -302,7 +304,7 @@ export const DishesListScreen = () => {
     const [activeTag, setActiveTag] = useState<string | null>(null);
     const [activeStatus, setActiveStatus] = useState<DishStatusFilter>("all");
     const dispatch = useDispatch();
-    useScreenTitle({ value: "Món ăn", deps: [] });
+    useScreenTitle({ value: AppCopy.dishes.screenTitle, deps: [] });
     const virtualListStyle = useMemo<React.CSSProperties>(() => ({
         height: "100%",
         overscrollBehavior: "contain",
@@ -448,9 +450,9 @@ export const DishesListScreen = () => {
             <Box style={topToolCardStyle}>
                 <Stack.Compact style={searchControlRowStyle}>
                     <DeferredSearchInput onCommit={_onSearchCommit} />
-                    {isAdmin && <Button preserveAntdStyle onClick={toggleAddModal.show} icon={<PlusOutlined />} />}
+                    {isAdmin && <Button preserveAntdStyle aria-label={AppCopy.dishes.addModalTitle} onClick={toggleAddModal.show} icon={<PlusOutlined />} style={{ width: 44, height: 44, minWidth: 44, paddingInline: 0 }} />}
                 </Stack.Compact>
-                {searchPending && <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "15px", marginTop: 5 }}>Đang lọc danh sách...</Typography.Text>}
+                {searchPending && <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "15px", marginTop: 5 }}>{AppCopy.dishes.filteringHint}</Typography.Text>}
                 <div style={filterRowStyle}>
                     {DISH_STATUS_FILTERS.map(item => (
                         <button key={item.value} type="button" data-testid={`dish-filter-${item.value}`} onClick={() => _setActiveStatus(item.value)} style={filterChipStyle(activeStatus === item.value)}>
@@ -461,7 +463,7 @@ export const DishesListScreen = () => {
                 {allTags.length > 0 && (
                     <div style={filterRowStyle}>
                         <button type="button" data-testid="dish-tag-filter-reset" onClick={_resetActiveTag} style={filterChipStyle(activeTag === null)}>
-                            Tất cả tag ({tagCounts.__all ?? 0})
+                            {AppCopy.dishes.allTagsLabel} ({tagCounts.__all ?? 0})
                         </button>
                         {allTags.map(tag => (
                             <button key={tag} type="button" onClick={() => _toggleActiveTag(tag)} style={filterChipStyle(activeTag === tag)}>
@@ -485,7 +487,7 @@ export const DishesListScreen = () => {
                     data-testid="dish-virtual-list"
                 />
                 {hasMoreDishes && <div data-testid="dish-list-page-status" style={{ position: "absolute", left: "50%", bottom: 10, transform: "translateX(-50%)", padding: "4px 10px", borderRadius: 999, background: "rgba(255,255,255,0.94)", border: "1px solid #f0f0f0", boxShadow: "0 4px 14px rgba(0,0,0,0.08)", fontSize: 12, color: "#595959", pointerEvents: "none" }}>
-                    Đã tải {loadedDishCount}/{totalDishCount}
+                    {AppCopy.dishes.loadedCount({ loaded: loadedDishCount, total: totalDishCount })}
                 </div>}
                 <VirtualListScrollTopButton listRef={listRef} rowCount={visibleDishes.length} visible={showScrollTop} />
             </div>
@@ -493,7 +495,7 @@ export const DishesListScreen = () => {
         <Modal open={toggleAddModal.value} title={
             <Space>
                 <Image src={NoodlesIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
-                Thêm món ăn
+                {AppCopy.dishes.addModalTitle}
             </Space>
         } destroyOnClose={true} onCancel={toggleAddModal.hide} footer={null}>
             <DeferredModalContent active={toggleAddModal.value}>
@@ -557,7 +559,7 @@ const DishesItemComponent: React.FunctionComponent<DishesItemProps> = (props) =>
             case "delete": {
                 const refs = _referencingDishes();
                 if (refs.length > 0) {
-                    message.error(`Không thể xóa! Món ăn này đang được dùng trong: ${refs.map(d => d.name).join(", ")}.`);
+                    message.error(AppCopy.dishes.cannotDeleteUsedIn({ dishNames: refs.map(d => d.name).join(", ") }));
                 } else {
                     toggleDeleteConfirm.show();
                 }
@@ -569,7 +571,7 @@ const DishesItemComponent: React.FunctionComponent<DishesItemProps> = (props) =>
     const _onSaveDuration = (value: DishesDurationEditParams) => {
         dispatch(updateDishDuration(value));
         toggleEditDuration.hide();
-        message.success("Đã lưu thời gian món ăn");
+        message.success(AppCopy.dishes.savedCookTimeToast);
     }
 
     const ingredientCount = props.summary.ingredientCount;
@@ -600,7 +602,7 @@ const DishesItemComponent: React.FunctionComponent<DishesItemProps> = (props) =>
             }}>
                 <div onClick={toggleDishesDetail.show} style={{ position: "relative", cursor: "pointer", width: 88, height: 122 }}>
                     <DishImageWidget src={props.item.image} width={88} height={122} borderRadius={8} fallbackIconSize={34} surface="list" testId={`dish-row-image-${props.item.id}`} />
-                    <Popover title="Thời lượng" content={durationOpen ? <DishDurationDetail dish={props.item} dishesById={dishesById} /> : null} open={durationOpen} onOpenChange={setDurationOpen}>
+                    <Popover title={AppCopy.dishes.durationPopoverTitle} content={durationOpen ? <DishDurationDetail dish={props.item} dishesById={dishesById} /> : null} open={durationOpen} onOpenChange={setDurationOpen}>
                         <button
                             type="button"
                             onClick={(event) => event.stopPropagation()}
@@ -627,7 +629,7 @@ const DishesItemComponent: React.FunctionComponent<DishesItemProps> = (props) =>
                         >
                             <ClockCircleOutlined style={{ fontSize: 11, flexShrink: 0 }} />
                             <span style={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                {hasDuration ? _sumDuration() : "Chưa có"}
+                                {hasDuration ? _sumDuration() : AppCopy.dishes.durationBadgeEmpty}
                             </span>
                         </button>
                     </Popover>
@@ -645,7 +647,7 @@ const DishesItemComponent: React.FunctionComponent<DishesItemProps> = (props) =>
                         textAlign: "center",
                         whiteSpace: "nowrap",
                     }}>
-                        {props.item.isCompleted ? "Hoàn thiện" : "Cần cập nhật"}
+                        {props.item.isCompleted ? AppCopy.dishes.statusComplete : AppCopy.dishes.statusNeedsUpdateBadge}
                     </div>
                 </div>
 
@@ -662,21 +664,21 @@ const DishesItemComponent: React.FunctionComponent<DishesItemProps> = (props) =>
                             <Space size={[4, 4]} wrap>
                                 {visibleTags.map(tag => <Tag key={tag} color="geekblue" style={{ fontSize: 11, padding: "0 5px", marginInlineEnd: 0 }}>{tag}</Tag>)}
                                 {extraTagCount > 0 && <Tag style={{ fontSize: 11, padding: "0 5px", marginInlineEnd: 0 }}>+{extraTagCount}</Tag>}
-                                <Tag color="blue" style={{ fontSize: 11, padding: "0 5px", marginInlineEnd: 0 }}>{baseServings} phần</Tag>
+                                <Tag color="blue" style={{ fontSize: 11, padding: "0 5px", marginInlineEnd: 0 }}>{AppCopy.dishes.servingsTag({ count: baseServings })}</Tag>
                             </Space>
                         </div>
 
                         <Dropdown menu={{
                             items: [
-                                { label: "Bắt đầu nấu", key: "cook", icon: <FireOutlined /> },
-                                { label: "Xuất dữ liệu", key: "export", icon: <FileTextOutlined /> },
+                                { label: AppCopy.dishes.menuStartCooking, key: "cook", icon: <FireOutlined /> },
+                                { label: AppCopy.dishes.menuExport, key: "export", icon: <FileTextOutlined /> },
                                 ...(props.isAdmin ? [
                                     { type: "divider" as const },
-                                    { label: "Sửa món ăn", key: "edit", icon: <EditOutlined /> },
-                                    { label: "Thời lượng", key: "duration", icon: <ClockCircleOutlined /> },
-                                    { label: "Nhân bản", key: "duplicate", icon: <CopyOutlined /> },
+                                    { label: AppCopy.dishes.menuEdit, key: "edit", icon: <EditOutlined /> },
+                                    { label: AppCopy.dishes.menuDuration, key: "duration", icon: <ClockCircleOutlined /> },
+                                    { label: AppCopy.dishes.menuDuplicate, key: "duplicate", icon: <CopyOutlined /> },
                                     { type: "divider" as const },
-                                    { label: "Xóa", key: "delete", icon: <DeleteOutlined />, danger: true },
+                                    { label: AppCopy.dishes.menuDelete, key: "delete", icon: <DeleteOutlined />, danger: true },
                                 ] : []),
                             ],
                             onClick: (e) => e.key === "export" ? toggleExport.show() : _onMoreActionClick(e)
@@ -687,32 +689,32 @@ const DishesItemComponent: React.FunctionComponent<DishesItemProps> = (props) =>
 
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 6 }}>
                         <div style={{ border: "1px solid #f0f0f0", background: "#fafafa", borderRadius: 8, padding: "6px 7px", textAlign: "left", minWidth: 0 }}>
-                            <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "14px" }}>Nguyên liệu</Typography.Text>
+                            <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "14px" }}>{AppCopy.dishes.ingredientsLabel}</Typography.Text>
                             <Typography.Text strong style={{ display: "block", fontSize: 13, lineHeight: "18px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                {hasIngredients ? `${ingredientCount} nguyên liệu` : "Chưa có"}
+                                {hasIngredients ? AppCopy.dishes.ingredientsCount({ count: ingredientCount }) : AppCopy.dishes.emptyShort}
                             </Typography.Text>
-                            {optionalIngredientCount > 0 && <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "14px" }}>{optionalIngredientCount} tùy chọn</Typography.Text>}
+                            {optionalIngredientCount > 0 && <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "14px" }}>{AppCopy.dishes.optionalCount({ count: optionalIngredientCount })}</Typography.Text>}
                         </div>
 
                         <div style={{ border: "1px solid #f0f0f0", background: "#fafafa", borderRadius: 8, padding: "6px 7px", textAlign: "left", minWidth: 0 }}>
-                            <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "14px" }}>Quy trình</Typography.Text>
+                            <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "14px" }}>{AppCopy.dishes.stepsLabel}</Typography.Text>
                             <Typography.Text strong style={{ display: "block", fontSize: 13, lineHeight: "18px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                {hasSteps ? `${stepCount} bước` : "Chưa có"}
+                                {hasSteps ? AppCopy.dishes.stepsCount({ count: stepCount }) : AppCopy.dishes.emptyShort}
                             </Typography.Text>
-                            {includedDishCount > 0 && <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "14px" }}>{includedDishCount} món kèm</Typography.Text>}
+                            {includedDishCount > 0 && <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "14px" }}>{AppCopy.dishes.includedDishCount({ count: includedDishCount })}</Typography.Text>}
                         </div>
                     </div>
 
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginTop: "auto", flexWrap: "wrap" }}>
                         <Space size={6} style={{ minWidth: 0 }}>
                             {props.item.isCompleted
-                                ? <Typography.Text style={{ color: "#389e0d", fontSize: 12 }}><CheckCircleOutlined /> Sẵn sàng</Typography.Text>
-                                : <Typography.Text style={{ color: "#d46b08", fontSize: 12 }}><ExclamationCircleOutlined /> Cần cập nhật</Typography.Text>}
-                            {requiredIngredientCount > 0 && <Typography.Text type="secondary" style={{ fontSize: 12 }}>{requiredIngredientCount} nguyên liệu bắt buộc</Typography.Text>}
+                                ? <Typography.Text style={{ color: "#389e0d", fontSize: 12 }}><CheckCircleOutlined /> {AppCopy.dishes.readyShort}</Typography.Text>
+                                : <Typography.Text style={{ color: "#d46b08", fontSize: 12 }}><ExclamationCircleOutlined /> {AppCopy.dishes.needsUpdateShort}</Typography.Text>}
+                            {requiredIngredientCount > 0 && <Typography.Text type="secondary" style={{ fontSize: 12 }}>{AppCopy.dishes.requiredIngredientCount({ count: requiredIngredientCount })}</Typography.Text>}
                         </Space>
                         <Space size={6}>
-                            <ActionButton tone="success" icon={<FireOutlined />} onClick={toggleCooking.show}>Nấu</ActionButton>
-                            <ActionButton tone="primary" icon={<BarChartOutlined />} onClick={toggleNutritionUsage.show}>Dinh dưỡng</ActionButton>
+                            <ActionButton tone="success" icon={<FireOutlined />} onClick={toggleCooking.show}>{AppCopy.dishes.rowCookAction}</ActionButton>
+                            <ActionButton tone="primary" icon={<BarChartOutlined />} onClick={toggleNutritionUsage.show}>{AppCopy.dishes.rowNutritionAction}</ActionButton>
                         </Space>
                     </div>
                 </div>
@@ -727,8 +729,8 @@ const DishesItemComponent: React.FunctionComponent<DishesItemProps> = (props) =>
                 {props.item.name}
             </Space>
         } onClose={toggleDishesDetail.hide} footer={<Space>
-            <Button onClick={toggleDishesDetail.hide}>Đóng</Button>
-            <Button type="primary" icon={<EditOutlined />} onClick={_onOpenDetailPage}>Mở trang chi tiết</Button>
+            <Button onClick={toggleDishesDetail.hide}>{AppCopy.dishes.detailFooterClose}</Button>
+            <Button type="primary" icon={<EditOutlined />} onClick={_onOpenDetailPage}>{AppCopy.dishes.detailFooterOpenPage}</Button>
         </Space>}>
             <DeferredModalContent active={toggleDishesDetail.value} minHeight={220}>
                 <DishesDetailWidget dish={props.item} />
@@ -737,7 +739,7 @@ const DishesItemComponent: React.FunctionComponent<DishesItemProps> = (props) =>
         {toggleEdit.value && <Modal open={toggleEdit.value} title={
             <Space>
                 <Image src={NoodlesIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
-                Chỉnh sửa món ăn
+                {AppCopy.dishes.editModalTitle}
             </Space>
         } destroyOnClose={true} onCancel={toggleEdit.hide} footer={null}>
             <DeferredModalContent active={toggleEdit.value}>
@@ -747,28 +749,30 @@ const DishesItemComponent: React.FunctionComponent<DishesItemProps> = (props) =>
         {toggleEditDuration.value && <Modal open={toggleEditDuration.value} title={<Stack gap={0} direction="column" align="flex-start">
             <Space>
                 <Image src={Clock2Icon} preview={false} width={24} style={{ marginBottom: 3 }} />
-                <Typography.Title level={5} style={{ margin: 0 }}>Thời lượng</Typography.Title>
+                <Typography.Title level={5} style={{ margin: 0 }}>{AppCopy.dishes.durationModalTitle}</Typography.Title>
             </Space>
             <Typography.Text type="secondary">{props.item.name}</Typography.Text>
         </Stack>} destroyOnClose={true} onCancel={toggleEditDuration.hide} footer={null}>
             <DishDurationWidget dish={props.item} onSave={_onSaveDuration} />
         </Modal>}
         {toggleExport.value && <DishesExportWidget dish={props.item} allIngredients={ingredients} open={toggleExport.value} onClose={toggleExport.hide} />}
-        {toggleDeleteConfirm.value && <Modal
+        {toggleDeleteConfirm.value && <Sheet
             open={toggleDeleteConfirm.value}
-            title={<Space><DeleteOutlined style={{ color: "red" }} />Xác nhận xóa</Space>}
-            onCancel={toggleDeleteConfirm.hide}
-            onOk={() => { props.onDelete(props.item); toggleDeleteConfirm.hide(); }}
-            okText="Xóa"
-            cancelText="Hủy"
-            okButtonProps={{ danger: true }}
-            destroyOnClose
+            title={<Space><DeleteOutlined style={{ color: "red" }} />{AppCopy.dishes.deleteConfirmTitle}</Space>}
+            onClose={toggleDeleteConfirm.hide}
+            data-testid={`dish-delete-sheet-${props.item.id}`}
         >
-            Bạn có chắc muốn xóa món <b>{props.item.name}</b> không? Hành động này không thể hoàn tác.
-        </Modal>}
+            <Stack direction="column" gap={16} fullwidth align="stretch" style={{ padding: 16 }}>
+                <Typography.Text>{AppCopy.dishes.deleteConfirmBody({ name: props.item.name })}</Typography.Text>
+                <Button type="primary" danger size="large" onClick={() => { props.onDelete(props.item); toggleDeleteConfirm.hide(); }}>
+                    {AppCopy.dishes.menuDelete}
+                </Button>
+                <Button size="large" onClick={toggleDeleteConfirm.hide}>{AppCopy.common.cancel}</Button>
+            </Stack>
+        </Sheet>}
         {toggleCooking.value && <Modal
             open={toggleCooking.value}
-            title={<Space><FireOutlined style={{ color: "#fa8c16" }} />{props.item.name} — Bắt đầu nấu</Space>}
+            title={<Space><FireOutlined style={{ color: "#fa8c16" }} />{props.item.name} — {AppCopy.dishes.cookingModalSuffix}</Space>}
             destroyOnClose
             onCancel={toggleCooking.hide}
             footer={null}

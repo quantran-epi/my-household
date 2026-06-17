@@ -463,6 +463,67 @@ export const AppCopy = {
         allMembersPlaceholder: "Tất cả thành viên",
         suitabilityScoreSummary: (args: { positives: number; warnings: number }) => `${args.positives} điểm hợp · ${args.warnings} lưu ý`,
     },
+    dishes: {
+        // Screen header / page-level
+        screenTitle: "Món ăn",
+        searchPlaceholder: "Tìm kiếm",
+        filteringHint: "Đang lọc danh sách...",
+        loadedCount: (args: { loaded: number; total: number }) => `Đã tải ${args.loaded}/${args.total}`,
+        // Status filter chips
+        statusAll: "Tất cả",
+        statusReady: "Hoàn thiện",
+        statusNeedsUpdate: "Cần cập nhật",
+        statusHasIngredients: "Có nguyên liệu",
+        statusHasSteps: "Có bước nấu",
+        // Tag filter
+        allTagsLabel: "Tất cả tag",
+        // Add modal
+        addModalTitle: "Thêm món ăn",
+        // Duration popover
+        durationPopoverTitle: "Thời lượng",
+        durationEmpty: "Chưa nhập thời lượng cho món này.",
+        durationOwnDishLabel: "Món chính",
+        durationIncludedDishesLabel: "Món bao gồm",
+        // Row badges
+        durationBadgeEmpty: "Chưa có",
+        statusComplete: "Hoàn thiện",
+        statusNeedsUpdateBadge: "Cần cập nhật",
+        servingsTag: (args: { count: number }) => `${args.count} phần`,
+        // Row dropdown menu
+        menuStartCooking: "Bắt đầu nấu",
+        menuExport: "Xuất dữ liệu",
+        menuEdit: "Sửa món ăn",
+        menuDuration: "Thời lượng",
+        menuDuplicate: "Nhân bản",
+        menuDelete: "Xóa",
+        // Row metric cards
+        ingredientsLabel: "Nguyên liệu",
+        ingredientsCount: (args: { count: number }) => `${args.count} nguyên liệu`,
+        emptyShort: "Chưa có",
+        optionalCount: (args: { count: number }) => `${args.count} tùy chọn`,
+        stepsLabel: "Quy trình",
+        stepsCount: (args: { count: number }) => `${args.count} bước`,
+        includedDishCount: (args: { count: number }) => `${args.count} món kèm`,
+        // Row footer status
+        readyShort: "Sẵn sàng",
+        needsUpdateShort: "Cần cập nhật",
+        requiredIngredientCount: (args: { count: number }) => `${args.count} nguyên liệu bắt buộc`,
+        rowCookAction: "Nấu",
+        rowNutritionAction: "Dinh dưỡng",
+        // Detail modal
+        detailFooterClose: "Đóng",
+        detailFooterOpenPage: "Mở trang chi tiết",
+        // Edit / duration / cooking modals
+        editModalTitle: "Chỉnh sửa món ăn",
+        durationModalTitle: "Thời lượng",
+        cookingModalSuffix: "Bắt đầu nấu",
+        // Toasts / inline messages
+        savedCookTimeToast: "Đã lưu thời gian món ăn",
+        cannotDeleteUsedIn: (args: { dishNames: string }) => `Không thể xóa! Món ăn này đang được dùng trong: ${args.dishNames}.`,
+        // Delete confirm Sheet
+        deleteConfirmTitle: "Xác nhận xóa",
+        deleteConfirmBody: (args: { name: string }) => `Bạn có chắc muốn xóa món ${args.name} không? Hành động này không thể hoàn tác.`,
+    },
     emptyStates: {
         noDishes: "Chưa có món nào — thêm món đầu tiên nhé",
         noSchedule: "Chưa có bữa nào được lên lịch — bắt đầu nhé",
