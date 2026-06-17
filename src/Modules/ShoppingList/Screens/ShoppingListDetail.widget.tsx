@@ -7,8 +7,10 @@ import { Image } from "@components/Image";
 import { Box } from "@components/Layout/Box";
 import { Stack } from "@components/Layout/Stack";
 import { List } from "@components/List";
-import { DeferredModalContent, Modal } from "@components/Modal";
+import { DeferredModalContent } from "@components/Modal";
+import { Sheet } from "@components/Sheet";
 import { useMessage } from "@components/Message";
+import { AppCopy } from "@common/Copy";
 import { Tooltip } from "@components/Tootip";
 import { Typography } from "@components/Typography";
 import { useScheduledCalculation, useToggle } from "@hooks";
@@ -341,21 +343,9 @@ const estimateRememberedPriceForTarget = (
 }
 
 const formatPriceMemoryLine = (memory: IngredientPriceMemory): string => {
-    const dateLabel = memory.updatedAt ? moment(memory.updatedAt).format("DD/MM") : "gần nhất";
+    const dateLabel = memory.updatedAt ? moment(memory.updatedAt).format("DD/MM") : AppCopy.shoppingList.recentLabel;
     return `${IngredientPriceHelper.formatCurrency(memory.price)} / ${IngredientUnitHelper.formatAmount(memory.amount)}${memory.unit} · ${dateLabel}`;
 }
-
-const compactSmallButtonStyle: React.CSSProperties = {
-    height: 30,
-    padding: "0 10px",
-    lineHeight: "18px",
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 999,
-    fontSize: 12,
-    fontWeight: 650,
-};
 
 const asHistoryEntry = (memory: IngredientPriceMemory | undefined): IngredientPriceHistoryEntry | undefined => {
     if (!memory) return undefined;
@@ -490,7 +480,7 @@ export const ShoppingListDetailWidget: React.FunctionComponent<ShoppingListDetai
 
         dispatch(completeShoppingList({ shoppingListId: props.shoppingList.id, imports: completionImports }));
         toggleCompletionReview.hide();
-        message.success("Đã hoàn tất lịch mua sắm");
+        message.success(AppCopy.shoppingList.completedToast);
     }
 
     const _onCompleteShoppingList = () => {
@@ -511,7 +501,7 @@ export const ShoppingListDetailWidget: React.FunctionComponent<ShoppingListDetai
     return <React.Fragment>
         <Tabs activeKey={activeTab} onChange={setActiveTab} items={[
             {
-                key: "ingredients", icon: <Image src={IngredientIcon} preview={false} width={22} style={{ marginBottom: 3 }} />, label: `Nguyên liệu (${props.shoppingList.ingredients.length})`,
+                key: "ingredients", icon: <Image src={IngredientIcon} preview={false} width={22} style={{ marginBottom: 3 }} />, label: AppCopy.shoppingList.ingredientsTab({ count: props.shoppingList.ingredients.length }),
                 children: activeTab === "ingredients" ? <div data-testid="shopping-list-ingredients-tab">
                     <Stack fullwidth justify="space-between" style={{ marginBottom: 10 }}>
                         <Space>
@@ -522,19 +512,21 @@ export const ShoppingListDetailWidget: React.FunctionComponent<ShoppingListDetai
                             ? <Space>
                                 <CheckCircleOutlined style={{ color: "#52c41a" }} />
                                 <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                                    Đã hoàn tất {moment(props.shoppingList.completedAt).format("DD/MM/YYYY HH:mm")}
+                                    {AppCopy.shoppingList.completedAt({ when: moment(props.shoppingList.completedAt).format("DD/MM/YYYY HH:mm") })}
                                 </Typography.Text>
                             </Space>
-                            : <Space wrap size={6} style={{ justifyContent: "flex-end" }}>
+                            : <Stack fullwidth justify="flex-end">
                                 <Button
                                     type="primary"
+                                    size="large"
                                     icon={<ShoppingCartOutlined />}
                                     disabled={props.shoppingList.ingredients.length === 0}
                                     onClick={_onCompleteShoppingList}
+                                    style={{ minHeight: 44 }}
                                 >
-                                    Hoàn tất
+                                    {AppCopy.shoppingList.completeAction}
                                 </Button>
-                            </Space>}
+                            </Stack>}
                     </Stack>
                     <Box>
                         {groupedIngredients.length > 1
@@ -556,7 +548,7 @@ export const ShoppingListDetailWidget: React.FunctionComponent<ShoppingListDetai
                 </div> : null
             },
             {
-                key: "cost", icon: <Image src={BudgetIcon} preview={false} width={22} style={{ marginBottom: 3 }} />, label: "Chi phí",
+                key: "cost", icon: <Image src={BudgetIcon} preview={false} width={22} style={{ marginBottom: 3 }} />, label: AppCopy.shoppingList.costTab,
                 children: activeTab === "cost" ? <Box data-testid="shopping-list-cost-tab">
                     <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%", boxSizing: "border-box" }}>
                         <ShoppingListCostSummaryWidget summary={costSummary} pending={costSummaryPending} />
@@ -565,7 +557,7 @@ export const ShoppingListDetailWidget: React.FunctionComponent<ShoppingListDetai
                 </Box> : null
             },
             {
-                key: "dishes", icon: <Image src={DishesIcon} preview={false} width={22} style={{ marginBottom: 3 }} />, label: `Món ăn (${props.shoppingList.dishes.length})`,
+                key: "dishes", icon: <Image src={DishesIcon} preview={false} width={22} style={{ marginBottom: 3 }} />, label: AppCopy.shoppingList.dishesTab({ count: props.shoppingList.dishes.length }),
                 children: activeTab === "dishes" ? <Box data-testid="shopping-list-dishes-tab">
                     <List
                         size="small"
@@ -576,7 +568,7 @@ export const ShoppingListDetailWidget: React.FunctionComponent<ShoppingListDetai
                 </Box> : null
             },
             {
-                key: "meals", icon: <Image src={MealsIcon} preview={false} width={22} style={{ marginBottom: 3 }} />, label: `Thực đơn (${props.shoppingList.scheduledMeals.length})`,
+                key: "meals", icon: <Image src={MealsIcon} preview={false} width={22} style={{ marginBottom: 3 }} />, label: AppCopy.shoppingList.mealsTab({ count: props.shoppingList.scheduledMeals.length }),
                 children: activeTab === "meals" ? <Box data-testid="shopping-list-meals-tab">
                     <List
                         size="small"
@@ -616,37 +608,25 @@ export const ShoppingListDetailWidget: React.FunctionComponent<ShoppingListDetai
                 </Box> : null
             }
         ]} />
-        <Modal style={{ top: 50 }} open={toggleMealModal.value} title={<Space>
+        <Sheet open={toggleMealModal.value} title={<Space>
             <Image src={MealsIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
-            Thực đơn
-        </Space>} destroyOnClose={true} onCancel={toggleMealModal.hide} footer={null}>
-            <Box style={{ maxHeight: 550, overflowY: "auto" }}>
+            {AppCopy.shoppingList.mealModalTitle}
+        </Space>} onClose={toggleMealModal.hide}>
+            <Box style={{ maxHeight: 550, overflowY: "auto", padding: 16 }}>
                 <DeferredModalContent active={toggleMealModal.value} minHeight={220}>
                     <ShoppingListMealDetailWidget mealId={selectedMeal} />
                 </DeferredModalContent>
             </Box>
-        </Modal>
-        <Modal
-            style={{ top: 40 }}
-            width={760}
+        </Sheet>
+        <Sheet
             open={toggleCompletionReview.value}
             title={<Space size={8}>
                 <ShoppingCartOutlined />
-                <span>Xác nhận hoàn tất mua sắm</span>
+                <span>{AppCopy.shoppingList.completionReviewTitle}</span>
             </Space>}
-            destroyOnClose
-            onCancel={toggleCompletionReview.hide}
-            footer={<div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap", width: "100%", boxSizing: "border-box" }}>
-                <Typography.Text type="secondary" style={{ fontSize: 12, lineHeight: "18px" }}>
-                    Kiểm tra hạn dùng và nơi bảo quản trước khi nhập kho.
-                </Typography.Text>
-                <Space>
-                    <Button onClick={toggleCompletionReview.hide}>Hủy</Button>
-                    <Button type="primary" danger onClick={_completeShoppingList}>Hoàn tất và nhập kho</Button>
-                </Space>
-            </div>}
+            onClose={toggleCompletionReview.hide}
         >
-            <div data-testid="purchase-completion-review">
+            <div data-testid="purchase-completion-review" style={{ padding: 16 }}>
                 <DeferredModalContent active={toggleCompletionReview.value} minHeight={220}>
                     <PurchaseCompletionReviewWidget
                         plans={boughtImportPlans}
@@ -654,8 +634,19 @@ export const ShoppingListDetailWidget: React.FunctionComponent<ShoppingListDetai
                         onPatch={_patchCompletionReviewValue}
                     />
                 </DeferredModalContent>
+                <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "18px", marginTop: 12 }}>
+                    {AppCopy.shoppingList.completionReviewHint}
+                </Typography.Text>
+                <Stack direction="column" gap={8} fullwidth style={{ marginTop: 12 }}>
+                    <Button type="primary" danger size="large" onClick={_completeShoppingList} style={{ width: "100%", minHeight: 44 }}>
+                        {AppCopy.shoppingList.completeAndImport}
+                    </Button>
+                    <Button size="large" onClick={toggleCompletionReview.hide} style={{ width: "100%", minHeight: 44 }}>
+                        {AppCopy.common.cancel}
+                    </Button>
+                </Stack>
             </div>
-        </Modal>
+        </Sheet>
     </React.Fragment >
 
 }
@@ -677,10 +668,10 @@ const PurchaseCompletionReviewWidget: React.FunctionComponent<{
                 <WarningOutlined style={{ color: "#d46b08", marginTop: 2 }} />
                 <div style={{ minWidth: 0 }}>
                     <Typography.Text strong style={{ display: "block", color: "#ad4e00", fontSize: 13, lineHeight: "18px" }}>
-                        Hành động này không thể hoàn tác
+                        {AppCopy.shoppingList.irreversibleWarning}
                     </Typography.Text>
                     <Typography.Text style={{ display: "block", color: "#ad4e00", fontSize: 12, lineHeight: "18px" }}>
-                        Sau khi hoàn tất, danh sách mua sắm sẽ chuyển sang chỉ xem và các lô bên dưới sẽ được thêm vào kho.
+                        {AppCopy.shoppingList.completionReviewBody}
                     </Typography.Text>
                 </div>
             </div>
@@ -689,20 +680,20 @@ const PurchaseCompletionReviewWidget: React.FunctionComponent<{
         <Box style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", borderRadius: 8, background: "#fafafa", border: "1px solid #f0f0f0" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap", width: "100%", boxSizing: "border-box" }}>
                 <Box>
-                    <Typography.Text strong style={{ display: "block", lineHeight: "20px" }}>{plans.length} lô sẽ được nhập kho</Typography.Text>
+                    <Typography.Text strong style={{ display: "block", lineHeight: "20px" }}>{AppCopy.shoppingList.batchesToImport({ count: plans.length })}</Typography.Text>
                     <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "18px" }}>
-                        Hạn dùng để trống sẽ dùng quy tắc bảo quản của nguyên liệu.
+                        {AppCopy.shoppingList.expiryEmptyHint}
                     </Typography.Text>
                 </Box>
                 <Typography.Text strong style={{ color: "#0958d9" }}>
-                    {CostEstimateHelper.hasPrice(total) ? IngredientPriceHelper.formatRange(total) : "0đ"}
+                    {CostEstimateHelper.hasPrice(total) ? IngredientPriceHelper.formatRange(total) : AppCopy.shoppingList.zeroPrice}
                 </Typography.Text>
             </div>
         </Box>
 
         {plans.length === 0 && <Box style={{ width: "100%", boxSizing: "border-box", padding: "12px", borderRadius: 8, background: "#fafafa", border: "1px dashed #d9d9d9" }}>
             <Typography.Text type="secondary">
-                Không có nguyên liệu nào cần thêm vào kho. Danh sách vẫn sẽ được đánh dấu hoàn tất.
+                {AppCopy.shoppingList.noBatchesToImport}
             </Typography.Text>
         </Box>}
 
@@ -735,14 +726,14 @@ const PurchaseCompletionReviewWidget: React.FunctionComponent<{
                                 </Typography.Text>
                             </div>
                             <Typography.Text type="secondary" style={{ fontSize: 12, lineHeight: "18px", whiteSpace: "nowrap" }}>
-                                {cost ? IngredientPriceHelper.formatRange(cost) : "Chưa có giá"}
+                                {cost ? IngredientPriceHelper.formatRange(cost) : AppCopy.shoppingList.noPriceYet}
                             </Typography.Text>
                         </div>
                         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8, width: "100%" }}>
                             <DatePicker
                                 size="middle"
                                 allowClear
-                                placeholder="Hạn dùng"
+                                placeholder={AppCopy.shoppingList.expiryPlaceholder}
                                 value={value.expiresAt ? moment(value.expiresAt) : undefined}
                                 onChange={(date) => onPatch(plan.ingredientId, { expiresAt: date ? date.endOf("day").toISOString() : undefined })}
                                 style={{ width: "100%", height: 32 }}
@@ -750,7 +741,7 @@ const PurchaseCompletionReviewWidget: React.FunctionComponent<{
                             <Select
                                 size="middle"
                                 allowClear
-                                placeholder="Bảo quản"
+                                placeholder={AppCopy.shoppingList.storagePlaceholder}
                                 value={preservationValue}
                                 onChange={(next: IngredientPreservationCondition) => onPatch(plan.ingredientId, { preservationCondition: next })}
                                 style={{ width: "100%", height: 32 }}
@@ -774,16 +765,16 @@ const ShoppingListCompletionAuditWidget: React.FunctionComponent<{ shoppingList:
         <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%", boxSizing: "border-box" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap", width: "100%", boxSizing: "border-box" }}>
                 <Box>
-                    <Typography.Text strong style={{ display: "block", lineHeight: "20px" }}>Lịch sử nhập kho</Typography.Text>
+                    <Typography.Text strong style={{ display: "block", lineHeight: "20px" }}>{AppCopy.shoppingList.importHistoryTitle}</Typography.Text>
                     <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "18px" }}>
-                        Hoàn tất {moment(shoppingList.completedAt).format("DD/MM/YYYY HH:mm")}
+                        {AppCopy.shoppingList.auditCompletedAt({ when: moment(shoppingList.completedAt).format("DD/MM/YYYY HH:mm") })}
                     </Typography.Text>
                 </Box>
-                <Typography.Text type="secondary" style={{ fontSize: 12 }}>{imports.length} lô</Typography.Text>
+                <Typography.Text type="secondary" style={{ fontSize: 12 }}>{AppCopy.shoppingList.batchCount({ count: imports.length })}</Typography.Text>
             </div>
 
             {imports.length === 0
-                ? <Typography.Text type="secondary" style={{ fontSize: 12 }}>Không có lô nguyên liệu nào được nhập khi hoàn tất.</Typography.Text>
+                ? <Typography.Text type="secondary" style={{ fontSize: 12 }}>{AppCopy.shoppingList.noImportedBatches}</Typography.Text>
                 : <List
                     size="small"
                     style={{ width: "100%" }}
@@ -806,10 +797,10 @@ const ShoppingListCompletionAuditWidget: React.FunctionComponent<{ shoppingList:
                                 {item.estimatedCost ? ` · ${IngredientPriceHelper.formatRange(item.estimatedCost)}` : ""}
                             </Typography.Text>
                             <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "18px", marginTop: 2 }}>
-                                Lô {item.batchId}
+                                {AppCopy.shoppingList.batchLabel({ id: item.batchId })}
                             </Typography.Text>
                             {(item.expiresAt || item.preservationCondition) && <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "18px", marginTop: 2 }}>
-                                {item.expiresAt ? `Hạn dùng ${moment(item.expiresAt).format("DD/MM/YYYY")}` : ""}
+                                {item.expiresAt ? AppCopy.shoppingList.expiresOn({ date: moment(item.expiresAt).format("DD/MM/YYYY") }) : ""}
                                 {item.expiresAt && item.preservationCondition ? " · " : ""}
                                 {storageLabel(item.preservationCondition) ?? ""}
                             </Typography.Text>}
@@ -820,9 +811,9 @@ const ShoppingListCompletionAuditWidget: React.FunctionComponent<{ shoppingList:
     </Box>
 }
 
-const formatCostSummary = (summary: CostEstimateSummary, emptyText = "0đ"): string => {
+const formatCostSummary = (summary: CostEstimateSummary, emptyText: string = AppCopy.shoppingList.zeroPrice): string => {
     if (!CostEstimateHelper.hasAny(summary)) return emptyText;
-    if (!CostEstimateHelper.hasPrice(summary)) return "Chưa có giá";
+    if (!CostEstimateHelper.hasPrice(summary)) return AppCopy.shoppingList.noPriceYet;
     return IngredientPriceHelper.formatRange(summary);
 }
 
@@ -851,7 +842,7 @@ const ShoppingListCostMetric: React.FunctionComponent<ShoppingListCostMetricProp
                 {description}
             </Typography.Text>
             {summary.missingPriceCount > 0 && <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "16px" }}>
-                {summary.missingPriceCount} mục chưa có giá
+                {AppCopy.shoppingList.missingPriceCount({ count: summary.missingPriceCount })}
             </Typography.Text>}
         </div>
     </div>
@@ -869,46 +860,46 @@ const ShoppingListCostSummaryWidget: React.FunctionComponent<{ summary: Shopping
         {pending ? <div style={{ minHeight: 92, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
             <Stack direction="column" align="center" gap={8}>
                 <Spin size="small" />
-                <Typography.Text type="secondary">Đang tính chi phí mua sắm...</Typography.Text>
+                <Typography.Text type="secondary">{AppCopy.shoppingList.costCalculating}</Typography.Text>
             </Stack>
         </div> :
         <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%", boxSizing: "border-box" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap", width: "100%", boxSizing: "border-box" }}>
                 <Box>
-                    <Typography.Text strong style={{ display: "block", lineHeight: "20px" }}>Ước tính mua sắm</Typography.Text>
-                    <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "18px" }}>Giá tham khảo theo khoảng giá nguyên liệu</Typography.Text>
+                    <Typography.Text strong style={{ display: "block", lineHeight: "20px" }}>{AppCopy.shoppingList.costEstimateTitle}</Typography.Text>
+                    <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "18px" }}>{AppCopy.shoppingList.costEstimateSubtitle}</Typography.Text>
                 </Box>
-                <Typography.Text type="secondary" style={{ fontSize: 12 }}>Tổng quan chi phí</Typography.Text>
+                <Typography.Text type="secondary" style={{ fontSize: 12 }}>{AppCopy.shoppingList.costOverview}</Typography.Text>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 10, width: "100%" }}>
                 <ShoppingListCostMetric
                     testId="shopping-cost-required-buy"
-                    label="Cần mua ban đầu"
-                    description="Bắt buộc còn thiếu theo kho"
+                    label={AppCopy.shoppingList.costRequiredLabel}
+                    description={AppCopy.shoppingList.costRequiredDesc}
                     summary={summary.requiredToBuy}
-                    emptyText="0đ"
+                    emptyText={AppCopy.shoppingList.zeroPrice}
                 />
                 <ShoppingListCostMetric
                     testId="shopping-cost-recipe-total"
-                    label="Tổng công thức"
-                    description="Bao gồm bắt buộc và tùy chọn"
+                    label={AppCopy.shoppingList.costRecipeLabel}
+                    description={AppCopy.shoppingList.costRecipeDesc}
                     summary={summary.recipeTotal}
-                    emptyText="Chưa có giá"
+                    emptyText={AppCopy.shoppingList.noPriceYet}
                 />
                 <ShoppingListCostMetric
                     testId="shopping-cost-need-more"
-                    label="Cần mua thêm"
-                    description="Sau khi trừ phần đã mua"
+                    label={AppCopy.shoppingList.costNeedMoreLabel}
+                    description={AppCopy.shoppingList.costNeedMoreDesc}
                     summary={summary.needMore}
                     primary
-                    emptyText="0đ"
+                    emptyText={AppCopy.shoppingList.zeroPrice}
                 />
                 {CostEstimateHelper.hasAny(summary.bought) && <ShoppingListCostMetric
                     testId="shopping-cost-bought"
-                    label="Đã mua"
-                    description="Theo lượng đã đánh dấu"
+                    label={AppCopy.shoppingList.costBoughtLabel}
+                    description={AppCopy.shoppingList.costBoughtDesc}
                     summary={summary.bought}
-                    emptyText="0đ"
+                    emptyText={AppCopy.shoppingList.zeroPrice}
                 />}
             </div>
         </div>}
@@ -1056,7 +1047,7 @@ const ShoppingListIngredientPanelItem: React.FunctionComponent<ShoppingListIngre
 
     const _applyPaidPrice = (price: number | undefined) => {
         if (props.readonly || !price || price <= 0 || boughtPriceTarget.amount <= 0) {
-            message.warning("Nhập giá và lượng đã mua trước khi lưu.");
+            message.warning(AppCopy.shoppingList.enterPriceAndAmountWarning);
             return;
         }
 
@@ -1081,7 +1072,7 @@ const ShoppingListIngredientPanelItem: React.FunctionComponent<ShoppingListIngre
         }));
         setDraftPrice(normalizedPrice);
         setPriceEditorOpen(false);
-        message.success("Đã lưu giá mua gần nhất");
+        message.success(AppCopy.shoppingList.priceSavedToast);
     }
 
     const _clearPaidPrice = () => {
@@ -1141,7 +1132,7 @@ const ShoppingListIngredientPanelItem: React.FunctionComponent<ShoppingListIngre
         ? Array.from(new Set([targetPriceEstimate.min, targetPriceEstimate.max].filter(value => value > 0)))
         : [];
     const canEditBoughtInfo = !props.readonly && !status.isAlwaysAvailable;
-    const currentPriceLabel = props.item.boughtEstimatedCost ? IngredientPriceHelper.formatRange(props.item.boughtEstimatedCost) : "Chưa lưu giá";
+    const currentPriceLabel = props.item.boughtEstimatedCost ? IngredientPriceHelper.formatRange(props.item.boughtEstimatedCost) : AppCopy.shoppingList.currentPriceUnsaved;
 
     const _openBoughtModal = (event?: React.MouseEvent<HTMLElement>) => {
         event?.stopPropagation();
@@ -1149,18 +1140,12 @@ const ShoppingListIngredientPanelItem: React.FunctionComponent<ShoppingListIngre
         toggleBoughtModal.show();
     }
 
-    const boughtInfoModal = <Modal
-        style={{ top: 35 }}
-        width={620}
+    const boughtInfoModal = <Sheet
         open={toggleBoughtModal.value}
-        title={<Space size={8}><DollarOutlined /><span>Mua thực tế</span></Space>}
-        destroyOnClose={false}
-        onCancel={toggleBoughtModal.hide}
-        footer={<div style={{ display: "flex", justifyContent: "flex-end", width: "100%" }}>
-            <Button onClick={toggleBoughtModal.hide} style={compactSmallButtonStyle}>Đóng</Button>
-        </div>}
+        title={<Space size={8}><DollarOutlined /><span>{AppCopy.shoppingList.boughtModalTitle}</span></Space>}
+        onClose={toggleBoughtModal.hide}
     >
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }} data-testid={`shopping-list-bought-modal-${props.item.ingredientId}`}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, padding: 16 }} data-testid={`shopping-list-bought-modal-${props.item.ingredientId}`}>
             <Box style={{ padding: "11px 12px", border: "1px solid #efe7ff", borderRadius: 8, background: "linear-gradient(135deg, #fff 0%, #fbf8ff 100%)" }}>
                 <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto", gap: 10, alignItems: "start" }}>
                     <div style={{ minWidth: 0 }}>
@@ -1168,8 +1153,8 @@ const ShoppingListIngredientPanelItem: React.FunctionComponent<ShoppingListIngre
                             {_getIngredientNameById(props.item.ingredientId)}
                         </Typography.Text>
                         <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "18px", marginTop: 2 }}>
-                            Cần {IngredientUnitHelper.formatAmount(status.totalRequired)}{status.unit}
-                            {status.inStock > 0 ? ` · có ${IngredientUnitHelper.formatAmount(status.inStock)}${status.unit}` : ""}
+                            {AppCopy.shoppingList.boughtNeed({ amount: IngredientUnitHelper.formatAmount(status.totalRequired), unit: status.unit })}
+                            {status.inStock > 0 ? AppCopy.shoppingList.boughtInStockSuffix({ amount: IngredientUnitHelper.formatAmount(status.inStock), unit: status.unit }) : ""}
                         </Typography.Text>
                     </div>
                     <span style={{ borderRadius: 999, padding: "3px 9px", border: "1px solid #d3adf7", background: "#f9f0ff", color: "#722ed1", fontSize: 12, lineHeight: "18px", fontWeight: 800, whiteSpace: "nowrap" }}>
@@ -1181,8 +1166,8 @@ const ShoppingListIngredientPanelItem: React.FunctionComponent<ShoppingListIngre
             <Box style={{ padding: "11px 12px", border: "1px solid #f0f0f0", borderRadius: 8, background: "#fff" }}>
                 <Stack justify="space-between" align="flex-start" gap={8} style={{ marginBottom: 10 }}>
                     <Box>
-                        <Typography.Text strong style={{ display: "block", fontSize: 13, lineHeight: "18px" }}>Lượng đã mua</Typography.Text>
-                        <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "17px" }}>Nhập đúng lượng thực tế để nhập kho và tính chi phí.</Typography.Text>
+                        <Typography.Text strong style={{ display: "block", fontSize: 13, lineHeight: "18px" }}>{AppCopy.shoppingList.boughtAmountLabel}</Typography.Text>
+                        <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "17px" }}>{AppCopy.shoppingList.boughtAmountDesc}</Typography.Text>
                     </Box>
                     {props.item.boughtAmount && <Tag color="purple" style={{ marginInlineEnd: 0 }}>{IngredientUnitHelper.formatAmount(props.item.boughtAmount)}{boughtUnit}</Tag>}
                 </Stack>
@@ -1200,9 +1185,9 @@ const ShoppingListIngredientPanelItem: React.FunctionComponent<ShoppingListIngre
                     </Select>
                 </div>
                 {canEditBoughtInfo && <Space wrap size={6}>
-                    {status.needToBuy > 0 && <ActionButton onClick={() => _setBoughtAmount(status.needToBuy, status.unit)}>Đủ cần {IngredientUnitHelper.formatAmount(status.needToBuy)}{status.unit}</ActionButton>}
-                    {status.totalRequired > 0 && <ActionButton onClick={() => _setBoughtAmount(status.totalRequired, status.unit)}>Tổng công thức</ActionButton>}
-                    <ActionButton tone="danger" onClick={() => _setBoughtAmount(undefined, boughtUnit)}>Xóa lượng</ActionButton>
+                    {status.needToBuy > 0 && <ActionButton onClick={() => _setBoughtAmount(status.needToBuy, status.unit)}>{AppCopy.shoppingList.boughtEnoughNeed({ amount: IngredientUnitHelper.formatAmount(status.needToBuy), unit: status.unit })}</ActionButton>}
+                    {status.totalRequired > 0 && <ActionButton onClick={() => _setBoughtAmount(status.totalRequired, status.unit)}>{AppCopy.shoppingList.boughtRecipeTotal}</ActionButton>}
+                    <ActionButton tone="danger" onClick={() => _setBoughtAmount(undefined, boughtUnit)}>{AppCopy.shoppingList.boughtClearAmount}</ActionButton>
                 </Space>}
             </Box>
 
@@ -1211,52 +1196,52 @@ const ShoppingListIngredientPanelItem: React.FunctionComponent<ShoppingListIngre
                     <Box style={{ minWidth: 0 }}>
                         <Space size={6} align="center">
                             <DollarOutlined style={{ color: "#722ed1" }} />
-                            <Typography.Text strong style={{ fontSize: 13 }}>Giá hôm nay</Typography.Text>
+                            <Typography.Text strong style={{ fontSize: 13 }}>{AppCopy.shoppingList.priceTodayTitle}</Typography.Text>
                         </Space>
                         <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "17px", marginTop: 2 }}>
-                            {boughtPriceTarget.amount > 0 ? `${IngredientUnitHelper.formatAmount(boughtPriceTarget.amount)}${boughtPriceTarget.unit} đã mua` : "Nhập lượng đã mua trước khi lưu giá."}
+                            {boughtPriceTarget.amount > 0 ? AppCopy.shoppingList.boughtPurchased({ amount: IngredientUnitHelper.formatAmount(boughtPriceTarget.amount), unit: boughtPriceTarget.unit }) : AppCopy.shoppingList.enterAmountBeforePrice}
                         </Typography.Text>
                     </Box>
-                    {hasSavedPrice && !priceEditorOpen && canEditBoughtInfo && <ActionButton icon={<EditOutlined />} onClick={() => setPriceEditorOpen(true)}>Sửa giá</ActionButton>}
+                    {hasSavedPrice && !priceEditorOpen && canEditBoughtInfo && <ActionButton icon={<EditOutlined />} onClick={() => setPriceEditorOpen(true)}>{AppCopy.shoppingList.editPrice}</ActionButton>}
                 </Stack>
 
                 {hasSavedPrice && !priceEditorOpen && <Box style={{ padding: "9px 10px", borderRadius: 8, border: "1px solid #d3adf7", background: "#f9f0ff", marginBottom: displayPriceHistory.length > 0 ? 10 : 0 }}>
                     <Typography.Text strong style={{ display: "block", color: "#722ed1", fontSize: 14, lineHeight: "19px" }}>{currentPriceLabel}</Typography.Text>
                     <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "17px", marginTop: 2 }}>
-                        Đã lưu cho {IngredientUnitHelper.formatAmount(boughtPriceTarget.amount)}{boughtPriceTarget.unit}. Lần sau có thể chọn cùng giá hoặc cùng đơn giá.
+                        {AppCopy.shoppingList.priceSavedFor({ amount: IngredientUnitHelper.formatAmount(boughtPriceTarget.amount), unit: boughtPriceTarget.unit })}
                     </Typography.Text>
                 </Box>}
 
                 {priceEditorOpen && canEditBoughtInfo && <Box style={{ marginBottom: displayPriceHistory.length > 0 ? 10 : 0 }}>
                     {priceMemory && <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "17px", marginBottom: 7 }}>
-                        Lần trước: {formatPriceMemoryLine(priceMemory)}
+                        {AppCopy.shoppingList.lastTime({ detail: formatPriceMemoryLine(priceMemory) })}
                     </Typography.Text>}
                     <Space wrap size={6} style={{ marginBottom: 8 }}>
                         {rememberedPriceForTarget && <ActionButton tone="primary" icon={<DollarOutlined />} onClick={() => _applyPaidPrice(rememberedPriceForTarget)}>
-                            {rememberedPriceMatchesTarget ? "Cùng giá" : "Cùng đơn giá"}
+                            {rememberedPriceMatchesTarget ? AppCopy.shoppingList.samePrice : AppCopy.shoppingList.sameUnitPrice}
                         </ActionButton>}
                         {estimatedPriceButtons.map((value, index) => <ActionButton key={value} onClick={() => setDraftPrice(value)}>
-                            {index === 0 ? "Giá thấp" : "Giá cao"} {IngredientPriceHelper.formatCurrency(value)}
+                            {index === 0 ? AppCopy.shoppingList.priceLow : AppCopy.shoppingList.priceHigh} {IngredientPriceHelper.formatCurrency(value)}
                         </ActionButton>)}
                     </Space>
                     <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto auto", gap: 6, alignItems: "center" }}>
                         <NumberStepper
                             min={0}
                             size="small"
-                            placeholder="Giá đã trả"
+                            placeholder={AppCopy.shoppingList.pricePaidPlaceholder}
                             value={draftPrice}
                             onChange={(value) => setDraftPrice(typeof value === "number" ? value : undefined)}
                             style={{ width: "100%" }}
                         />
-                        <ActionButton tone="primary" onClick={() => _applyPaidPrice(draftPrice)}>Lưu</ActionButton>
-                        {props.item.boughtEstimatedCost && <ActionButton tone="danger" onClick={_clearPaidPrice}>Xóa</ActionButton>}
+                        <ActionButton tone="primary" onClick={() => _applyPaidPrice(draftPrice)}>{AppCopy.common.save}</ActionButton>
+                        {props.item.boughtEstimatedCost && <ActionButton tone="danger" onClick={_clearPaidPrice}>{AppCopy.shoppingList.delete}</ActionButton>}
                     </div>
                 </Box>}
 
                 {displayPriceHistory.length > 0 && <Box>
                     <Space size={6} align="center" style={{ marginBottom: 7 }}>
                         <HistoryOutlined style={{ color: "#8c8c8c" }} />
-                        <Typography.Text type="secondary" style={{ fontSize: 12 }}>Lịch sử giá gần đây</Typography.Text>
+                        <Typography.Text type="secondary" style={{ fontSize: 12 }}>{AppCopy.shoppingList.priceHistoryTitle}</Typography.Text>
                     </Space>
                     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                         {displayPriceHistory.slice(0, 5).map(entry => <div key={entry.id} style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto", gap: 8, alignItems: "center", padding: "8px 9px", border: "1px solid #f0f0f0", borderRadius: 8, background: "#fafafa" }}>
@@ -1271,8 +1256,9 @@ const ShoppingListIngredientPanelItem: React.FunctionComponent<ShoppingListIngre
                     </div>
                 </Box>}
             </Box>
+            <Button size="large" onClick={toggleBoughtModal.hide} style={{ width: "100%", minHeight: 44 }}>{AppCopy.shoppingList.close}</Button>
         </div>
-    </Modal>;
+    </Sheet>;
 
     return <React.Fragment>
     <List.Item data-testid={`shopping-list-ingredient-${props.item.ingredientId}`} style={{ padding: 0, borderBottom: "none" }} actions={[]}>
@@ -1318,22 +1304,22 @@ const ShoppingListIngredientPanelItem: React.FunctionComponent<ShoppingListIngre
                             {_getIngredientNameById(props.item.ingredientId)}
                         </Typography.Text>
                         <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 6 }}>
-                            {_statusPill(`Cần ${IngredientUnitHelper.formatAmount(status.totalRequired)}${status.unit}`, "blue")}
+                            {_statusPill(AppCopy.shoppingList.pillNeed({ amount: IngredientUnitHelper.formatAmount(status.totalRequired), unit: status.unit }), "blue")}
                             {status.isAlwaysAvailable
-                                ? _statusPill("Luôn có", "green")
-                                : status.inStock > 0 && _statusPill(`Có ${IngredientUnitHelper.formatAmount(status.inStock)}${status.unit}`, "green")}
-                            {remainingToBuy > 0 && priceEstimate && _statusPill(`Mua ${IngredientUnitHelper.formatAmount(remainingToBuy)}${priceEstimate.unit}`, "orange")}
-                            {props.item.boughtAmount > 0 && _statusPill(`Đã mua ${props.item.boughtAmount}${boughtUnit}`, "purple")}
-                            {props.item.boughtEstimatedCost && _statusPill(`Giá ${IngredientPriceHelper.formatRange(props.item.boughtEstimatedCost)}`, "gray")}
-                            {status.inventoryCovered && !props.item.isDone && !status.isAlwaysAvailable && _statusPill("Đủ hàng", "green")}
-                            {priceEstimate?.range && _statusPill(`~ ${IngredientPriceHelper.formatRange(priceEstimate.range)}`, "gray")}
-                            {priceEstimate && !priceEstimate.range && _statusPill("Chưa có giá", "gray")}
+                                ? _statusPill(AppCopy.shoppingList.pillAlwaysAvailable, "green")
+                                : status.inStock > 0 && _statusPill(AppCopy.shoppingList.pillInStock({ amount: IngredientUnitHelper.formatAmount(status.inStock), unit: status.unit }), "green")}
+                            {remainingToBuy > 0 && priceEstimate && _statusPill(AppCopy.shoppingList.pillToBuy({ amount: IngredientUnitHelper.formatAmount(remainingToBuy), unit: priceEstimate.unit }), "orange")}
+                            {props.item.boughtAmount > 0 && _statusPill(AppCopy.shoppingList.pillBought({ amount: String(props.item.boughtAmount), unit: boughtUnit }), "purple")}
+                            {props.item.boughtEstimatedCost && _statusPill(AppCopy.shoppingList.pillPrice({ range: IngredientPriceHelper.formatRange(props.item.boughtEstimatedCost) }), "gray")}
+                            {status.inventoryCovered && !props.item.isDone && !status.isAlwaysAvailable && _statusPill(AppCopy.shoppingList.pillCovered, "green")}
+                            {priceEstimate?.range && _statusPill(AppCopy.shoppingList.pillEstimate({ range: IngredientPriceHelper.formatRange(priceEstimate.range) }), "gray")}
+                            {priceEstimate && !priceEstimate.range && _statusPill(AppCopy.shoppingList.noPriceYet, "gray")}
                         </div>
                     </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
                     {canEditBoughtInfo && <ActionButton tone={hasSavedPrice ? "primary" : "default"} icon={<DollarOutlined />} onClick={_openBoughtModal}>
-                        {hasSavedPrice ? "Giá" : "Mua"}
+                        {hasSavedPrice ? AppCopy.shoppingList.priceShort : AppCopy.shoppingList.buyShort}
                     </ActionButton>}
                     <div style={{ padding: "4px 4px", color: "#aaa", flexShrink: 0 }}>
                         {expanded ? <MinusOutlined /> : <PlusOutlined />}
@@ -1342,7 +1328,7 @@ const ShoppingListIngredientPanelItem: React.FunctionComponent<ShoppingListIngre
             </div>
 
             {expanded && <Box style={{ padding: "0 12px 10px 40px", borderTop: "1px solid #f0f0f0" }}>
-                <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, marginTop: 8, marginBottom: 7 }}>Cần cho từng món</Typography.Text>
+                <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, marginTop: 8, marginBottom: 7 }}>{AppCopy.shoppingList.neededPerDish}</Typography.Text>
                 <List
                     size="small"
                     dataSource={props.item.amounts}
@@ -1354,7 +1340,7 @@ const ShoppingListIngredientPanelItem: React.FunctionComponent<ShoppingListIngre
                                     <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "15px", marginTop: 2 }}>{item.amount} {item.unit}</Typography.Text>
                                 </div>
                                 <Stack.Compact>
-                                    {!item.required && <Tooltip title="Tùy chọn"><Tag color="gold" icon={<QuestionCircleOutlined />} /></Tooltip>}
+                                    {!item.required && <Tooltip title={AppCopy.shoppingList.optional}><Tag color="gold" icon={<QuestionCircleOutlined />} /></Tooltip>}
                                     {item.meal && _getDateFromNow(item) > 0 && <Tooltip title={_getDateFromNowDisplayText(item)}><Tag color="blue">{`${_getDateFromNow(item)}d`}</Tag></Tooltip>}
                                     {item.meal && _getDateFromNow(item) < 0 && <Tooltip title={_getDateFromNowDisplayText(item)}><Tag color="volcano">{`${Math.abs(_getDateFromNow(item))}d`}</Tag></Tooltip>}
                                 </Stack.Compact>
@@ -1440,21 +1426,21 @@ export const ShoppingListIngredientItem: React.FunctionComponent<ShoppingListIng
                     <Space size={4}>
                         {isAlwaysAvailable ? (
                             <Tag color="green" style={{ fontSize: 11, marginInlineEnd: 0 }}>
-                                Luôn có
+                                {AppCopy.shoppingList.pillAlwaysAvailable}
                             </Tag>
                         ) : inStock > 0 && (
                             <Tag color="green" style={{ fontSize: 11, marginInlineEnd: 0 }}>
-                                Còn {inStock}{unit}
+                                {AppCopy.shoppingList.pillRemaining({ amount: String(inStock), unit })}
                             </Tag>
                         )}
                         {needToBuy > 0 && (
                             <Tag color="orange" style={{ fontSize: 11, marginInlineEnd: 0 }}>
-                                Mua {needToBuy}{unit}
+                                {AppCopy.shoppingList.pillToBuy({ amount: String(needToBuy), unit })}
                             </Tag>
                         )}
                         {inventoryCovered && !props.item.isDone && !isAlwaysAvailable && (
                             <Tag color="green" style={{ fontSize: 11, marginInlineEnd: 0 }}>
-                                Đủ hàng
+                                {AppCopy.shoppingList.pillCovered}
                             </Tag>
                         )}
                     </Space>
@@ -1467,7 +1453,7 @@ export const ShoppingListIngredientItem: React.FunctionComponent<ShoppingListIng
                             description={<Space>
                                 <Typography.Text type={item.isDone ? "secondary" : undefined} style={{ textDecorationLine: item.isDone ? "line-through" : "none" }}>{item.amount} {item.unit} ({item?.dish.name})</Typography.Text>
                                 <Stack.Compact>
-                                    {!item.required && <Tooltip title="Tùy chọn"><Tag color="gold" icon={<QuestionCircleOutlined />} /></Tooltip>}
+                                    {!item.required && <Tooltip title={AppCopy.shoppingList.optional}><Tag color="gold" icon={<QuestionCircleOutlined />} /></Tooltip>}
                                     {item.meal && _getDateFromNow(item) > 0 && <Tooltip
                                         title={_getDateFromNowDisplayText(item)}>
                                         <Tag color="blue">{`${_getDateFromNow(item)}d`}</Tag>
