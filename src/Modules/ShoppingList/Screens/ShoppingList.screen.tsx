@@ -2,6 +2,7 @@ import { CalendarOutlined, CheckCircleOutlined, DeleteOutlined, EditOutlined, Ex
 import { ActionButton, Button } from "@components/Button";
 import { Dropdown } from "@components/Dropdown";
 import { FastModalShell } from "@components/FastOverlay";
+import { Sheet } from "@components/Sheet";
 import { DatePicker } from "@components/Form/DatePicker";
 import { Input } from "@components/Form/Input";
 import { Option, Select } from "@components/Form/Select";
@@ -12,9 +13,9 @@ import { Space } from "@components/Layout/Space";
 import { Stack } from "@components/Layout/Stack";
 import { DeferredModalContent, Modal } from "@components/Modal";
 import { useMessage } from "@components/Message";
-import { useModal } from "@components/Modal/ModalProvider";
 import { Tooltip } from "@components/Tootip";
 import { Typography } from "@components/Typography";
+import { AppCopy } from "@common/Copy";
 import { usePagedVirtualItems, useScreenTitle, useToggle } from "@hooks";
 import { useAppShellNavigation } from "@routing/AppShellNavigationContext";
 import { usePageActions } from "@routing/PageActionsContext";
@@ -47,12 +48,12 @@ import { normalizeDishServings } from "./DishServingSelector.widget";
 type ShoppingListStatusFilter = "all" | "buying" | "overdue" | "checklist_done" | "completed" | "empty_checklist";
 
 const SHOPPING_LIST_STATUS_FILTERS: { value: ShoppingListStatusFilter; label: string }[] = [
-    { value: "all", label: "Tất cả" },
-    { value: "buying", label: "Đang mua" },
-    { value: "overdue", label: "Quá hạn" },
-    { value: "checklist_done", label: "Checklist xong" },
-    { value: "completed", label: "Đã hoàn tất" },
-    { value: "empty_checklist", label: "Chưa checklist" },
+    { value: "all", label: AppCopy.shoppingList.statusAll },
+    { value: "buying", label: AppCopy.shoppingList.statusBuying },
+    { value: "overdue", label: AppCopy.shoppingList.statusOverdue },
+    { value: "checklist_done", label: AppCopy.shoppingList.statusChecklistDone },
+    { value: "completed", label: AppCopy.shoppingList.statusCompleted },
+    { value: "empty_checklist", label: AppCopy.shoppingList.statusEmptyChecklist },
 ];
 
 const SHOPPING_LIST_ROW_HEIGHT = 186;
@@ -148,7 +149,7 @@ export const ShoppingListScreen = () => {
     const toggleAddModal = useToggle({ defaultValue: false });
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    useScreenTitle({ value: "Lịch mua sắm", deps: [] });
+    useScreenTitle({ value: AppCopy.shoppingList.screenTitle, deps: [] });
     const [searchText, setSearchText] = useState("");
     const [activeStatus, setActiveStatus] = useState<ShoppingListStatusFilter>("all");
     const [templateApplyOpen, setTemplateApplyOpen] = useState(false);
@@ -245,8 +246,8 @@ export const ShoppingListScreen = () => {
     }
 
     usePageActions([
-        { key: "template", label: "Tạo từ mẫu", icon: <FileTextOutlined />, onClick: _onOpenTemplateApply },
-        { key: "calendar", label: "Lịch mua sắm", icon: <CalendarOutlined />, onClick: _onShowCalendar },
+        { key: "template", label: AppCopy.shoppingList.actionCreateFromTemplate, icon: <FileTextOutlined />, onClick: _onOpenTemplateApply },
+        { key: "calendar", label: AppCopy.shoppingList.screenTitle, icon: <CalendarOutlined />, onClick: _onShowCalendar },
     ], []);
 
     const _applyShoppingListTemplate = () => {
@@ -312,7 +313,7 @@ export const ShoppingListScreen = () => {
         <div style={{ height: "100%", display: "flex", flexDirection: "column", minHeight: 0 }}>
             <Box style={topToolCardStyle}>
                 <Stack.Compact style={searchControlRowStyle}>
-                    <Input allowClear data-testid="shopping-list-search-input" placeholder="Tìm kiếm" onChange={_onSearchChange} style={searchInputStyle} />
+                    <Input allowClear data-testid="shopping-list-search-input" placeholder={AppCopy.shoppingList.searchPlaceholder} onChange={_onSearchChange} style={searchInputStyle} />
                     <Button preserveAntdStyle onClick={_onAdd} icon={<PlusOutlined />} />
                 </Stack.Compact>
                 <div style={filterRowStyle}>
@@ -337,14 +338,14 @@ export const ShoppingListScreen = () => {
                     data-testid="shopping-list-virtual-list"
                 />
                 {hasMoreShoppingLists && <div data-testid="shopping-list-list-page-status" style={{ position: "absolute", left: "50%", bottom: 10, transform: "translateX(-50%)", padding: "4px 10px", borderRadius: 999, background: "rgba(255,255,255,0.94)", border: "1px solid #f0f0f0", boxShadow: "0 4px 14px rgba(0,0,0,0.08)", fontSize: 12, color: "#595959", pointerEvents: "none" }}>
-                    Đã tải {loadedShoppingListCount}/{totalShoppingListCount}
+                    {AppCopy.shoppingList.loadedCount({ loaded: loadedShoppingListCount, total: totalShoppingListCount })}
                 </div>}
                 <VirtualListScrollTopButton listRef={listRef} rowCount={visibleShoppingLists.length} visible={showScrollTop} />
             </div>
         </div>
         <Modal open={toggleAddModal.value} title={<Space>
             <Image src={ShoppinglistIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
-            Thêm lịch mua sắm
+            {AppCopy.shoppingList.addModalTitle}
         </Space>} destroyOnClose={true} onCancel={toggleAddModal.hide} footer={null}>
             <DeferredModalContent active={toggleAddModal.value}>
                 <ShoppingListAddWidget
@@ -357,50 +358,56 @@ export const ShoppingListScreen = () => {
 
         <Modal style={{ top: 50 }} open={toggleCalendarModal.value} title={<Space>
             <Image src={ShoppinglistIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
-            Lịch mua sắm
+            {AppCopy.shoppingList.screenTitle}
         </Space>} destroyOnClose={true} onCancel={toggleCalendarModal.hide} footer={null}>
             <DeferredModalContent active={toggleCalendarModal.value} minHeight={220}>
                 <ShoppingListCalendarWidget onAdd={_onAddWithDate} />
             </DeferredModalContent>
         </Modal>
 
-        <Modal
+        <Sheet
             open={templateApplyOpen}
-            title={<Space><FileTextOutlined />Tạo lịch mua từ mẫu</Space>}
-            onCancel={() => setTemplateApplyOpen(false)}
-            onOk={_applyShoppingListTemplate}
-            okText="Tạo lịch mua"
-            cancelText="Hủy"
-            okButtonProps={{ disabled: shoppingListTemplates.length === 0 }}
-            destroyOnClose
+            title={<Space><FileTextOutlined />{AppCopy.shoppingList.templateModalTitle}</Space>}
+            onClose={() => setTemplateApplyOpen(false)}
+            data-testid="shopping-list-template-apply-sheet"
         >
-            <DeferredModalContent active={templateApplyOpen} minHeight={150}>
-                <Stack direction="column" align="stretch" gap={10}>
-                    <div>
-                        <Typography.Text strong style={{ display: "block", fontSize: 12, marginBottom: 5 }}>Mẫu mua sắm</Typography.Text>
-                        <Select
-                            value={selectedTemplate?.id}
-                            onChange={setSelectedTemplateId}
-                            placeholder="Chọn mẫu mua sắm"
-                            disabled={shoppingListTemplates.length === 0}
-                            style={{ width: "100%" }}
-                        >
-                            {shoppingListTemplates.map(template => <Option key={template.id} value={template.id}>{template.name}</Option>)}
-                        </Select>
-                        {shoppingListTemplates.length === 0 && <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, marginTop: 6 }}>
-                            Chưa có mẫu mua sắm. Vào trang Mẫu dùng lại để tạo mẫu trước.
+            <Stack direction="column" align="stretch" gap={12} style={{ padding: 16 }}>
+                <DeferredModalContent active={templateApplyOpen} minHeight={150}>
+                    <Stack direction="column" align="stretch" gap={10}>
+                        <div>
+                            <Typography.Text strong style={{ display: "block", fontSize: 12, marginBottom: 5 }}>{AppCopy.shoppingList.templateLabel}</Typography.Text>
+                            <Select
+                                value={selectedTemplate?.id}
+                                onChange={setSelectedTemplateId}
+                                placeholder={AppCopy.shoppingList.templatePlaceholder}
+                                disabled={shoppingListTemplates.length === 0}
+                                style={{ width: "100%" }}
+                            >
+                                {shoppingListTemplates.map(template => <Option key={template.id} value={template.id}>{template.name}</Option>)}
+                            </Select>
+                            {shoppingListTemplates.length === 0 && <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, marginTop: 6 }}>
+                                {AppCopy.shoppingList.templateNoneHint}
+                            </Typography.Text>}
+                        </div>
+                        <div>
+                            <Typography.Text strong style={{ display: "block", fontSize: 12, marginBottom: 5 }}>{AppCopy.shoppingList.plannedDateLabel}</Typography.Text>
+                            <DatePicker value={templateApplyDate} onChange={value => value && setTemplateApplyDate(value)} format="DD/MM/YYYY" style={{ width: "100%" }} />
+                        </div>
+                        {selectedTemplate && <Typography.Text type="secondary" style={{ fontSize: 12, lineHeight: "17px" }}>
+                            {AppCopy.shoppingList.templatePreview({ dishCount: selectedTemplate.dishes.length })}
                         </Typography.Text>}
-                    </div>
-                    <div>
-                        <Typography.Text strong style={{ display: "block", fontSize: 12, marginBottom: 5 }}>Ngày mua</Typography.Text>
-                        <DatePicker value={templateApplyDate} onChange={value => value && setTemplateApplyDate(value)} format="DD/MM/YYYY" style={{ width: "100%" }} />
-                    </div>
-                    {selectedTemplate && <Typography.Text type="secondary" style={{ fontSize: 12, lineHeight: "17px" }}>
-                        Mẫu này có {selectedTemplate.dishes.length} món. App sẽ tạo checklist nguyên liệu ngay sau khi tạo lịch mua.
-                    </Typography.Text>}
+                    </Stack>
+                </DeferredModalContent>
+                <Stack direction="column" gap={8} fullwidth>
+                    <Button type="primary" size="large" disabled={shoppingListTemplates.length === 0} onClick={_applyShoppingListTemplate} style={{ width: "100%", minHeight: 44 }}>
+                        {AppCopy.shoppingList.templateCreateAction}
+                    </Button>
+                    <Button size="large" onClick={() => setTemplateApplyOpen(false)} style={{ width: "100%", minHeight: 44 }}>
+                        {AppCopy.common.cancel}
+                    </Button>
                 </Stack>
-            </DeferredModalContent>
-        </Modal>
+            </Stack>
+        </Sheet>
     </React.Fragment>
 }
 
@@ -418,11 +425,11 @@ const ShoppingListItemComponent: React.FunctionComponent<ShoppingListItemProps> 
     const { navigateWithFeedback } = useAppShellNavigation();
     const dispatch = useDispatch();
     const message = useMessage();
-    const modal = useModal();
     const toggleEditModal = useToggle({ defaultValue: false });
     const toggleLoading = useToggle();
     const toggleExport = useToggle();
     const toggleDeleteConfirm = useToggle();
+    const toggleReloadConfirm = useToggle({ defaultValue: false });
     const isReadonly = Boolean(props.item.completedAt);
 
     const _onGenerate = () => {
@@ -433,7 +440,7 @@ const ShoppingListItemComponent: React.FunctionComponent<ShoppingListItemProps> 
             allScheduledMeals: props.allScheduledMeals,
             allIngredients: props.allIngredients,
         }));
-        message.success("Đã tạo lại checklist nguyên liệu");
+        message.success(AppCopy.shoppingList.regenerateSuccessToast);
     }
 
     const _onGenerateAndShow = () => {
@@ -471,12 +478,7 @@ const ShoppingListItemComponent: React.FunctionComponent<ShoppingListItemProps> 
     const _onMoreActionClick = (e) => {
         if (isReadonly && ["reload", "add_dishes", "edit_shopping_list"].includes(e.key)) return;
         switch (e.key) {
-            case "reload": modal.confirm({
-                content: "Tải lại danh sách nguyên liệu?",
-                onOk: () => {
-                    _onGenerate();
-                }
-            }); break;
+            case "reload": toggleReloadConfirm.show(); break;
             case "add_dishes": _onAddMoreDishes(); break;
             case "edit_shopping_list": toggleEditModal.show(); break;
             case "export": toggleExport.show(); break;
@@ -497,15 +499,15 @@ const ShoppingListItemComponent: React.FunctionComponent<ShoppingListItemProps> 
     const dishCount = props.item.dishes.length;
     const scheduledMealCount = props.item.scheduledMeals?.length ?? 0;
     const status = isReadonly
-        ? { label: "Đã hoàn tất", color: "#1677ff", background: "#e6f4ff", border: "#91caff", icon: <CheckCircleOutlined /> }
+        ? { label: AppCopy.shoppingList.statusCompleted, color: "#1677ff", background: "#e6f4ff", border: "#91caff", icon: <CheckCircleOutlined /> }
         : isAllIngredientDone
-            ? { label: "Checklist xong", color: "#389e0d", background: "#f6ffed", border: "#b7eb8f", icon: <CheckCircleOutlined /> }
+            ? { label: AppCopy.shoppingList.statusChecklistDone, color: "#389e0d", background: "#f6ffed", border: "#b7eb8f", icon: <CheckCircleOutlined /> }
             : isOverdue
-                ? { label: "Quá hạn", color: "#cf1322", background: "#fff1f0", border: "#ffa39e", icon: <ExclamationCircleOutlined /> }
+                ? { label: AppCopy.shoppingList.statusOverdue, color: "#cf1322", background: "#fff1f0", border: "#ffa39e", icon: <ExclamationCircleOutlined /> }
                 : hasChecklist
-                    ? { label: "Đang mua", color: "#d46b08", background: "#fff7e6", border: "#ffd591", icon: <OrderedListOutlined /> }
-                    : { label: "Chưa có checklist", color: "#8c8c8c", background: "#fafafa", border: "#d9d9d9", icon: <OrderedListOutlined /> };
-    const plannedLabel = props.item.plannedDate ? DateHelpers.formatWithCapitalizedWeekday(props.item.plannedDate, "ddd, DD/MM/YY") : "Chưa đặt";
+                    ? { label: AppCopy.shoppingList.statusBuying, color: "#d46b08", background: "#fff7e6", border: "#ffd591", icon: <OrderedListOutlined /> }
+                    : { label: AppCopy.shoppingList.statusNoChecklist, color: "#8c8c8c", background: "#fafafa", border: "#d9d9d9", icon: <OrderedListOutlined /> };
+    const plannedLabel = props.item.plannedDate ? DateHelpers.formatWithCapitalizedWeekday(props.item.plannedDate, "ddd, DD/MM/YY") : AppCopy.shoppingList.plannedDateUnset;
     const plannedColor = isOverdue ? "#cf1322" : "#595959";
     const createdLabel = DateHelpers.formatWithCapitalizedWeekday(props.item.createdDate, "ddd, DD/MM/YY hh:mm A");
     const completedLabel = props.item.completedAt ? moment(props.item.completedAt).format("DD/MM/YY") : null;
@@ -540,24 +542,24 @@ const ShoppingListItemComponent: React.FunctionComponent<ShoppingListItemProps> 
                                 <span style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "1px 7px", borderRadius: 999, background: status.background, color: status.color, border: `1px solid ${status.border}`, fontSize: 11, lineHeight: "18px", fontWeight: 650 }}>
                                     {status.icon} {status.label}
                                 </span>
-                                <span style={{ padding: "1px 7px", borderRadius: 999, background: "#f0f5ff", color: "#1d39c4", fontSize: 11, lineHeight: "18px", fontWeight: 600 }}>{dishCount} món</span>
-                                <span style={{ padding: "1px 7px", borderRadius: 999, background: "#fafafa", color: "#595959", border: "1px solid #f0f0f0", fontSize: 11, lineHeight: "18px" }}>{scheduledMealCount} thực đơn</span>
-                                {completedLabel && <span style={{ padding: "1px 7px", borderRadius: 999, background: "#e6f4ff", color: "#0958d9", border: "1px solid #91caff", fontSize: 11, lineHeight: "18px" }}>Xong {completedLabel}</span>}
+                                <span style={{ padding: "1px 7px", borderRadius: 999, background: "#f0f5ff", color: "#1d39c4", fontSize: 11, lineHeight: "18px", fontWeight: 600 }}>{AppCopy.shoppingList.dishCount({ count: dishCount })}</span>
+                                <span style={{ padding: "1px 7px", borderRadius: 999, background: "#fafafa", color: "#595959", border: "1px solid #f0f0f0", fontSize: 11, lineHeight: "18px" }}>{AppCopy.shoppingList.scheduledMealCount({ count: scheduledMealCount })}</span>
+                                {completedLabel && <span style={{ padding: "1px 7px", borderRadius: 999, background: "#e6f4ff", color: "#0958d9", border: "1px solid #91caff", fontSize: 11, lineHeight: "18px" }}>{AppCopy.shoppingList.completedShortLabel({ when: completedLabel })}</span>}
                             </div>
                         </div>
 
                         <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
                             {hasChecklist
-                                ? <ActionButton tone="primary" onClick={_onShow} icon={toggleLoading.value ? <LoadingOutlined /> : <MonitorOutlined />}>Mở</ActionButton>
-                                : <ActionButton tone="primary" onClick={_onGenerateAndShow} icon={toggleLoading.value ? <LoadingOutlined /> : <MonitorOutlined />}>Tạo</ActionButton>}
+                                ? <ActionButton tone="primary" onClick={_onShow} icon={toggleLoading.value ? <LoadingOutlined /> : <MonitorOutlined />}>{AppCopy.shoppingList.openAction}</ActionButton>
+                                : <ActionButton tone="primary" onClick={_onGenerateAndShow} icon={toggleLoading.value ? <LoadingOutlined /> : <MonitorOutlined />}>{AppCopy.shoppingList.generateAction}</ActionButton>}
                             <Dropdown menu={{
                                 items: [
-                                    { label: 'Xuất danh sách', key: 'export', icon: <FileTextOutlined /> },
-                                    { label: 'Tải lại', key: 'reload', icon: <ReloadOutlined />, disabled: isReadonly },
-                                    { label: 'Sửa món ăn', key: 'add_dishes', icon: <OrderedListOutlined />, disabled: isReadonly },
-                                    { label: 'Sửa lịch mua sắm', key: 'edit_shopping_list', icon: <EditOutlined />, disabled: isReadonly },
+                                    { label: AppCopy.shoppingList.exportAction, key: 'export', icon: <FileTextOutlined /> },
+                                    { label: AppCopy.shoppingList.regenerateMenuAction, key: 'reload', icon: <ReloadOutlined />, disabled: isReadonly },
+                                    { label: AppCopy.shoppingList.editDishesAction, key: 'add_dishes', icon: <OrderedListOutlined />, disabled: isReadonly },
+                                    { label: AppCopy.shoppingList.editListAction, key: 'edit_shopping_list', icon: <EditOutlined />, disabled: isReadonly },
                                     { type: 'divider' },
-                                    { label: 'Xóa', key: 'delete', icon: <DeleteOutlined />, danger: true },
+                                    { label: AppCopy.shoppingList.delete, key: 'delete', icon: <DeleteOutlined />, danger: true },
                                 ],
                                 onClick: _onMoreActionClick
                             }} placement="bottomRight">
@@ -568,8 +570,8 @@ const ShoppingListItemComponent: React.FunctionComponent<ShoppingListItemProps> 
 
                     <div>
                         <div style={{ display: "flex", justifyContent: "space-between", gap: 8, alignItems: "center", marginBottom: 5 }}>
-                            <Typography.Text type="secondary" style={{ fontSize: 12 }}>Checklist</Typography.Text>
-                            <Typography.Text strong style={{ fontSize: 12, color: status.color }}>{doneCount}/{totalIngredientCount} nguyên liệu</Typography.Text>
+                            <Typography.Text type="secondary" style={{ fontSize: 12 }}>{AppCopy.shoppingList.checklistLabel}</Typography.Text>
+                            <Typography.Text strong style={{ fontSize: 12, color: status.color }}>{AppCopy.shoppingList.ingredientProgress({ done: doneCount, total: totalIngredientCount })}</Typography.Text>
                         </div>
                         <div style={{ height: 7, borderRadius: 999, background: "#f0f0f0", overflow: "hidden" }}>
                             <div style={{ width: `${progressPercent}%`, height: "100%", background: status.color, borderRadius: 999, transition: "width 0.2s ease" }} />
@@ -578,13 +580,13 @@ const ShoppingListItemComponent: React.FunctionComponent<ShoppingListItemProps> 
 
                     <div style={{ display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 1fr))", gap: 8 }}>
                         <div style={{ minWidth: 0 }}>
-                            <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "14px" }}>Ngày mua</Typography.Text>
+                            <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "14px" }}>{AppCopy.shoppingList.plannedDateLabel}</Typography.Text>
                             {isOverdue ? <Tooltip title={moment(props.item.plannedDate).startOf("day").from(moment().startOf("day"))}>
                                 <Typography.Text strong style={{ display: "block", color: plannedColor, fontSize: 13, lineHeight: "18px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{plannedLabel}</Typography.Text>
                             </Tooltip> : <Typography.Text strong style={{ display: "block", color: plannedColor, fontSize: 13, lineHeight: "18px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{plannedLabel}</Typography.Text>}
                         </div>
                         <div style={{ minWidth: 0 }}>
-                            <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "14px" }}>Ngày tạo</Typography.Text>
+                            <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "14px" }}>{AppCopy.shoppingList.createdDateLabel}</Typography.Text>
                             <Typography.Text strong style={{ display: "block", fontSize: 13, lineHeight: "18px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{createdLabel}</Typography.Text>
                         </div>
                     </div>
@@ -595,8 +597,8 @@ const ShoppingListItemComponent: React.FunctionComponent<ShoppingListItemProps> 
             <Image src={ShoppinglistIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
             {props.item.name}
         </Space>} onClose={toggleIngredient.hide} footer={<Space>
-            <Button onClick={toggleIngredient.hide}>Đóng</Button>
-            <Button type="primary" icon={<EditOutlined />} onClick={_onOpenDetailPage}>Mở trang chi tiết</Button>
+            <Button onClick={toggleIngredient.hide}>{AppCopy.shoppingList.close}</Button>
+            <Button type="primary" icon={<EditOutlined />} onClick={_onOpenDetailPage}>{AppCopy.shoppingList.openDetailPageAction}</Button>
         </Space>} afterOpenChange={toggleLoading.hide}>
             <DeferredModalContent active={toggleIngredient.value} minHeight={220}>
                 <Box data-testid="shopping-list-ingredient-modal" style={{ maxHeight: 550, overflowY: "auto" }}>
@@ -606,20 +608,13 @@ const ShoppingListItemComponent: React.FunctionComponent<ShoppingListItemProps> 
         </FastModalShell>}
         {toggleAddMoreDishes.value && <Modal style={{ top: 50 }} open={toggleAddMoreDishes.value} title={<Space>
             <Image src={ShoppinglistIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
-            Sửa món ăn
+            {AppCopy.shoppingList.editDishesAction}
         </Space>} destroyOnClose={true} onCancel={toggleAddMoreDishes.hide} footer={null}>
             <DeferredModalContent active={toggleAddMoreDishes.value} minHeight={220}>
                 <Box data-testid="shopping-list-add-dishes-modal" style={{ maxHeight: 550, overflowY: "auto" }}>
                     <ShoppingListAddMoreDishesWidget shoppingList={props.item} onDone={() => {
                         toggleAddMoreDishes.hide();
-                        modal.confirm({
-                            content: "Tải lại danh sách nguyên liệu?",
-                            okText: "Đồng ý",
-                            cancelText: "Hủy",
-                            onOk: () => {
-                                _onGenerate();
-                            }
-                        })
+                        toggleReloadConfirm.show();
                     }} />
                 </Box>
             </DeferredModalContent>
@@ -627,7 +622,7 @@ const ShoppingListItemComponent: React.FunctionComponent<ShoppingListItemProps> 
         {toggleEditModal.value && <Modal open={toggleEditModal.value} title={
             <Space>
                 <Image src={ShoppinglistIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
-                Sửa lịch mua sắm
+                {AppCopy.shoppingList.editListAction}
             </Space>
         } destroyOnClose={true} onCancel={toggleEditModal.hide} footer={null}>
             <DeferredModalContent active={toggleEditModal.value} minHeight={180}>
@@ -637,18 +632,46 @@ const ShoppingListItemComponent: React.FunctionComponent<ShoppingListItemProps> 
             </DeferredModalContent>
         </Modal>}
         {toggleExport.value && <ShoppingListExportWidget shoppingList={props.item} allIngredients={props.allIngredients} open={toggleExport.value} onClose={toggleExport.hide} />}
-        {toggleDeleteConfirm.value && <Modal
-            open={toggleDeleteConfirm.value}
-            title={<Space><DeleteOutlined style={{ color: "red" }} />Xác nhận xóa</Space>}
-            onCancel={toggleDeleteConfirm.hide}
-            onOk={() => { props.onDelete(props.item); toggleDeleteConfirm.hide(); }}
-            okText="Xóa"
-            cancelText="Hủy"
-            okButtonProps={{ danger: true }}
-            destroyOnClose
+        {toggleReloadConfirm.value && <Sheet
+            open={toggleReloadConfirm.value}
+            title={<Space><ReloadOutlined />{AppCopy.shoppingList.regenerateMenuAction}</Space>}
+            onClose={toggleReloadConfirm.hide}
+            data-testid={`shopping-list-reload-confirm-${props.item.id}`}
         >
-            Bạn có chắc muốn xóa lịch <b>{props.item.name}</b> không? Hành động này không thể hoàn tác.
-        </Modal>}
+            <Stack direction="column" gap={12} fullwidth align="stretch" style={{ padding: 16 }}>
+                <Typography.Text style={{ fontSize: 14, lineHeight: "20px" }}>
+                    {AppCopy.shoppingList.reloadConfirmContent}
+                </Typography.Text>
+                <Stack direction="column" gap={8} fullwidth>
+                    <Button type="primary" size="large" onClick={() => { _onGenerate(); toggleReloadConfirm.hide(); }} style={{ width: "100%", minHeight: 44 }}>
+                        {AppCopy.shoppingList.reloadConfirmOk}
+                    </Button>
+                    <Button size="large" onClick={toggleReloadConfirm.hide} style={{ width: "100%", minHeight: 44 }}>
+                        {AppCopy.common.cancel}
+                    </Button>
+                </Stack>
+            </Stack>
+        </Sheet>}
+        {toggleDeleteConfirm.value && <Sheet
+            open={toggleDeleteConfirm.value}
+            title={<Space><DeleteOutlined style={{ color: "red" }} />{AppCopy.shoppingList.deleteConfirmTitle}</Space>}
+            onClose={toggleDeleteConfirm.hide}
+            data-testid={`shopping-list-delete-confirm-${props.item.id}`}
+        >
+            <Stack direction="column" gap={12} fullwidth align="stretch" style={{ padding: 16 }}>
+                <Typography.Text style={{ fontSize: 14, lineHeight: "20px" }}>
+                    {AppCopy.shoppingList.deleteConfirmBody({ name: props.item.name })}
+                </Typography.Text>
+                <Stack direction="column" gap={8} fullwidth>
+                    <Button type="primary" danger size="large" onClick={() => { props.onDelete(props.item); toggleDeleteConfirm.hide(); }} style={{ width: "100%", minHeight: 44 }}>
+                        {AppCopy.shoppingList.delete}
+                    </Button>
+                    <Button size="large" onClick={toggleDeleteConfirm.hide} style={{ width: "100%", minHeight: 44 }}>
+                        {AppCopy.common.cancel}
+                    </Button>
+                </Stack>
+            </Stack>
+        </Sheet>}
     </React.Fragment >
 }
 
