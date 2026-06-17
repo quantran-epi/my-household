@@ -1,4 +1,5 @@
 import { ObjectPropertyHelper } from "@common/Helpers/ObjectProperty"
+import { AppCopy } from "@common/Copy"
 import { Button } from "@components/Button"
 import { DatePicker } from "@components/Form/DatePicker"
 import { Box } from "@components/Layout/Box"
@@ -24,9 +25,9 @@ import { HouseholdMemberPicker } from "@modules/ScheduledMeal/Components/Househo
 type MealSlotKey = keyof ScheduledMeal["meals"];
 
 const mealSlotLabels: Array<{ key: MealSlotKey; label: string; color: string; background: string; border: string }> = [
-    { key: "breakfast", label: "Sáng", color: "#d48806", background: "#fffbe6", border: "#ffe58f" },
-    { key: "lunch", label: "Trưa", color: "#d46b08", background: "#fff7e6", border: "#ffd591" },
-    { key: "dinner", label: "Tối", color: "#531dab", background: "#f9f0ff", border: "#efdbff" },
+    { key: "breakfast", label: AppCopy.scheduledMeal.slotMorning, color: "#d48806", background: "#fffbe6", border: "#ffe58f" },
+    { key: "lunch", label: AppCopy.scheduledMeal.slotNoon, color: "#d46b08", background: "#fff7e6", border: "#ffd591" },
+    { key: "dinner", label: AppCopy.scheduledMeal.slotEvening, color: "#531dab", background: "#f9f0ff", border: "#efdbff" },
 ];
 
 const buildNameOptions = (names: string[]) => {
@@ -64,7 +65,7 @@ export const ScheduledMealAddWidget = ({ date, initialName, initialMeals, initia
     const addScheduledMealForm = useSmartForm<ScheduledMeal>({
         defaultValues: {
             id: "",
-            name: initialName ?? "Thực đơn chưa đặt tên",
+            name: initialName ?? AppCopy.scheduledMeal.defaultMenuName,
             meals: initialMeals ?? createEmptyMeals(),
             memberIds: [],
             dishServings: initialDishServings ?? {},
@@ -74,14 +75,14 @@ export const ScheduledMealAddWidget = ({ date, initialName, initialMeals, initia
         onSubmit: (values) => {
             dispatch(addScheduledMeal(values.transformValues));
             dispatch(rememberScheduledMealName(values.transformValues.name));
-            message.success("Đã tạo thực đơn");
+            message.success(AppCopy.scheduledMeal.createdToast);
             addScheduledMealForm.reset();
             onDone();
             onCreated?.(values.transformValues);
         },
         itemDefinitions: defaultValues => ({
             id: { name: ObjectPropertyHelper.nameof(defaultValues, e => e.id), noMarkup: true },
-            name: { label: "Tên gợi nhớ", name: ObjectPropertyHelper.nameof(defaultValues, e => e.name) },
+            name: { label: AppCopy.scheduledMeal.nameLabel, name: ObjectPropertyHelper.nameof(defaultValues, e => e.name) },
             meals: { name: ObjectPropertyHelper.nameof(defaultValues, e => e.meals), noMarkup: true },
             memberIds: { name: ObjectPropertyHelper.nameof(defaultValues, e => e.memberIds), noMarkup: true },
             skipMeals: { name: ObjectPropertyHelper.nameof(defaultValues, e => e.skipMeals), noMarkup: true },
@@ -90,7 +91,7 @@ export const ScheduledMealAddWidget = ({ date, initialName, initialMeals, initia
             actualMeals: { name: ObjectPropertyHelper.nameof(defaultValues, e => e.actualMeals), noMarkup: true },
             dishServings: { name: ObjectPropertyHelper.nameof(defaultValues, e => e.dishServings), noMarkup: true },
             createdDate: { name: ObjectPropertyHelper.nameof(defaultValues, e => e.createdDate), noMarkup: true },
-            plannedDate: { label: "Ngày kế hoạch", name: ObjectPropertyHelper.nameof(defaultValues, e => e.plannedDate) },
+            plannedDate: { label: AppCopy.scheduledMeal.plannedDateLabel, name: ObjectPropertyHelper.nameof(defaultValues, e => e.plannedDate) },
         }),
         transformFunc: (values) => {
             const selectedDishIds = Object.values(values.meals ?? { breakfast: [], lunch: [], dinner: [] }).flat();
@@ -139,7 +140,7 @@ export const ScheduledMealAddWidget = ({ date, initialName, initialMeals, initia
         <SmartForm.Item {...addScheduledMealForm.itemDefinitions.name}>
             <AutoComplete
                 options={nameOptions}
-                placeholder="Nhập tên"
+                placeholder={AppCopy.scheduledMeal.namePlaceholder}
                 autoFocus
                 allowClear
                 filterOption={(inputValue, option) => (option?.value ?? "").toString().toLowerCase().includes(inputValue.toLowerCase())}
@@ -147,35 +148,35 @@ export const ScheduledMealAddWidget = ({ date, initialName, initialMeals, initia
         </SmartForm.Item>
         <Box style={{ marginBottom: 12 }}>
             <HouseholdMemberPicker
-                label="Cho ai ăn? (để trống = cả nhà)"
-                placeholder="Cho ai ăn?"
+                label={AppCopy.scheduledMeal.forWhomLabel}
+                placeholder={AppCopy.scheduledMeal.forWhom}
                 value={memberIds}
                 onChange={ids => addScheduledMealForm.form.setFieldsValue({ memberIds: ids })}
             />
         </Box>
         <ScheduledMealMealPlanner meals={meals} dishServings={dishServings} dishes={dishes} onMealsChange={_onMealsChange} />
         <SmartForm.Item {...addScheduledMealForm.itemDefinitions.plannedDate}>
-            <DatePicker style={{ width: "100%" }} placeholder="Chọn ngày" format={"DD/MM/YYYY"} />
+            <DatePicker style={{ width: "100%" }} placeholder={AppCopy.scheduledMeal.plannedDatePlaceholder} format={"DD/MM/YYYY"} />
         </SmartForm.Item>
         {plannedDate && <Box style={{ display: "block", width: "100%", maxWidth: "100%", minWidth: 0, boxSizing: "border-box", alignSelf: "stretch", justifySelf: "stretch", marginInline: 0, textAlign: "left", border: "1px solid #e6f4ff", borderRadius: 8, background: "#f8fbff", padding: 10, marginBottom: 12 }}>
-            <Typography.Text strong style={{ display: "block", color: "#111827", fontSize: 12, lineHeight: "17px", marginBottom: 8 }}>Thực đơn đã có trong ngày này</Typography.Text>
+            <Typography.Text strong style={{ display: "block", color: "#111827", fontSize: 12, lineHeight: "17px", marginBottom: 8 }}>{AppCopy.scheduledMeal.existingMealsTitle}</Typography.Text>
             <Stack direction="column" gap={6} fullwidth align="stretch" style={{ width: "100%", textAlign: "left" }}>
                 {mealSlotLabels.map(slot => {
                     const names = _getExistingDishNames(slot.key);
                     return <div key={slot.key} style={{ display: "grid", gridTemplateColumns: "58px minmax(0, 1fr)", gap: 8, alignItems: "start", width: "100%", boxSizing: "border-box", textAlign: "left" }}>
                         <Tag style={{ marginRight: 0, color: slot.color, background: slot.background, borderColor: slot.border, textAlign: "center" }}>{slot.label}</Tag>
                         <Typography.Text type={names.length > 0 ? undefined : "secondary"} style={{ fontSize: 12, lineHeight: "18px", overflowWrap: "anywhere" }}>
-                            {names.length > 0 ? names.join(" · ") : "Chưa có món"}
+                            {names.length > 0 ? names.join(" · ") : AppCopy.scheduledMeal.emptyMealLine}
                         </Typography.Text>
                     </div>
                 })}
             </Stack>
         </Box>}
         <div style={{ marginBottom: 14 }}>
-            <ScheduledMealEstimateSummary dishIds={selectedDishIds} dishServings={dishServings} title="Ước tính ngày này" maxRows={4} />
+            <ScheduledMealEstimateSummary dishIds={selectedDishIds} dishServings={dishServings} title={AppCopy.scheduledMeal.estimateTitle} maxRows={4} />
         </div>
-        <Stack fullwidth justify="flex-end">
-            <Button type="primary" onClick={_onSave}>Lưu</Button>
+        <Stack direction="column" gap={8} fullwidth>
+            <Button type="primary" size="large" onClick={_onSave} style={{ width: "100%", minHeight: 44 }}>{AppCopy.common.save}</Button>
         </Stack>
     </SmartForm>
 }

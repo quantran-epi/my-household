@@ -286,8 +286,7 @@ export const AppCopy = {
     scheduledMeal: {
         // Screen header
         screenTitle: "Thực đơn",
-        screenSubtitle: "Lên kế hoạch bữa ăn theo ngày, theo dõi nấu nướng, phần dư và phản hồi của cả nhà.",
-        // Day navigator
+        screenSubtitle: "Lên kế hoạch bữa ăn theo ngày, theo dõi nấu nướng, phần dư và phản hồi của cả nhà.",        // Day navigator
         prevDayAria: "Ngày trước",
         nextDayAria: "Ngày sau",
         showCalendarAria: "Chọn ngày",
@@ -368,6 +367,18 @@ export const AppCopy = {
         // Delete confirm Sheet
         deleteConfirmTitle: "Xác nhận xóa",
         deleteConfirmBody: (args: { name: string }) => `Bạn có chắc muốn xóa thực đơn ${args.name} không? Hành động này không thể hoàn tác.`,
+        // Add widget — form fields, slots, summary, save
+        defaultMenuName: "Thực đơn chưa đặt tên",
+        createdToast: "Đã tạo thực đơn",
+        nameLabel: "Tên gợi nhớ",
+        namePlaceholder: "Nhập tên",
+        plannedDateLabel: "Ngày kế hoạch",
+        plannedDatePlaceholder: "Chọn ngày",
+        forWhomLabel: "Cho ai ăn? (để trống = cả nhà)",
+        forWhom: "Cho ai ăn?",
+        existingMealsTitle: "Thực đơn đã có trong ngày này",
+        emptyMealLine: "Chưa có món",
+        estimateTitle: "Ước tính ngày này",
     },
     emptyStates: {
         noDishes: "Chưa có món nào — thêm món đầu tiên nhé",
