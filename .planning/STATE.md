@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 5 context gathered
-last_updated: "2026-06-17T00:34:39.591Z"
+last_updated: "2026-06-17T11:34:48.873Z"
 last_activity: 2026-06-16 -- Phase 05 execution started
 progress:
   total_phases: 6
   completed_phases: 4
   total_plans: 22
-  completed_plans: 17
+  completed_plans: 18
   percent: 67
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-06-14)
 ## Current Position
 
 Phase: 05 (mobile-tuning-copy-rollout) — EXECUTING
-Plan: 3 of 7
+Plan: 4 of 7
 Status: Ready to execute
 Last activity: 2026-06-16 -- Phase 05 execution started
 
@@ -59,6 +59,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 04 P05 | 8min | 3 tasks | 3 files |
 | Phase 05 P01 | 18 | 3 tasks | 5 files |
 | Phase 05 P02 | 10 | 3 tasks | 8 files |
+| Phase 05 P03 | 12min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,7 @@ Recent decisions affecting current work:
 - [Phase ?]: 04-05: empty-catalog cold-start uses a seedApp variant (preserving the welcome-complete flag) rather than a raw IndexedDB clear, so first-timers reach the wizard without an onboarding redirect
 - [Phase ?]: 05-01: AppCopy wizard+emptyStates namespace is the Phase 5 copy-migration template — migrate literals first, reword in 05-07
 - [Phase ?]: 05-02: MOB-03 long-tail picker/confirmation sweep onto @components/Sheet; full app-wide inventory disposition recorded (converted vs deferred-with-reason) for auditability; imperative modal.confirm sites lifted to state-driven Sheets only when single-step
+- [Phase ?]: 05-03: shell/nav copy migrated to AppCopy.shell; SidebarDrawer PIN+Backup confirmations swapped to @components/Sheet, FastDrawerShell nav kept
 
 ### Pending Todos
 
@@ -100,6 +102,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-17T00:33:46.751Z
+Last session: 2026-06-17T11:34:06.545Z
 Stopped at: Phase 5 context gathered
 Resume file: .planning/phases/05-mobile-tuning-copy-rollout/05-CONTEXT.md
