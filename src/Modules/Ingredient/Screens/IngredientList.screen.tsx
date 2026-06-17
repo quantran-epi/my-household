@@ -1,14 +1,15 @@
 import { DeleteOutlined, EditOutlined, PlusOutlined, DatabaseOutlined, FireOutlined, BarChartOutlined, MoreOutlined } from "@ant-design/icons";
+import { AppCopy } from "@common/Copy";
 import { Button, ActionButton } from "@components/Button";
 import { Dropdown } from "@components/Dropdown";
-import { FastModalShell } from "@components/FastOverlay";
 import { Input } from "@components/Form/Input";
 import { Image } from "@components/Image";
 import { Box } from "@components/Layout/Box";
 import { Space } from "@components/Layout/Space";
 import { Stack } from "@components/Layout/Stack";
 import { scrollVirtualListToTop, VirtualListRowFrame, VirtualListScrollTopButton } from "@components/List";
-import { DeferredModalContent, Modal } from "@components/Modal";
+import { DeferredModalContent } from "@components/Modal";
+import { Sheet } from "@components/Sheet";
 import { Tooltip } from "@components/Tootip";
 import { Typography } from "@components/Typography";
 import { useScreenTitle, useToggle, useAdminMode, usePagedVirtualItems, useScheduledCalculation } from "@hooks";
@@ -45,12 +46,12 @@ type IngredientFilterData = {
 }
 
 const INGREDIENT_STOCK_FILTERS: { value: IngredientStockFilter; label: string }[] = [
-    { value: "all", label: "Tất cả" },
-    { value: "in_stock", label: "Đang có" },
-    { value: "need_stock", label: "Cần nhập" },
-    { value: "low_stock", label: "Sắp hết" },
-    { value: "urgent", label: "Sắp hết hạn" },
-    { value: "always_available", label: "Luôn có" },
+    { value: "all", label: AppCopy.ingredient.stockAll },
+    { value: "in_stock", label: AppCopy.ingredient.stockInStock },
+    { value: "need_stock", label: AppCopy.ingredient.stockNeedStock },
+    { value: "low_stock", label: AppCopy.ingredient.stockLowStock },
+    { value: "urgent", label: AppCopy.ingredient.stockUrgent },
+    { value: "always_available", label: AppCopy.ingredient.stockAlwaysAvailable },
 ];
 
 const INGREDIENT_ROW_DEFAULT_HEIGHT = 158;
@@ -141,7 +142,7 @@ const DeferredSearchInput = React.memo(({ onCommit }: { onCommit: (value: string
 
     useEffect(() => () => commitSearch.cancel(), [commitSearch]);
 
-    return <Input allowClear data-testid="ingredient-search-input" placeholder="Tìm kiếm" value={value} onChange={onChange} style={searchInputStyle} />;
+    return <Input allowClear data-testid="ingredient-search-input" placeholder={AppCopy.ingredient.searchPlaceholder} value={value} onChange={onChange} style={searchInputStyle} />;
 });
 
 const getIngredientStockSnapshot = (
@@ -195,7 +196,7 @@ export const IngredientListScreen = () => {
     const toggleAddModal = useToggle({ defaultValue: false });
     const [inventoryIngredient, setInventoryIngredient] = useState<Ingredient | null>(null);
     const dispatch = useDispatch();
-    useScreenTitle({ value: "Nguyên liệu", deps: [] });
+    useScreenTitle({ value: AppCopy.ingredient.screenTitle, deps: [] });
     const [searchText, setSearchText] = useState("");
     const [activeStockFilter, setActiveStockFilter] = useState<IngredientStockFilter>("all");
     const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -247,8 +248,8 @@ export const IngredientListScreen = () => {
     }, [toggleSuggester]);
 
     usePageActions([
-        { key: "use-first", label: "Dùng trước hết hạn", icon: <FireOutlined style={{ color: "#ff4d4f" }} />, onClick: toggleUseFirst.show },
-        { key: "stats", label: "Thống kê nguyên liệu", icon: <BarChartOutlined style={{ color: "#1677ff" }} />, onClick: toggleStats.show },
+        { key: "use-first", label: AppCopy.ingredient.actionUseFirst, icon: <FireOutlined style={{ color: "#ff4d4f" }} />, onClick: toggleUseFirst.show },
+        { key: "stats", label: AppCopy.ingredient.actionStats, icon: <BarChartOutlined style={{ color: "#1677ff" }} />, onClick: toggleStats.show },
     ], []);
 
     const availableCategories = useMemo(() => {
@@ -377,9 +378,9 @@ export const IngredientListScreen = () => {
             <Box style={topToolCardStyle}>
                 <Stack.Compact style={searchControlRowStyle}>
                     <DeferredSearchInput onCommit={_onSearchCommit} />
-                    {isAdmin && <Button preserveAntdStyle onClick={_onAdd} icon={<PlusOutlined />} />}
+                    {isAdmin && <Button preserveAntdStyle aria-label={AppCopy.ingredient.addModalTitle} onClick={_onAdd} icon={<PlusOutlined />} style={{ width: 44, height: 44, minWidth: 44, paddingInline: 0 }} />}
                 </Stack.Compact>
-                {searchPending && <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "15px", marginTop: 5 }}>Đang lọc danh sách...</Typography.Text>}
+                {searchPending && <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "15px", marginTop: 5 }}>{AppCopy.ingredient.filteringHint}</Typography.Text>}
                 <div style={filterRowStyle}>
                     {INGREDIENT_STOCK_FILTERS.map(item => (
                         <button key={item.value} type="button" data-testid={`ingredient-filter-${item.value}`} onClick={() => _setActiveStockFilter(item.value)} style={filterChipStyle(activeStockFilter === item.value)}>
@@ -390,7 +391,7 @@ export const IngredientListScreen = () => {
                 {availableCategories.length > 0 && (
                     <div style={filterRowStyle}>
                         <button type="button" data-testid="ingredient-category-filter-reset" onClick={_resetActiveCategory} style={filterChipStyle(activeCategory === null)}>
-                            Tất cả nhóm ({categoryCounts.__all ?? 0})
+                            {AppCopy.ingredient.allCategoriesLabel} ({categoryCounts.__all ?? 0})
                         </button>
                         {availableCategories.map(category => (
                             <button key={category} type="button" onClick={() => _toggleActiveCategory(category)} style={filterChipStyle(activeCategory === category)}>
@@ -414,21 +415,16 @@ export const IngredientListScreen = () => {
                     data-testid="ingredient-virtual-list"
                 />
                 {hasMoreIngredients && <div data-testid="ingredient-list-page-status" style={{ position: "absolute", left: "50%", bottom: 10, transform: "translateX(-50%)", padding: "4px 10px", borderRadius: 999, background: "rgba(255,255,255,0.94)", border: "1px solid #f0f0f0", boxShadow: "0 4px 14px rgba(0,0,0,0.08)", fontSize: 12, color: "#595959", pointerEvents: "none" }}>
-                    Đã tải {loadedIngredientCount}/{totalIngredientCount}
+                    {AppCopy.ingredient.loadedCount({ loaded: loadedIngredientCount, total: totalIngredientCount })}
                 </div>}
                 <VirtualListScrollTopButton listRef={listRef} rowCount={visibleIngredients.length} visible={showScrollTop} />
             </div>
         </div>
-        <Modal width={640} open={toggleAddModal.value} title={
-            <Space>
-                <Image src={VegetablesIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
-                Thêm nguyên liệu
-            </Space>
-        } destroyOnClose={true} onCancel={toggleAddModal.hide} footer={null}>
+        <Sheet open={toggleAddModal.value} title={<Space><Image src={VegetablesIcon} preview={false} width={24} style={{ marginBottom: 3 }} />{AppCopy.ingredient.addModalTitle}</Space>} onClose={toggleAddModal.hide} data-testid="ingredient-add-sheet">
             <DeferredModalContent active={toggleAddModal.value}>
                 <IngredientAddWidget />
             </DeferredModalContent>
-        </Modal>
+        </Sheet>
         {toggleUseFirst.value && <UseFirstWidget
             open={toggleUseFirst.value}
             onClose={toggleUseFirst.hide}
@@ -445,16 +441,11 @@ export const IngredientListScreen = () => {
                 initialIngredientIds={suggestIds}
             />
         </React.Suspense>}
-        {inventoryIngredient && <FastModalShell open={Boolean(inventoryIngredient)} title={
-            <Space>
-                <DatabaseOutlined />
-                Tồn kho - {inventoryIngredient.name}
-            </Space>
-        } onClose={_onCloseInventory} footer={null}>
+        {inventoryIngredient && <Sheet open={Boolean(inventoryIngredient)} title={<Space><DatabaseOutlined />{AppCopy.ingredient.inventoryModalTitle({ name: inventoryIngredient.name })}</Space>} onClose={_onCloseInventory} data-testid="ingredient-inventory-sheet">
             <DeferredModalContent active={Boolean(inventoryIngredient)} minHeight={180}>
                 <IngredientInventoryWidget item={inventoryIngredient} onDone={_onCloseInventory} onSuggest={_onSuggest} />
             </DeferredModalContent>
-        </FastModalShell>}
+        </Sheet>}
     </React.Fragment>
 }
 
@@ -490,14 +481,14 @@ const IngredientItemComponent: React.FunctionComponent<IngredientItemProps> = (p
     const visibleRecipeUnits = recipeUnits.slice(0, 4).join(", ");
     const extraRecipeUnitCount = Math.max(0, recipeUnits.length - 4);
     const inventoryStatus = props.item.alwaysAvailable
-        ? { label: "Luôn có", detail: "Không cần quản lý tồn kho", color: "#389e0d", background: "#f6ffed", border: "#b7eb8f" }
+        ? { label: AppCopy.ingredient.statusAlwaysAvailable, detail: AppCopy.ingredient.statusAlwaysAvailableDetail, color: "#389e0d", background: "#f6ffed", border: "#b7eb8f" }
         : !props.stockSnapshot?.hasInventory
-            ? { label: "Chưa có tồn kho", detail: "Bấm để nhập lô đầu tiên", color: "#8c8c8c", background: "#fafafa", border: "#d9d9d9" }
+            ? { label: AppCopy.ingredient.statusNoInventory, detail: AppCopy.ingredient.statusNoInventoryDetail, color: "#8c8c8c", background: "#fafafa", border: "#d9d9d9" }
             : totalAmt <= 0
-                ? { label: "Hết khả dụng", detail: "Không còn lô dùng được", color: "#cf1322", background: "#fff1f0", border: "#ffa39e" }
+                ? { label: AppCopy.ingredient.statusOutOfStock, detail: AppCopy.ingredient.statusOutOfStockDetail, color: "#cf1322", background: "#fff1f0", border: "#ffa39e" }
                 : props.stockSnapshot.lowStock
-                    ? { label: `${IngredientUnitHelper.formatAmount(totalAmt)} ${inventoryUnit}`, detail: "Tồn kho thấp", color: "#d46b08", background: "#fff7e6", border: "#ffd591" }
-                    : { label: `${IngredientUnitHelper.formatAmount(totalAmt)} ${inventoryUnit}`, detail: "Tồn kho ổn", color: "#389e0d", background: "#f6ffed", border: "#b7eb8f" };
+                    ? { label: `${IngredientUnitHelper.formatAmount(totalAmt)} ${inventoryUnit}`, detail: AppCopy.ingredient.statusLowDetail, color: "#d46b08", background: "#fff7e6", border: "#ffd591" }
+                    : { label: `${IngredientUnitHelper.formatAmount(totalAmt)} ${inventoryUnit}`, detail: AppCopy.ingredient.statusOkDetail, color: "#389e0d", background: "#f6ffed", border: "#b7eb8f" };
     const railColor = expiryBadge && props.stockSnapshot.urgent ? expiryBadge.color : inventoryStatus.color;
 
     return <React.Fragment>
@@ -524,7 +515,7 @@ const IngredientItemComponent: React.FunctionComponent<IngredientItemProps> = (p
                             </Tooltip>
                             <div style={{ display: "flex", gap: 5, flexWrap: "wrap", alignItems: "center" }}>
                                 {props.item.category && <span style={{ padding: "1px 7px", borderRadius: 999, background: "#f0f5ff", color: "#1d39c4", fontSize: 11, lineHeight: "18px", fontWeight: 600 }}>{props.item.category}</span>}
-                                <span style={{ padding: "1px 7px", borderRadius: 999, background: "#fafafa", color: "#595959", border: "1px solid #f0f0f0", fontSize: 11, lineHeight: "18px" }}>Gốc: {inventoryUnit}</span>
+                                <span style={{ padding: "1px 7px", borderRadius: 999, background: "#fafafa", color: "#595959", border: "1px solid #f0f0f0", fontSize: 11, lineHeight: "18px" }}>{AppCopy.ingredient.rowOriginUnit({ unit: inventoryUnit })}</span>
                                 {shelfLife && <Tooltip title={shelfLife.description}>
                                     <span style={{ padding: "1px 7px", borderRadius: 999, background: `${shelfLife.color}14`, color: shelfLife.color, border: `1px solid ${shelfLife.color}33`, fontSize: 11, lineHeight: "18px", fontWeight: 600 }}>{shelfLife.emoji} {shelfLife.label}</span>
                                 </Tooltip>}
@@ -535,19 +526,19 @@ const IngredientItemComponent: React.FunctionComponent<IngredientItemProps> = (p
                         </div>
 
                         <div style={{ display: "flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-                            <Tooltip title="Xem dinh dưỡng">
-                                <ActionButton shape="circle" icon={<BarChartOutlined />} aria-label="Xem chi tiết dinh dưỡng" onClick={toggleNutrition.show} />
+                            <Tooltip title={AppCopy.ingredient.aria_viewNutrition}>
+                                <ActionButton shape="circle" icon={<BarChartOutlined />} aria-label={AppCopy.ingredient.aria_viewNutritionDetail} onClick={toggleNutrition.show} />
                             </Tooltip>
                             {props.isAdmin && (
                                 <Dropdown menu={{
                                     items: [
-                                        { label: "Sửa", key: "edit", icon: <EditOutlined /> },
+                                        { label: AppCopy.ingredient.menuEdit, key: "edit", icon: <EditOutlined /> },
                                         { type: "divider" },
-                                        { label: "Xóa", key: "delete", icon: <DeleteOutlined />, danger: true },
+                                        { label: AppCopy.ingredient.menuDelete, key: "delete", icon: <DeleteOutlined />, danger: true },
                                     ],
                                     onClick: _onMoreActionClick,
                                 }} placement="bottomRight">
-                                    <Button type="text" aria-label="Thao tác nguyên liệu" icon={<MoreOutlined />} style={{ width: 34, paddingInline: 0 }} />
+                                    <Button type="text" aria-label={AppCopy.ingredient.aria_rowMenu} icon={<MoreOutlined />} style={{ width: 34, paddingInline: 0 }} />
                                 </Dropdown>
                             )}
                         </div>
@@ -568,7 +559,7 @@ const IngredientItemComponent: React.FunctionComponent<IngredientItemProps> = (p
                                 minWidth: 0,
                             }}
                         >
-                            <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "14px" }}>Tồn kho khả dụng</Typography.Text>
+                            <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "14px" }}>{AppCopy.ingredient.labelUsableInventory}</Typography.Text>
                             <Typography.Text strong style={{ display: "block", color: inventoryStatus.color, fontSize: 14, lineHeight: "19px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                 <DatabaseOutlined /> {inventoryStatus.label}
                             </Typography.Text>
@@ -576,58 +567,48 @@ const IngredientItemComponent: React.FunctionComponent<IngredientItemProps> = (p
                         </button>
 
                         <div style={{ minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "center", gap: 4, border: "1px solid #f0f0f0", borderRadius: 8, background: "#fafafa", padding: "7px 9px" }}>
-                            <Typography.Text type="secondary" style={{ fontSize: 11, lineHeight: "14px" }}>Đơn vị công thức</Typography.Text>
+                            <Typography.Text type="secondary" style={{ fontSize: 11, lineHeight: "14px" }}>{AppCopy.ingredient.labelRecipeUnits}</Typography.Text>
                             <Typography.Text strong style={{ fontSize: 13, lineHeight: "18px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                                 {visibleRecipeUnits}{extraRecipeUnitCount > 0 ? ` +${extraRecipeUnitCount}` : ""}
                             </Typography.Text>
                             <Typography.Text type="secondary" style={{ fontSize: 11, lineHeight: "14px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                                Nhập kho: {inventoryUnits.join(", ")}
+                                {AppCopy.ingredient.labelInventoryUnits({ units: inventoryUnits.join(", ") })}
                             </Typography.Text>
                         </div>
                     </div>
 
                     {expiryBadge && <Typography.Text style={{ color: expiryBadge.color, fontSize: 12, lineHeight: "16px" }}>
-                        <FireOutlined style={{ fontSize: 11 }} /> Lô gần nhất: {expiryBadge.label}
+                        <FireOutlined style={{ fontSize: 11 }} /> {AppCopy.ingredient.latestBatch({ label: expiryBadge.label })}
                     </Typography.Text>}
                 </div>
             </div>
         </div>
 
         {/* Edit modal */}
-        {toggleEdit.value && <Modal width={640} open={toggleEdit.value} title={
-            <Space>
-                <Image src={VegetablesIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
-                Chỉnh sửa nguyên liệu
-            </Space>
-        } destroyOnClose={true} onCancel={toggleEdit.hide} footer={null}>
+        {toggleEdit.value && <Sheet open={toggleEdit.value} title={<Space><Image src={VegetablesIcon} preview={false} width={24} style={{ marginBottom: 3 }} />{AppCopy.ingredient.editModalTitle}</Space>} onClose={toggleEdit.hide} data-testid={`ingredient-edit-sheet-${props.item.id}`}>
             <DeferredModalContent active={toggleEdit.value}>
                 <IngredientEditWidget item={props.item} onDone={() => toggleEdit.hide()} />
             </DeferredModalContent>
-        </Modal>}
+        </Sheet>}
 
-        {toggleNutrition.value && <Modal width={640} open={toggleNutrition.value} title={
-            <Space>
-                <BarChartOutlined />
-                Dinh dưỡng - {props.item.name}
-            </Space>
-        } destroyOnClose={true} onCancel={toggleNutrition.hide} footer={<Button onClick={toggleNutrition.hide}>Đóng</Button>}>
-            <DeferredModalContent active={toggleNutrition.value} minHeight={180}>
-                <IngredientNutritionDetail ingredient={props.item} />
-            </DeferredModalContent>
-        </Modal>}
+        {toggleNutrition.value && <Sheet open={toggleNutrition.value} title={<Space><BarChartOutlined />{AppCopy.ingredient.nutritionModalTitle({ name: props.item.name })}</Space>} onClose={toggleNutrition.hide} data-testid={`ingredient-nutrition-sheet-${props.item.id}`}>
+            <Stack direction="column" gap={16} fullwidth align="stretch">
+                <DeferredModalContent active={toggleNutrition.value} minHeight={180}>
+                    <IngredientNutritionDetail ingredient={props.item} />
+                </DeferredModalContent>
+                <Button size="large" onClick={toggleNutrition.hide}>{AppCopy.ingredient.nutritionModalClose}</Button>
+            </Stack>
+        </Sheet>}
 
-        {toggleDeleteConfirm.value && <Modal
-            open={toggleDeleteConfirm.value}
-            title={<Space><DeleteOutlined style={{ color: "red" }} />Xác nhận xóa</Space>}
-            onCancel={toggleDeleteConfirm.hide}
-            onOk={() => { props.onDelete(props.item); toggleDeleteConfirm.hide(); }}
-            okText="Xóa"
-            cancelText="Hủy"
-            okButtonProps={{ danger: true }}
-            destroyOnClose
-        >
-            Bạn có chắc muốn xóa nguyên liệu <b>{props.item.name}</b> không? Hành động này không thể hoàn tác.
-        </Modal>}
+        {toggleDeleteConfirm.value && <Sheet open={toggleDeleteConfirm.value} title={<Space><DeleteOutlined style={{ color: "red" }} />{AppCopy.ingredient.deleteConfirmTitle}</Space>} onClose={toggleDeleteConfirm.hide} data-testid={`ingredient-delete-sheet-${props.item.id}`}>
+            <Stack direction="column" gap={16} fullwidth align="stretch" style={{ padding: 16 }}>
+                <Typography.Text>{AppCopy.ingredient.deleteConfirmBody({ name: props.item.name })}</Typography.Text>
+                <Button type="primary" danger size="large" onClick={() => { props.onDelete(props.item); toggleDeleteConfirm.hide(); }}>
+                    {AppCopy.ingredient.menuDelete}
+                </Button>
+                <Button size="large" onClick={toggleDeleteConfirm.hide}>{AppCopy.common.cancel}</Button>
+            </Stack>
+        </Sheet>}
 
     </React.Fragment>
 }

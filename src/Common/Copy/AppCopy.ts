@@ -524,6 +524,58 @@ export const AppCopy = {
         deleteConfirmTitle: "Xác nhận xóa",
         deleteConfirmBody: (args: { name: string }) => `Bạn có chắc muốn xóa món ${args.name} không? Hành động này không thể hoàn tác.`,
     },
+    ingredient: {
+        // Screen header / page-level
+        screenTitle: "Nguyên liệu",
+        searchPlaceholder: "Tìm kiếm",
+        filteringHint: "Đang lọc danh sách...",
+        loadedCount: (args: { loaded: number; total: number }) => `Đã tải ${args.loaded}/${args.total}`,
+        // Stock filter chips
+        stockAll: "Tất cả",
+        stockInStock: "Đang có",
+        stockNeedStock: "Cần nhập",
+        stockLowStock: "Sắp hết",
+        stockUrgent: "Sắp hết hạn",
+        stockAlwaysAvailable: "Luôn có",
+        // Category filter
+        allCategoriesLabel: "Tất cả nhóm",
+        // Page actions (toolkit)
+        actionUseFirst: "Dùng trước hết hạn",
+        actionStats: "Thống kê nguyên liệu",
+        // Add modal
+        addModalTitle: "Thêm nguyên liệu",
+        // Inventory modal
+        inventoryModalTitle: (args: { name: string }) => `Tồn kho - ${args.name}`,
+        // Row inventory status states
+        statusAlwaysAvailable: "Luôn có",
+        statusAlwaysAvailableDetail: "Không cần quản lý tồn kho",
+        statusNoInventory: "Chưa có tồn kho",
+        statusNoInventoryDetail: "Bấm để nhập lô đầu tiên",
+        statusOutOfStock: "Hết khả dụng",
+        statusOutOfStockDetail: "Không còn lô dùng được",
+        statusLowDetail: "Tồn kho thấp",
+        statusOkDetail: "Tồn kho ổn",
+        // Row aria + tooltip
+        aria_viewNutrition: "Xem dinh dưỡng",
+        aria_viewNutritionDetail: "Xem chi tiết dinh dưỡng",
+        aria_rowMenu: "Thao tác nguyên liệu",
+        rowOriginUnit: (args: { unit: string }) => `Gốc: ${args.unit}`,
+        // Row dropdown
+        menuEdit: "Sửa",
+        menuDelete: "Xóa",
+        // Row metric cards
+        labelUsableInventory: "Tồn kho khả dụng",
+        labelRecipeUnits: "Đơn vị công thức",
+        labelInventoryUnits: (args: { units: string }) => `Nhập kho: ${args.units}`,
+        latestBatch: (args: { label: string }) => `Lô gần nhất: ${args.label}`,
+        // Edit / nutrition modal titles
+        editModalTitle: "Chỉnh sửa nguyên liệu",
+        nutritionModalTitle: (args: { name: string }) => `Dinh dưỡng - ${args.name}`,
+        nutritionModalClose: "Đóng",
+        // Delete confirm Sheet
+        deleteConfirmTitle: "Xác nhận xóa",
+        deleteConfirmBody: (args: { name: string }) => `Bạn có chắc muốn xóa nguyên liệu ${args.name} không? Hành động này không thể hoàn tác.`,
+    },
     emptyStates: {
         noDishes: "Chưa có món nào — thêm món đầu tiên nhé",
         noSchedule: "Chưa có bữa nào được lên lịch — bắt đầu nhé",
