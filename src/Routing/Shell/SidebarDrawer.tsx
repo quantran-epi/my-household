@@ -1,4 +1,5 @@
 import { CloudDownloadOutlined, CloudUploadOutlined, DatabaseOutlined, LockOutlined, MedicineBoxOutlined, MenuOutlined, UnlockOutlined, QuestionCircleOutlined, LoadingOutlined, SyncOutlined, SettingOutlined } from "@ant-design/icons";
+import { AppCopy } from "@common/Copy";
 import { SharedSyncModal } from "@components/AppInitializer/SharedSyncModal";
 import { ActionButton, Button } from "@components/Button";
 import { FastDrawerShell } from "@components/FastOverlay";
@@ -7,8 +8,9 @@ import { Box } from "@components/Layout/Box";
 import { Space } from "@components/Layout/Space";
 import { Stack } from "@components/Layout/Stack";
 import { useMessage } from "@components/Message";
-import { DeferredModalContent, Modal } from "@components/Modal";
+import { DeferredModalContent } from "@components/Modal";
 import { useModal } from "@components/Modal/ModalProvider";
+import { Sheet } from "@components/Sheet";
 import { Typography } from "@components/Typography";
 import { useAdminMode, useToggle, useSharedPublish, useSharedDataSync, type SyncedVersions } from "@hooks";
 import { ScheduledMealToolkitWidget } from "@modules/ScheduledMeal/Screens/ScheduledMealToolkit.widget";
@@ -185,7 +187,7 @@ export const SidebarDrawer = ({ buttonStyle }: { buttonStyle?: React.CSSProperti
             setPinError("");
             window.location.reload();
         } else {
-            setPinError("Sai mã PIN");
+            setPinError(AppCopy.shell.pinWrong);
         }
     };
 
@@ -201,27 +203,27 @@ export const SidebarDrawer = ({ buttonStyle }: { buttonStyle?: React.CSSProperti
                 setOpen(false);
                 toggleBackupCenter.hide();
             } else {
-                message.success("Dữ liệu dùng chung đã mới nhất");
+                message.success(AppCopy.shell.backupSharedUpToDate);
             }
         } catch (ex: any) {
-            message.error("Đồng bộ thất bại: " + ex?.message);
+            message.error(AppCopy.shell.backupSyncFailed({ reason: ex?.message }));
         }
     };
 
     const onSharedSyncDone = async (synced: SyncedVersions) => {
         await markSynced(synced);
-        message.success("Đồng bộ dữ liệu dùng chung thành công");
+        message.success(AppCopy.shell.backupSyncSuccess);
     };
 
     const onSavePublishToken = async () => {
         await setGithubToken(publishTokenInput);
-        message.success("Đã lưu GitHub token xuất bản trên thiết bị này");
+        message.success(AppCopy.shell.publishTokenSaved);
     };
 
     const onClearPublishToken = async () => {
         await clearGithubToken();
         setPublishTokenInput("");
-        message.success("Đã xoá GitHub token xuất bản trên thiết bị này");
+        message.success(AppCopy.shell.publishTokenCleared);
     };
 
     const onTestPublishToken = () => {
@@ -230,10 +232,10 @@ export const SidebarDrawer = ({ buttonStyle }: { buttonStyle?: React.CSSProperti
 
     const onPublishSharedData = () => {
         modal.confirm({
-            title: "Xác nhận xuất bản dữ liệu dùng chung",
-            content: "Thao tác này sẽ ghi nguyên liệu, món ăn và cấu hình dùng chung lên GitHub để các thiết bị khác đồng bộ. Bạn có chắc muốn xuất bản dữ liệu hiện tại?",
-            okText: "Xuất bản",
-            cancelText: "Hủy",
+            title: AppCopy.shell.publishConfirmTitle,
+            content: AppCopy.shell.publishConfirmBody,
+            okText: AppCopy.shell.publishConfirmOk,
+            cancelText: AppCopy.common.cancel,
             centered: true,
             zIndex: APP_CONFIRM_Z_INDEX,
             onOk: publishSharedData,
@@ -266,54 +268,54 @@ export const SidebarDrawer = ({ buttonStyle }: { buttonStyle?: React.CSSProperti
 
     const saveInventoryConfig = () => {
         dispatch(updateInventoryConfig(inventoryConfigDraft));
-        message.success("Đã lưu cấu hình tồn kho dùng chung");
+        message.success(AppCopy.shell.inventorySaved);
     };
 
     const publishTokenSaved = publishTokenInput.trim() === githubToken;
     const publishTokenStatusText = githubTokenSource === "local"
-        ? "Đang dùng token lưu trên thiết bị này."
+        ? AppCopy.shell.publishTokenStatusLocal
         : githubTokenSource === "build"
-            ? "Đang dùng token cấu hình sẵn. Bạn có thể nhập token khác để ghi đè trên thiết bị này."
-            : "Chưa có token xuất bản. Token chỉ lưu trong trình duyệt của thiết bị này.";
+            ? AppCopy.shell.publishTokenStatusBuild
+            : AppCopy.shell.publishTokenStatusNone;
 
     const sidebarNavGroups = [
         {
             key: 'overview',
-            label: 'Tổng quan',
+            label: AppCopy.shell.navGroupOverview,
             items: [
-                { key: 'dashboard', href: RootRoutes.AuthorizedRoutes.Root(), icon: HouseIcon, label: 'Tổng quan' },
-                { key: 'analytics', href: RootRoutes.AuthorizedRoutes.Analytics(), icon: MonitorIcon, label: 'Phân tích' },
+                { key: 'dashboard', href: RootRoutes.AuthorizedRoutes.Root(), icon: HouseIcon, label: AppCopy.shell.navDashboard },
+                { key: 'analytics', href: RootRoutes.AuthorizedRoutes.Analytics(), icon: MonitorIcon, label: AppCopy.shell.navAnalytics },
             ],
         },
         {
             key: 'planning',
-            label: 'Lên thực đơn',
+            label: AppCopy.shell.navGroupPlanning,
             items: [
-                { key: 'dishSuggester', href: RootRoutes.AuthorizedRoutes.DishSuggester(), icon: SuggesterIcon, label: 'Nấu gì?' },
-                { key: 'meals', href: RootRoutes.AuthorizedRoutes.ScheduledMealRoutes.List(), icon: DietPlanIcon, label: 'Thực đơn' },
-                { key: 'dishFeedback', href: RootRoutes.AuthorizedRoutes.ScheduledMealRoutes.FeedbackHistory(), icon: ChatIcon, label: 'Phản hồi món' },
-                { key: 'cookingHistory', href: RootRoutes.AuthorizedRoutes.CookingHistory(), icon: CookingHistoryIcon, label: 'Lịch sử nấu ăn' },
-                { key: 'leftovers', href: RootRoutes.AuthorizedRoutes.ScheduledMealRoutes.Leftovers(), icon: LeftoverIcon, label: 'Phần còn lại' },
-                { key: 'prepTasks', href: RootRoutes.AuthorizedRoutes.ScheduledMealRoutes.PrepTasks(), icon: PrepTaskIcon, label: 'Việc chuẩn bị' },
-                { key: 'shoppingList', href: RootRoutes.AuthorizedRoutes.ShoppingListRoutes.List(), icon: ShoppingListIcon, label: 'Lịch mua sắm' },
-                { key: 'expensePlanner', href: RootRoutes.AuthorizedRoutes.ExpensePlanner(), icon: BudgetIcon, label: 'Tính chi phí' },
+                { key: 'dishSuggester', href: RootRoutes.AuthorizedRoutes.DishSuggester(), icon: SuggesterIcon, label: AppCopy.shell.navDishSuggester },
+                { key: 'meals', href: RootRoutes.AuthorizedRoutes.ScheduledMealRoutes.List(), icon: DietPlanIcon, label: AppCopy.shell.navMeals },
+                { key: 'dishFeedback', href: RootRoutes.AuthorizedRoutes.ScheduledMealRoutes.FeedbackHistory(), icon: ChatIcon, label: AppCopy.shell.navDishFeedback },
+                { key: 'cookingHistory', href: RootRoutes.AuthorizedRoutes.CookingHistory(), icon: CookingHistoryIcon, label: AppCopy.shell.navCookingHistory },
+                { key: 'leftovers', href: RootRoutes.AuthorizedRoutes.ScheduledMealRoutes.Leftovers(), icon: LeftoverIcon, label: AppCopy.shell.navLeftovers },
+                { key: 'prepTasks', href: RootRoutes.AuthorizedRoutes.ScheduledMealRoutes.PrepTasks(), icon: PrepTaskIcon, label: AppCopy.shell.navPrepTasks },
+                { key: 'shoppingList', href: RootRoutes.AuthorizedRoutes.ShoppingListRoutes.List(), icon: ShoppingListIcon, label: AppCopy.shell.navShoppingList },
+                { key: 'expensePlanner', href: RootRoutes.AuthorizedRoutes.ExpensePlanner(), icon: BudgetIcon, label: AppCopy.shell.navExpensePlanner },
             ],
         },
         {
             key: 'library',
-            label: 'Thư viện',
+            label: AppCopy.shell.navGroupLibrary,
             items: [
-                { key: 'dishes', href: RootRoutes.AuthorizedRoutes.DishesRoutes.List(), icon: DishesIcon, label: 'Món ăn' },
-                { key: 'ingredients', href: RootRoutes.AuthorizedRoutes.IngredientRoutes.List(), icon: IngredientIcon, label: 'Nguyên liệu' },
-                { key: 'templates', href: RootRoutes.AuthorizedRoutes.Templates(), icon: LayoutIcon, label: 'Mẫu dùng lại' },
+                { key: 'dishes', href: RootRoutes.AuthorizedRoutes.DishesRoutes.List(), icon: DishesIcon, label: AppCopy.shell.navDishes },
+                { key: 'ingredients', href: RootRoutes.AuthorizedRoutes.IngredientRoutes.List(), icon: IngredientIcon, label: AppCopy.shell.navIngredients },
+                { key: 'templates', href: RootRoutes.AuthorizedRoutes.Templates(), icon: LayoutIcon, label: AppCopy.shell.navTemplates },
             ],
         },
         {
             key: 'household',
-            label: 'Gia đình',
+            label: AppCopy.shell.navGroupHousehold,
             items: [
-                { key: 'household', href: RootRoutes.AuthorizedRoutes.HouseholdProfiles(), icon: FamilyIcon, label: 'Nhà mình' },
-                { key: 'nutritionGoals', href: RootRoutes.AuthorizedRoutes.NutritionGoals(), icon: NutritionPlanIcon, label: 'Dinh dưỡng' },
+                { key: 'household', href: RootRoutes.AuthorizedRoutes.HouseholdProfiles(), icon: FamilyIcon, label: AppCopy.shell.navHousehold },
+                { key: 'nutritionGoals', href: RootRoutes.AuthorizedRoutes.NutritionGoals(), icon: NutritionPlanIcon, label: AppCopy.shell.navNutritionGoals },
             ],
         },
     ];
@@ -329,7 +331,7 @@ export const SidebarDrawer = ({ buttonStyle }: { buttonStyle?: React.CSSProperti
                         </span>
                         <div style={{ minWidth: 0 }}>
                             <Typography.Text style={{ display: "block", fontSize: 18, lineHeight: "22px", fontWeight: 750, color: "#2f2545" }}>My Recipes</Typography.Text>
-                            <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "15px" }}>Bếp nhà hôm nay</Typography.Text>
+                            <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "15px" }}>{AppCopy.shell.drawerTagline}</Typography.Text>
                         </div>
                     </Flex>
                 }
@@ -365,60 +367,63 @@ export const SidebarDrawer = ({ buttonStyle }: { buttonStyle?: React.CSSProperti
                     {!toolsReady ? <div style={drawerToolsPlaceholderStyle}><LoadingOutlined /></div> : <React.Fragment>
 
                     {/* ── Data center ── */}
-                    <Divider orientation="left" style={{ fontSize: 12, color: "#888", marginTop: 16, marginBottom: 12 }}>Dữ liệu</Divider>
+                    <Divider orientation="left" style={{ fontSize: 12, color: "#888", marginTop: 16, marginBottom: 12 }}>{AppCopy.shell.dataSectionTitle}</Divider>
                     <Flex vertical gap={8}>
                         <Button
                             icon={<DatabaseOutlined />}
                             block
                             onClick={toggleBackupCenter.show}
+                            style={{ minHeight: 44 }}
                         >
-                            Dữ liệu & sao lưu
+                            {AppCopy.shell.dataBackupButton}
                         </Button>
                         <Button
                             icon={<MedicineBoxOutlined />}
                             block
                             onClick={() => onNavigate(RootRoutes.AuthorizedRoutes.SyncBackupHealth())}
+                            style={{ minHeight: 44 }}
                         >
-                            Sức khỏe dữ liệu
+                            {AppCopy.shell.dataHealthButton}
                         </Button>
                         <Typography.Text type="secondary" style={{ fontSize: 11, paddingLeft: 2 }}>
-                            Đồng bộ dùng chung, sao lưu cá nhân và trạng thái backup được gom vào một nơi.
+                            {AppCopy.shell.dataSectionHint}
                         </Typography.Text>
                     </Flex>
 
                     {/* ── Help ── */}
-                    <Divider orientation="left" style={{ fontSize: 12, color: "#888", marginTop: 20, marginBottom: 12 }}>Trợ giúp</Divider>
+                    <Divider orientation="left" style={{ fontSize: 12, color: "#888", marginTop: 20, marginBottom: 12 }}>{AppCopy.shell.helpSectionTitle}</Divider>
                     <Button
                         icon={<QuestionCircleOutlined />}
                         block
                         onClick={() => onNavigate(RootRoutes.AuthorizedRoutes.UserGuide())}
+                        style={{ minHeight: 44 }}
                     >
-                        Hướng dẫn sử dụng
+                        {AppCopy.shell.helpGuideButton}
                     </Button>
 
                     {/* ── Account ── */}
-                    <Divider orientation="left" style={{ fontSize: 12, color: "#888", marginTop: 20, marginBottom: 12 }}>Tài khoản</Divider>
+                    <Divider orientation="left" style={{ fontSize: 12, color: "#888", marginTop: 20, marginBottom: 12 }}>{AppCopy.shell.accountSectionTitle}</Divider>
                     <Flex vertical gap={4}>
                         {isAdmin ? (
                             <>
                                 <Flex align="center" justify="space-between" style={{ padding: "4px 0" }}>
                                     <Flex align="center" gap={6}>
                                         <LockOutlined style={{ color: "#52c41a" }} />
-                                        <Typography.Text style={{ fontSize: 13, color: "#52c41a", fontWeight: 500 }}>Đang ở chế độ Admin</Typography.Text>
+                                        <Typography.Text style={{ fontSize: 13, color: "#52c41a", fontWeight: 500 }}>{AppCopy.shell.adminModeActive}</Typography.Text>
                                     </Flex>
-                                    <Button type="text" danger onClick={onLock}>Khoá</Button>
+                                    <Button type="text" danger onClick={onLock} style={{ minHeight: 44 }}>{AppCopy.shell.lockButton}</Button>
                                 </Flex>
                                 <Typography.Text type="secondary" style={{ fontSize: 11, paddingLeft: 2 }}>
-                                    Nhấn "Khoá" để thoát chế độ admin và ẩn các công cụ quản trị.
+                                    {AppCopy.shell.adminModeHint}
                                 </Typography.Text>
                             </>
                         ) : (
                             <>
-                                <Button type="text" icon={<UnlockOutlined />} block onClick={() => setPinModalOpen(true)} style={{ justifyContent: "flex-start" }}>
-                                    Đăng nhập Admin
+                                <Button type="text" icon={<UnlockOutlined />} block onClick={() => setPinModalOpen(true)} style={{ justifyContent: "flex-start", minHeight: 44 }}>
+                                    {AppCopy.shell.adminLoginButton}
                                 </Button>
                                 <Typography.Text type="secondary" style={{ fontSize: 11, paddingLeft: 2 }}>
-                                    Nhập mã PIN để mở quyền thêm / sửa / xoá nguyên liệu và món ăn.
+                                    {AppCopy.shell.adminLoginHint}
                                 </Typography.Text>
                             </>
                         )}
@@ -428,45 +433,43 @@ export const SidebarDrawer = ({ buttonStyle }: { buttonStyle?: React.CSSProperti
 
                 </Box>
             </FastDrawerShell>
-            <Modal
-                title="Nhập mã PIN"
+            <Sheet
+                title={AppCopy.shell.pinTitle}
                 open={pinModalOpen}
-                onOk={onUnlock}
-                onCancel={() => { setPinModalOpen(false); setPin(""); setPinError(""); }}
-                okText="Xác nhận"
-                cancelText="Huỷ"
-                destroyOnClose
+                onClose={() => { setPinModalOpen(false); setPin(""); setPinError(""); }}
+                data-testid="sidebar-pin-sheet"
             >
-                <Flex vertical gap={8}>
+                <Flex vertical gap={12} style={{ padding: 16 }}>
                     <AntInput.Password
-                        placeholder="Nhập PIN"
+                        placeholder={AppCopy.shell.pinPlaceholder}
                         value={pin}
                         onChange={e => { setPin(e.target.value); setPinError(""); }}
                         onPressEnter={onUnlock}
                     />
                     {pinError && <Typography.Text type="danger">{pinError}</Typography.Text>}
+                    <Button type="primary" size="large" onClick={onUnlock} style={{ width: "100%", borderRadius: 12 }}>
+                        {AppCopy.shell.pinConfirm}
+                    </Button>
                 </Flex>
-            </Modal>
-            <Modal
-                title={<Space><DatabaseOutlined style={{ color: "#7436dc" }} />Dữ liệu & sao lưu</Space>}
+            </Sheet>
+            <Sheet
+                title={<Space><DatabaseOutlined style={{ color: "#7436dc" }} />{AppCopy.shell.backupTitle}</Space>}
                 open={toggleBackupCenter.value}
-                onCancel={toggleBackupCenter.hide}
-                footer={null}
-                width="min(720px, calc(100vw - 24px))"
-                destroyOnClose={false}
+                onClose={toggleBackupCenter.hide}
+                data-testid="sidebar-backup-sheet"
             >
                 <DeferredModalContent active={toggleBackupCenter.value} minHeight={280}>
-                    {toggleBackupCenter.value ? <Flex vertical gap={12}>
+                    {toggleBackupCenter.value ? <Flex vertical gap={12} style={{ padding: 16 }}>
                         <Box style={{ border: "1px solid rgba(116,54,220,0.12)", borderRadius: 8, padding: 10, background: "#fbf9ff" }}>
                             <Stack justify="space-between" align="flex-start" gap={8}>
                                 <div style={{ minWidth: 0 }}>
-                                    <Typography.Text strong style={{ display: "block", color: "#2f2545", fontSize: 15, lineHeight: "20px" }}>Dữ liệu dùng chung</Typography.Text>
+                                    <Typography.Text strong style={{ display: "block", color: "#2f2545", fontSize: 15, lineHeight: "20px" }}>{AppCopy.shell.backupSharedTitle}</Typography.Text>
                                     <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "17px" }}>
-                                        Cập nhật nguyên liệu, món ăn, mục tiêu dinh dưỡng và cấu hình tồn kho mới nhất được admin xuất bản.
+                                        {AppCopy.shell.backupSharedDesc}
                                     </Typography.Text>
                                 </div>
                                 <ActionButton tone="primary" icon={<CloudDownloadOutlined />} loading={isSyncChecking} onClick={onImportCloud}>
-                                    Đồng bộ mới
+                                    {AppCopy.shell.backupSyncNow}
                                 </ActionButton>
                             </Stack>
                         </Box>
@@ -478,16 +481,16 @@ export const SidebarDrawer = ({ buttonStyle }: { buttonStyle?: React.CSSProperti
                                         <SettingOutlined />
                                     </span>
                                     <div style={{ minWidth: 0 }}>
-                                        <Typography.Text strong style={{ display: "block", color: "#2f2545", fontSize: 15, lineHeight: "20px" }}>Cấu hình tồn kho dùng chung</Typography.Text>
+                                        <Typography.Text strong style={{ display: "block", color: "#2f2545", fontSize: 15, lineHeight: "20px" }}>{AppCopy.shell.inventoryConfigTitle}</Typography.Text>
                                         <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "17px" }}>
-                                            Thiết lập ngưỡng cảnh báo tồn kho và hạn dùng mặc định cho lô hàng chưa nhập ngày hết hạn riêng.
+                                            {AppCopy.shell.inventoryConfigDesc}
                                         </Typography.Text>
                                     </div>
                                 </Flex>
 
                                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 8 }}>
                                     <Box style={{ border: "1px solid #f0f0f0", borderRadius: 0, padding: 9, background: "#fbf9ff" }}>
-                                        <Typography.Text strong style={{ display: "block", fontSize: 12, marginBottom: 5 }}>Ngưỡng thiếu hàng</Typography.Text>
+                                        <Typography.Text strong style={{ display: "block", fontSize: 12, marginBottom: 5 }}>{AppCopy.shell.inventoryLowThreshold}</Typography.Text>
                                         <NumberStepper
                                             min={0}
                                             step={0.5}
@@ -496,11 +499,11 @@ export const SidebarDrawer = ({ buttonStyle }: { buttonStyle?: React.CSSProperti
                                             style={{ width: "100%" }}
                                         />
                                         <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "15px", marginTop: 5 }}>
-                                            Tồn kho lớn hơn 0 và nhỏ hơn hoặc bằng số này sẽ được xem là thấp.
+                                            {AppCopy.shell.inventoryLowThresholdHint}
                                         </Typography.Text>
                                     </Box>
                                     <Box style={{ border: "1px solid #f0f0f0", borderRadius: 0, padding: 9, background: "#fbf9ff" }}>
-                                        <Typography.Text strong style={{ display: "block", fontSize: 12, marginBottom: 5 }}>Sắp hết hạn trong</Typography.Text>
+                                        <Typography.Text strong style={{ display: "block", fontSize: 12, marginBottom: 5 }}>{AppCopy.shell.inventoryExpirySoon}</Typography.Text>
                                         <NumberStepper
                                             min={0}
                                             step={1}
@@ -509,13 +512,13 @@ export const SidebarDrawer = ({ buttonStyle }: { buttonStyle?: React.CSSProperti
                                             style={{ width: "100%" }}
                                         />
                                         <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "15px", marginTop: 5 }}>
-                                            Lô hàng còn trong khoảng ngày này sẽ được ưu tiên cảnh báo và gợi ý nấu trước.
+                                            {AppCopy.shell.inventoryExpirySoonHint}
                                         </Typography.Text>
                                     </Box>
                                 </div>
 
                                 <Flex vertical gap={8}>
-                                    <Typography.Text strong style={{ fontSize: 13, color: "#2f2545" }}>Hạn dùng mặc định theo bảo quản</Typography.Text>
+                                    <Typography.Text strong style={{ fontSize: 13, color: "#2f2545" }}>{AppCopy.shell.inventoryExpiryDefaults}</Typography.Text>
                                     {INGREDIENT_SHELF_LIFE_OPTIONS.map(shelfLife => (
                                         <Box key={shelfLife.value} style={{ border: "1px solid #f0f0f0", borderRadius: 0, padding: 9, background: "#fff" }}>
                                             <Typography.Text strong style={{ display: "block", fontSize: 12, lineHeight: "16px", marginBottom: 7 }}>{shelfLife.label}</Typography.Text>
@@ -538,33 +541,33 @@ export const SidebarDrawer = ({ buttonStyle }: { buttonStyle?: React.CSSProperti
                                 </Flex>
 
                                 <Flex gap={8} wrap="wrap" justify="flex-end">
-                                    <ActionButton onClick={resetInventoryConfigDraft}>Dùng mặc định</ActionButton>
-                                    <ActionButton tone="primary" onClick={saveInventoryConfig}>Lưu cấu hình</ActionButton>
+                                    <ActionButton onClick={resetInventoryConfigDraft}>{AppCopy.shell.inventoryUseDefaults}</ActionButton>
+                                    <ActionButton tone="primary" onClick={saveInventoryConfig}>{AppCopy.shell.inventorySaveConfig}</ActionButton>
                                 </Flex>
                             </Flex>
                         </Box>}
 
                         {isAdmin && <Box style={{ border: "1px solid rgba(82,196,26,0.18)", borderRadius: 8, padding: 10, background: "#fcfff8" }}>
                             <Flex vertical gap={8}>
-                                <Typography.Text strong style={{ display: "block", color: "#245822", fontSize: 15, lineHeight: "20px" }}>Quản trị xuất bản</Typography.Text>
+                                <Typography.Text strong style={{ display: "block", color: "#245822", fontSize: 15, lineHeight: "20px" }}>{AppCopy.shell.publishAdminTitle}</Typography.Text>
                                 <Typography.Text type="secondary" style={{ fontSize: 12, lineHeight: "17px" }}>
-                                    Đẩy nguyên liệu, món ăn và cấu hình dùng chung hiện tại lên GitHub để các thiết bị khác đồng bộ thủ công.
+                                    {AppCopy.shell.publishAdminDesc}
                                 </Typography.Text>
                                 <AntInput.Password
                                     autoComplete="off"
-                                    placeholder="Token có quyền ghi repo contents"
+                                    placeholder={AppCopy.shell.publishTokenPlaceholder}
                                     value={publishTokenInput}
                                     onChange={e => setPublishTokenInput(e.target.value)}
                                 />
                                 <Flex gap={8} wrap="wrap">
                                     <ActionButton disabled={publishTokenSaved} onClick={onSavePublishToken}>
-                                        Lưu token
+                                        {AppCopy.shell.publishSaveToken}
                                     </ActionButton>
                                     <ActionButton loading={isTestingGithubToken} disabled={!publishTokenInput.trim() && !hasGithubToken} onClick={onTestPublishToken}>
-                                        Kiểm tra token
+                                        {AppCopy.shell.publishTestToken}
                                     </ActionButton>
                                     <ActionButton tone="danger" disabled={!githubToken} onClick={onClearPublishToken}>
-                                        Xoá token
+                                        {AppCopy.shell.publishClearToken}
                                     </ActionButton>
                                 </Flex>
                                 <Typography.Text type="secondary" style={{ fontSize: 11, lineHeight: "16px" }}>
@@ -578,10 +581,10 @@ export const SidebarDrawer = ({ buttonStyle }: { buttonStyle?: React.CSSProperti
                                     onClick={onPublishSharedData}
                                     style={{ color: "#52c41a", borderColor: "#52c41a" }}
                                 >
-                                    Xuất bản dữ liệu dùng chung
+                                    {AppCopy.shell.publishButton}
                                 </ActionButton>
                                 {lastPublishAt && <Typography.Text type="secondary" style={{ fontSize: 11, color: "#52c41a" }}>
-                                    Xuất bản lần cuối: {new Date(lastPublishAt).toLocaleString("vi-VN")}
+                                    {AppCopy.shell.publishLastAt({ when: new Date(lastPublishAt).toLocaleString("vi-VN") })}
                                 </Typography.Text>}
                             </Flex>
                         </Box>}
@@ -589,20 +592,20 @@ export const SidebarDrawer = ({ buttonStyle }: { buttonStyle?: React.CSSProperti
                         <Box style={{ border: "1px solid #f0f0f0", borderRadius: 8, padding: 10, background: "#fff" }}>
                             <Stack justify="space-between" align="flex-start" gap={8} style={{ marginBottom: 6 }}>
                                 <div style={{ minWidth: 0 }}>
-                                    <Typography.Text strong style={{ display: "block", color: "#2f2545", fontSize: 15, lineHeight: "20px" }}>Sao lưu cá nhân</Typography.Text>
+                                    <Typography.Text strong style={{ display: "block", color: "#2f2545", fontSize: 15, lineHeight: "20px" }}>{AppCopy.shell.personalBackupTitle}</Typography.Text>
                                     <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "17px" }}>
-                                        Sao lưu tồn kho, lịch mua sắm, thực đơn và mẫu dùng lại vào GitHub Gist.
+                                        {AppCopy.shell.personalBackupDesc}
                                     </Typography.Text>
                                 </div>
                                 <ActionButton icon={<SyncOutlined />} onClick={() => { toggleBackupCenter.hide(); onNavigate(RootRoutes.AuthorizedRoutes.SyncBackupHealth()); }}>
-                                    Xem sức khỏe
+                                    {AppCopy.shell.personalBackupViewHealth}
                                 </ActionButton>
                             </Stack>
                             <GistBackupWidget />
                         </Box>
                     </Flex> : null}
                 </DeferredModalContent>
-            </Modal>
+            </Sheet>
             <ScheduledMealToolkitWidget onNavigate={onNavigate} />
             {pendingSync && (
                 <SharedSyncModal
