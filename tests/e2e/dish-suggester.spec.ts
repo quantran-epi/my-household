@@ -12,7 +12,7 @@ test.describe('Dish suggestor', () => {
   test('reaches the in-place suggester via /dish-suggester and opens the expense planner', async ({ page }) => {
     await page.goto('dish-suggester');
     await expect(page.getByTestId('dish-suggester-page')).toBeVisible();
-    await expect(page.getByText('Nấu gì hôm nay?').first()).toBeVisible();
+    await expect(page.getByText('Hôm nay nấu gì?').first()).toBeVisible();
 
     // The page opens directly in inventory ("Tủ lạnh") mode; selecting it explicitly keeps
     // the spec robust against the initial-mode default.
@@ -27,7 +27,7 @@ test.describe('Dish suggestor', () => {
     const moreActions = page.getByTestId('dish-suggester-more-actions-button');
     await expect(moreActions).toBeEnabled();
     await moreActions.click();
-    await page.getByRole('menuitem', { name: /Kế hoạch chi phí/ }).click();
+    await page.getByRole('menuitem', { name: /Tính chi phí/ }).click();
 
     // The expense planner opens as an in-place modal (actionMode='modal'); scope assertions
     // to that dialog via its modal-only heading ("Món cần tính") so the always-open sidebar
