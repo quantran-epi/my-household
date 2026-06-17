@@ -36,7 +36,7 @@ Requirements for this UI/UX refactor milestone. Each maps to roadmap phases. Thi
 
 - [x] **MOB-01**: Journey screens use a phone-first layout with primary CTAs in the thumb zone
 - [x] **MOB-02**: Interactive controls in the journey meet ~44px touch-target sizing
-- [ ] **MOB-03**: Pickers and confirmations use a bottom-sheet pattern (`@components/Sheet` over antd `Drawer placement="bottom"`)
+- [x] **MOB-03**: Pickers and confirmations use a bottom-sheet pattern (`@components/Sheet` over antd `Drawer placement="bottom"`)
 - [ ] **MOB-04**: Desktop layout remains intact — mobile changes do not regress the desktop experience
 
 ### Foundation & Safety
@@ -95,7 +95,7 @@ Each v1 requirement maps to exactly one phase. v2 requirements are carried in Ph
 | NAV-04 | Phase 4 | Complete |
 | MOB-01 | Phase 5 | Complete |
 | MOB-02 | Phase 5 | Complete |
-| MOB-03 | Phase 5 | Pending |
+| MOB-03 | Phase 5 | Complete |
 | MOB-04 | Phase 5 | Pending |
 | COPY-03 | Phase 5 | Complete |
 | COPY-04 | Phase 5 | Pending |
