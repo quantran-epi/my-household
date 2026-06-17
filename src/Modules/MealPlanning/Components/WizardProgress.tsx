@@ -17,11 +17,11 @@ const NEUTRAL_MARKER = "#f5f5f5";
 const NEUTRAL_TEXT = "#595959";
 
 // Mirrors the DishSuggester back-button idiom verbatim (DishSuggester.screen.tsx ~543 + ~432-439):
-// ActionButton shape="circle" + <LeftOutlined />, neutral color, 40px circle.
+// ActionButton shape="circle" + <LeftOutlined />, neutral color, 44px circle (>= 44px touch target, MOB-02).
 const backIconButtonStyle: React.CSSProperties = {
-    width: 40,
-    height: 40,
-    minWidth: 40,
+    width: 44,
+    height: 44,
+    minWidth: 44,
     paddingInline: 0,
     borderRadius: 999,
     color: NEUTRAL_TEXT,
@@ -45,7 +45,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({ current, total, 
                 <span data-testid="wizard-back" style={{ display: "inline-flex", flexShrink: 0 }}>
                     <ActionButton
                         shape="circle"
-                        height={40}
+                        height={44}
                         aria-label={AppCopy.common.back}
                         onClick={onBack}
                         icon={<LeftOutlined />}

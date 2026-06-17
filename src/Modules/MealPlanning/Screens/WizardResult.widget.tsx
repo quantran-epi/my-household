@@ -57,6 +57,7 @@ const ResultRow: React.FunctionComponent<ResultRowProps> = ({ dish, meta, onAddT
         <Stack direction="column" gap={8} fullwidth style={{ marginTop: 4 }}>
             <Button
                 type="primary"
+                size="large"
                 data-testid={`wizard-add-today-${dish.id}`}
                 onClick={onAddToday}
                 style={{ width: "100%", borderRadius: 20, paddingInline: 20 }}
@@ -64,6 +65,7 @@ const ResultRow: React.FunctionComponent<ResultRowProps> = ({ dish, meta, onAddT
                 {AppCopy.wizard.addToToday}
             </Button>
             <Button
+                size="large"
                 onClick={onPickDay}
                 style={{ width: "100%", borderRadius: 20, paddingInline: 20 }}
             >
@@ -185,6 +187,7 @@ export const WizardResult: React.FunctionComponent = () => {
 
         <Button
             type="primary"
+            size="large"
             data-testid="wizard-finish"
             onClick={() => {
                 dispatch(completeWizard());
@@ -211,6 +214,7 @@ export const WizardResult: React.FunctionComponent = () => {
                 />
                 <Button
                     type="primary"
+                    size="large"
                     onClick={confirmPickedDay}
                     style={{ borderRadius: 20, paddingInline: 20 }}
                 >
