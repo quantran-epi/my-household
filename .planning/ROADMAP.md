@@ -143,7 +143,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 05-01-PLAN.md — Journey copy migration to AppCopy + friendly empty-states + 44px touch polish (COPY-03, COPY-05, MOB-01, MOB-02)
+- [x] 05-01-PLAN.md — Journey copy migration to AppCopy + friendly empty-states + 44px touch polish (COPY-03, COPY-05, MOB-01, MOB-02)
 - [ ] 05-02-PLAN.md — App-wide bottom-sheet sweep, long-tail picker/confirmation files (MOB-03)
 
 **Wave 2** *(blocked on 05-01: shared AppCopy.ts)*
@@ -197,5 +197,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Shell Safety & Extraction | 5/5 | Complete   | 2026-06-15 |
 | 3. Wizard State Slice | 3/3 | Complete    | 2026-06-16 |
 | 4. Wizard UI & Hero Entry | 6/6 | Complete   | 2026-06-16 |
-| 5. Mobile Tuning & Copy Rollout | 0/7 | Not started | - |
+| 5. Mobile Tuning & Copy Rollout | 1/7 | In Progress|  |
 | 6. Differentiator Enhancements | 0/TBD | Deferred | - |

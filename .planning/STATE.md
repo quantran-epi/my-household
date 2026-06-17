@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 5 context gathered
-last_updated: "2026-06-16T14:02:22.935Z"
-last_activity: 2026-06-16 -- Phase 04 execution started
+last_updated: "2026-06-17T00:11:00.300Z"
+last_activity: 2026-06-16 -- Phase 05 execution started
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 15
-  completed_plans: 15
+  total_plans: 22
+  completed_plans: 16
   percent: 67
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-14)
 
 **Core value:** A local Vietnamese household member can open the app and go from "what do we eat?" to a planned meal quickly, in familiar language, without it feeling like an admin tool.
-**Current focus:** Phase 04 — wizard-ui-hero-entry
+**Current focus:** Phase 05 — mobile-tuning-copy-rollout
 
 ## Current Position
 
-Phase: 04 (wizard-ui-hero-entry) — EXECUTING
-Plan: 1 of 6
+Phase: 05 (mobile-tuning-copy-rollout) — EXECUTING
+Plan: 2 of 7
 Status: Ready to execute
-Last activity: 2026-06-16 -- Phase 04 execution started
+Last activity: 2026-06-16 -- Phase 05 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -57,6 +57,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 03 P02 | 6 min | 2 tasks | 1 files |
 | Phase 03 P03 | 5 min | 2 tasks | 2 files |
 | Phase 04 P05 | 8min | 3 tasks | 3 files |
+| Phase 05 P01 | 18 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,7 @@ Recent decisions affecting current work:
 - [Roadmap]: Separate "pure move, verified identical" from behavior change when extracting `MasterPage.tsx`; add error boundary before shell surgery.
 - [Roadmap]: Wizard state in an RTK slice under the existing `personal` root, persisted per-step commit to survive forced reloads.
 - [Phase ?]: 04-05: empty-catalog cold-start uses a seedApp variant (preserving the welcome-complete flag) rather than a raw IndexedDB clear, so first-timers reach the wizard without an onboarding redirect
+- [Phase ?]: 05-01: AppCopy wizard+emptyStates namespace is the Phase 5 copy-migration template — migrate literals first, reword in 05-07
 
 ### Pending Todos
 
@@ -96,6 +98,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-16T12:34:26.840Z
+Last session: 2026-06-17T00:10:38.024Z
 Stopped at: Phase 5 context gathered
 Resume file: .planning/phases/05-mobile-tuning-copy-rollout/05-CONTEXT.md
