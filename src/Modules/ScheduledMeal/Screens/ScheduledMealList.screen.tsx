@@ -2,14 +2,16 @@ import {
     CalendarOutlined, CheckCircleFilled, CopyOutlined, DeleteOutlined, EditOutlined,
     FireOutlined, LeftOutlined, MoreOutlined, PlusOutlined, RestOutlined, RightOutlined, ShoppingCartOutlined, TeamOutlined
 } from "@ant-design/icons";
+import { AppCopy } from "@common/Copy";
 import { DateHelpers } from "@common/Helpers/DateHelper";
 import { Badge } from "@components/Badge";
 import { ActionButton, Button } from "@components/Button";
 import { Dropdown } from "@components/Dropdown";
 import { Space } from "@components/Layout/Space";
 import { Stack } from "@components/Layout/Stack";
-import { DeferredModalContent, Modal } from "@components/Modal";
+import { DeferredModalContent } from "@components/Modal";
 import { useMessage } from "@components/Message";
+import { Sheet } from "@components/Sheet";
 import { Typography } from "@components/Typography";
 import { useScreenTitle, useToggle } from "@hooks";
 import { usePageActions } from "@routing/PageActionsContext";
@@ -65,7 +67,7 @@ const getPrimaryRangeDate = (start: Dayjs, end?: Dayjs) => {
 const getVietnameseWeekShoppingListName = (start: Dayjs, end?: Dayjs) => {
     const date = getPrimaryRangeDate(start, end);
     const weekOfMonth = Math.floor((date.date() - 1) / 7) + 1;
-    return `Tuần ${weekOfMonth}, ${date.format("MM/YY")}`;
+    return AppCopy.scheduledMeal.weekShoppingListName({ weekOfMonth, date: date.format("MM/YY") });
 };
 
 type MealTemplateScope = 'day' | 'week';
@@ -184,7 +186,7 @@ export const ScheduledMealListScreen = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const message = useMessage();
-    useScreenTitle({ value: "Thực đơn", deps: [] });
+    useScreenTitle({ value: AppCopy.scheduledMeal.screenTitle, deps: [] });
     const toggleAddModal = useToggle({ defaultValue: false });
 
     const scheduledMealsByDate = useMemo(() => {
@@ -275,14 +277,14 @@ export const ScheduledMealListScreen = () => {
             }));
             dispatch(rememberScheduledMealName(name));
         });
-        message.success(`Đã tạo ${selectedTemplate.days.length} thực đơn từ mẫu`);
+        message.success(AppCopy.scheduledMeal.templateCreatedToast({ count: selectedTemplate.days.length }));
         setTemplateModalOpen(false);
     };
     const selectedDayStatus = dayjs(selectedDate).isSame(dayjs(), "day")
-        ? { label: "Hôm nay", color: "#1677ff", background: "#e6f4ff", border: "#91caff" }
+        ? { label: AppCopy.scheduledMeal.statusToday, color: "#1677ff", background: "#e6f4ff", border: "#91caff" }
         : dayjs(selectedDate).isBefore(dayjs(), "day")
-            ? { label: "Đã qua", color: "#8c8c8c", background: "#fafafa", border: "#d9d9d9" }
-            : { label: "Sắp tới", color: "#389e0d", background: "#f6ffed", border: "#b7eb8f" };
+            ? { label: AppCopy.scheduledMeal.statusPast, color: "#8c8c8c", background: "#fafafa", border: "#d9d9d9" }
+            : { label: AppCopy.scheduledMeal.statusUpcoming, color: "#389e0d", background: "#f6ffed", border: "#b7eb8f" };
     const smartPlannerForSelectedDate = RootRoutes.AuthorizedRoutes.SmartMealPlanner({ date: selectedDate });
 
     const _onStartDayCooking = () => {
@@ -291,11 +293,11 @@ export const ScheduledMealListScreen = () => {
     };
 
     usePageActions([
-        { key: "smart-planner", label: "Gợi ý thực đơn", icon: <span className="anticon" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}><Image src={DietPlanIcon} preview={false} width={16} alt="" /></span>, onClick: () => navigate(smartPlannerForSelectedDate) },
-        { key: "template", label: "Tạo từ mẫu", icon: <CalendarOutlined />, onClick: _onOpenTemplateApply },
-        { key: "range-shopping", label: "Tạo giỏ theo khoảng ngày", icon: <ShoppingCartOutlined />, onClick: _onOpenRangeShopping },
-        { key: "cook-day", label: "Nấu cả ngày", icon: <FireOutlined />, disabled: allDayDishIds.length === 0, onClick: _onStartDayCooking },
-        { key: "add-meal", label: "Thêm thực đơn", icon: <PlusOutlined />, onClick: toggleAddModal.show },
+        { key: "smart-planner", label: AppCopy.scheduledMeal.actionSmartPlanner, icon: <span className="anticon" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}><Image src={DietPlanIcon} preview={false} width={16} alt="" /></span>, onClick: () => navigate(smartPlannerForSelectedDate) },
+        { key: "template", label: AppCopy.scheduledMeal.actionTemplate, icon: <CalendarOutlined />, onClick: _onOpenTemplateApply },
+        { key: "range-shopping", label: AppCopy.scheduledMeal.actionRangeShopping, icon: <ShoppingCartOutlined />, onClick: _onOpenRangeShopping },
+        { key: "cook-day", label: AppCopy.scheduledMeal.actionCookDay, icon: <FireOutlined />, disabled: allDayDishIds.length === 0, onClick: _onStartDayCooking },
+        { key: "add-meal", label: AppCopy.scheduledMeal.actionAddMeal, icon: <PlusOutlined />, onClick: toggleAddModal.show },
     ], [smartPlannerForSelectedDate, allDayDishIds.length]);
 
     return (
@@ -303,14 +305,14 @@ export const ScheduledMealListScreen = () => {
             <style>{scheduledMealCss}</style>
             <Box style={{ borderRadius: 8, padding: 14, marginBottom: 12, background: 'linear-gradient(135deg, #8f46f7 0%, #7436dc 58%, #5e2bbf 100%)', color: '#fff', boxShadow: '0 18px 36px rgba(74,48,130,0.24)' }}>
                 <Typography.Text style={{ display: 'block', color: 'rgba(255,255,255,0.82)', fontSize: 12, lineHeight: '16px', fontWeight: 650 }}>My Recipes</Typography.Text>
-                <Typography.Text strong style={{ display: 'block', color: '#fff', fontSize: 22, lineHeight: '28px' }}>Thực đơn</Typography.Text>
-                <Typography.Text style={{ display: 'block', color: 'rgba(255,255,255,0.78)', fontSize: 12, lineHeight: '17px', marginTop: 4 }}>Lên kế hoạch bữa ăn theo ngày, theo dõi nấu nướng, phần dư và phản hồi của cả nhà.</Typography.Text>
+                <Typography.Text strong style={{ display: 'block', color: '#fff', fontSize: 22, lineHeight: '28px' }}>{AppCopy.scheduledMeal.screenTitle}</Typography.Text>
+                <Typography.Text style={{ display: 'block', color: 'rgba(255,255,255,0.78)', fontSize: 12, lineHeight: '17px', marginTop: 4 }}>{AppCopy.scheduledMeal.screenSubtitle}</Typography.Text>
             </Box>
             <Box style={{ padding: 0 }}>
                 <Box style={dayNavigatorCardStyle}>
                     <ActionButton
                         shape="circle"
-                        aria-label="Ngày trước"
+                        aria-label={AppCopy.scheduledMeal.prevDayAria}
                         className="scheduled-meal-day-arrow"
                         icon={<LeftOutlined />}
                         onClick={() => _changeSelectedDay(-1)}
@@ -322,22 +324,22 @@ export const ScheduledMealListScreen = () => {
                         </Typography.Text>
                         <Space size={5} wrap style={{ justifyContent: "center", marginTop: 4 }}>
                             <span style={{ padding: "1px 8px", borderRadius: 999, background: selectedDayStatus.background, color: selectedDayStatus.color, border: `1px solid ${selectedDayStatus.border}`, fontSize: 11, lineHeight: "18px", fontWeight: 700 }}>{selectedDayStatus.label}</span>
-                            <Typography.Text type="secondary" style={{ fontSize: 12 }}>{mealsToday.length} thực đơn</Typography.Text>
+                            <Typography.Text type="secondary" style={{ fontSize: 12 }}>{AppCopy.scheduledMeal.mealsCount({ count: mealsToday.length })}</Typography.Text>
                         </Space>
                         <div style={dayjs(selectedDate).isSame(dayjs(), "day") ? dayPickerSingleControlRowStyle : dayPickerControlRowStyle}>
                             <ActionButton
                                 shape="circle"
-                                aria-label={calendarVisible ? "Ẩn lịch" : "Chọn ngày"}
+                                aria-label={calendarVisible ? AppCopy.scheduledMeal.hideCalendarAria : AppCopy.scheduledMeal.showCalendarAria}
                                 onClick={() => setCalendarVisible(value => !value)}
                                 icon={<CalendarOutlined />}
                                 style={dayPickerIconButtonStyle}
                             />
-                            {!dayjs(selectedDate).isSame(dayjs(), "day") && <ActionButton onClick={_goToday} style={dayPickerButtonStyle}>Hôm nay</ActionButton>}
+                            {!dayjs(selectedDate).isSame(dayjs(), "day") && <ActionButton onClick={_goToday} style={dayPickerButtonStyle}>{AppCopy.scheduledMeal.todayLabel}</ActionButton>}
                         </div>
                     </div>
                     <ActionButton
                         shape="circle"
-                        aria-label="Ngày sau"
+                        aria-label={AppCopy.scheduledMeal.nextDayAria}
                         className="scheduled-meal-day-arrow"
                         icon={<RightOutlined />}
                         onClick={() => _changeSelectedDay(1)}
@@ -355,7 +357,7 @@ export const ScheduledMealListScreen = () => {
             <Box style={{ padding: "8px 0 16px" }}>
                 {mealsToday.length === 0 ? (
                     <Box style={{ textAlign: "center", padding: "24px 0", border: "1px dashed #d9d9d9", borderRadius: 8, background: "#fafafa" }}>
-                        <Typography.Text type="secondary">Chưa có thực đơn trong ngày này</Typography.Text>
+                        <Typography.Text type="secondary">{AppCopy.scheduledMeal.emptyDay}</Typography.Text>
                     </Box>
                 ) : (
                     <React.Fragment>
@@ -380,7 +382,7 @@ export const ScheduledMealListScreen = () => {
                                 onClick={() => setPlanListOpen(value => !value)}
                                 style={{ width: "100%", justifyContent: "center", color: "#5e2bbf", borderRadius: 8, border: "1px solid rgba(116,54,220,0.14)", background: "rgba(255,255,255,0.86)" }}
                             >
-                                {planListOpen ? "Ẩn danh sách kế hoạch" : `Xem theo kế hoạch (${mealsToday.length})`}
+                                {planListOpen ? AppCopy.scheduledMeal.hidePlanListLabel : AppCopy.scheduledMeal.showPlanListLabel({ count: mealsToday.length })}
                             </Button>
                             {planListOpen && <Stack direction="column" align="stretch" gap={8} style={{ marginTop: 8 }}>
                                 {mealsToday.map(item => (
@@ -392,25 +394,25 @@ export const ScheduledMealListScreen = () => {
                 )}
             </Box>
 
-            {/* Add modal */}
-            <Modal
+            {/* Add sheet */}
+            <Sheet
                 open={toggleAddModal.value}
                 title={<Space>
                     <Image src={DietPlanIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
-                    Thêm thực đơn
+                    {AppCopy.scheduledMeal.addMenuLabel}
                 </Space>}
-                destroyOnClose
-                onCancel={toggleAddModal.hide}
-                footer={null}
+                onClose={toggleAddModal.hide}
             >
                 <DeferredModalContent active={toggleAddModal.value}>
-                    <ScheduledMealAddWidget date={selectedDate} onDone={toggleAddModal.hide} />
+                    <Box style={{ padding: 16 }}>
+                        <ScheduledMealAddWidget date={selectedDate} onDone={toggleAddModal.hide} />
+                    </Box>
                 </DeferredModalContent>
-            </Modal>
+            </Sheet>
 
             <ScheduledMealCookingModal
                 open={dayCookingOpen}
-                title={`Nấu cả ngày - ${moment(selectedDate).format("DD/MM/YYYY")}`}
+                title={AppCopy.scheduledMeal.dayCookingTitle({ date: moment(selectedDate).format("DD/MM/YYYY") })}
                 dishIds={allDayDishIds}
                 dishServings={allDayDishServings}
                 autoStartToken={dayCookingToken}
@@ -419,80 +421,78 @@ export const ScheduledMealListScreen = () => {
                 onClose={() => setDayCookingOpen(false)}
             />
 
-            {/* Range picker modal */}
-            <Modal
+            {/* Template apply sheet */}
+            <Sheet
                 open={templateModalOpen}
                 title={<Space>
                     <CalendarOutlined />
-                    Tạo thực đơn từ mẫu
+                    {AppCopy.scheduledMeal.templateModalTitle}
                 </Space>}
-                onCancel={() => setTemplateModalOpen(false)}
-                onOk={_applySelectedTemplate}
-                okText="Tạo"
-                cancelText="Huỷ"
-                destroyOnClose
-                okButtonProps={{ disabled: availableTemplates.length === 0 }}
+                onClose={() => setTemplateModalOpen(false)}
             >
                 <DeferredModalContent active={templateModalOpen} minHeight={160}>
-                    <Stack direction="column" align="stretch" gap={10}>
+                    <Stack direction="column" align="stretch" gap={12} style={{ padding: 16 }}>
                         <div>
-                            <Typography.Text strong style={{ display: "block", fontSize: 12, marginBottom: 5 }}>Tạo cho</Typography.Text>
+                            <Typography.Text strong style={{ display: "block", fontSize: 12, marginBottom: 5 }}>{AppCopy.scheduledMeal.templateScopeLabel}</Typography.Text>
                             <Select
                                 value={templateApplyMode}
                                 onChange={(value) => { setTemplateApplyMode(value); setSelectedTemplateId(undefined); }}
                                 style={{ width: "100%" }}
                             >
-                                <Select.Option value="day">Một ngày</Select.Option>
-                                <Select.Option value="week">Một tuần</Select.Option>
+                                <Select.Option value="day">{AppCopy.scheduledMeal.templateScopeDay}</Select.Option>
+                                <Select.Option value="week">{AppCopy.scheduledMeal.templateScopeWeek}</Select.Option>
                             </Select>
                         </div>
                         {templateApplyMode === 'week' && <div>
-                            <Typography.Text strong style={{ display: "block", fontSize: 12, marginBottom: 5 }}>Tuần áp dụng</Typography.Text>
+                            <Typography.Text strong style={{ display: "block", fontSize: 12, marginBottom: 5 }}>{AppCopy.scheduledMeal.templateWeekLabel}</Typography.Text>
                             <DatePicker picker="week" value={templateApplyWeek} onChange={value => value && setTemplateApplyWeek(getMondayStart(value))} format="DD/MM/YYYY" style={{ width: "100%" }} />
                         </div>}
                         <div>
-                            <Typography.Text strong style={{ display: "block", fontSize: 12, marginBottom: 5 }}>Mẫu</Typography.Text>
+                            <Typography.Text strong style={{ display: "block", fontSize: 12, marginBottom: 5 }}>{AppCopy.scheduledMeal.templateLabel}</Typography.Text>
                             <Select
                                 value={selectedTemplate?.id}
                                 onChange={setSelectedTemplateId}
-                                placeholder={templateApplyMode === 'day' ? 'Chọn mẫu ngày' : 'Chọn mẫu tuần'}
+                                placeholder={templateApplyMode === 'day' ? AppCopy.scheduledMeal.templatePlaceholderDay : AppCopy.scheduledMeal.templatePlaceholderWeek}
                                 style={{ width: "100%" }}
                                 disabled={availableTemplates.length === 0}
                             >
                                 {availableTemplates.map(template => <Select.Option key={template.id} value={template.id}>{template.name}</Select.Option>)}
                             </Select>
                             {availableTemplates.length === 0 && <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, marginTop: 6 }}>
-                                Chưa có mẫu phù hợp. Vào trang Mẫu dùng lại để tạo mẫu {templateApplyMode === 'day' ? 'ngày' : 'tuần'}.
+                                {AppCopy.scheduledMeal.templateNoneHint({ scope: templateApplyMode === 'day' ? AppCopy.scheduledMeal.templateScopeWordDay : AppCopy.scheduledMeal.templateScopeWordWeek })}
                             </Typography.Text>}
                         </div>
+                        <Stack direction="column" gap={8} fullwidth>
+                            <Button type="primary" size="large" disabled={availableTemplates.length === 0} onClick={_applySelectedTemplate} style={{ width: "100%", minHeight: 44 }}>
+                                {AppCopy.scheduledMeal.templateCreateAction}
+                            </Button>
+                            <Button size="large" onClick={() => setTemplateModalOpen(false)} style={{ width: "100%", minHeight: 44 }}>
+                                {AppCopy.common.cancel}
+                            </Button>
+                        </Stack>
                     </Stack>
                 </DeferredModalContent>
-            </Modal>
+            </Sheet>
 
-            <Modal
+            <Sheet
                 open={rangePickerOpen}
                 title={<Space>
                     <ShoppingCartOutlined />
-                    Chọn khoảng ngày để tạo giỏ hàng
+                    {AppCopy.scheduledMeal.rangeModalTitle}
                 </Space>}
-                onCancel={() => setRangePickerOpen(false)}
-                onOk={_onRangeConfirm}
-                okText="Tạo giỏ hàng"
-                cancelText="Huỷ"
-                destroyOnClose
-                okButtonProps={{ disabled: !selectedRange }}
+                onClose={() => setRangePickerOpen(false)}
             >
                 <DeferredModalContent active={rangePickerOpen} minHeight={96}>
-                <Box style={{ padding: "12px 0" }}>
+                <Stack direction="column" gap={12} fullwidth align="stretch" style={{ padding: 16 }}>
                     <DatePicker.RangePicker
                         style={{ width: "100%" }}
                         format="DD/MM/YYYY"
-                        placeholder={["Từ ngày", "Đến ngày"]}
+                        placeholder={[AppCopy.scheduledMeal.rangeFromPlaceholder, AppCopy.scheduledMeal.rangeToPlaceholder]}
                         onChange={(vals) => setSelectedRange(vals as [Dayjs, Dayjs] | null)}
                         presets={[
-                            { label: "7 ngày tới", value: [dayjs(), dayjs().add(6, "day")] },
-                            { label: "Tuần này", value: [getMondayStart(dayjs()), getMondayStart(dayjs()).add(6, "day")] },
-                            { label: "Tuần tới", value: [getMondayStart(dayjs()).add(1, "week"), getMondayStart(dayjs()).add(1, "week").add(6, "day")] },
+                            { label: AppCopy.scheduledMeal.rangePreset7Days, value: [dayjs(), dayjs().add(6, "day")] },
+                            { label: AppCopy.scheduledMeal.rangePresetThisWeek, value: [getMondayStart(dayjs()), getMondayStart(dayjs()).add(6, "day")] },
+                            { label: AppCopy.scheduledMeal.rangePresetNextWeek, value: [getMondayStart(dayjs()).add(1, "week"), getMondayStart(dayjs()).add(1, "week").add(6, "day")] },
                         ]}
                     />
                     {selectedRange && (() => {
@@ -502,42 +502,50 @@ export const ScheduledMealListScreen = () => {
                                 && (d.isBefore(selectedRange[1], "day") || d.isSame(selectedRange[1], "day"));
                         }).length;
                         return (
-                            <Typography.Text type="secondary" style={{ fontSize: 12, display: "block", marginTop: 10 }}>
-                                Tìm thấy <strong>{count}</strong> thực đơn trong khoảng ngày đã chọn
+                            <Typography.Text type="secondary" style={{ fontSize: 12, display: "block" }}>
+                                {AppCopy.scheduledMeal.rangeFoundCount({ count })}
                             </Typography.Text>
                         );
                     })()}
-                </Box>
+                    <Stack direction="column" gap={8} fullwidth>
+                        <Button type="primary" size="large" disabled={!selectedRange} onClick={_onRangeConfirm} style={{ width: "100%", minHeight: 44 }}>
+                            {AppCopy.scheduledMeal.rangeCreateAction}
+                        </Button>
+                        <Button size="large" onClick={() => setRangePickerOpen(false)} style={{ width: "100%", minHeight: 44 }}>
+                            {AppCopy.common.cancel}
+                        </Button>
+                    </Stack>
+                </Stack>
                 </DeferredModalContent>
-            </Modal>
+            </Sheet>
 
             {/* Range shopping list add */}
-            <Modal
+            <Sheet
                 open={shoppingRangeOpen}
                 title={<Space>
                     <Image src={DietPlanIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
-                    Tạo lịch mua sắm
+                    {AppCopy.scheduledMeal.rangeShoppingTitle}
                 </Space>}
-                destroyOnClose
-                onCancel={() => setShoppingRangeOpen(false)}
-                footer={null}
+                onClose={() => setShoppingRangeOpen(false)}
             >
                 <DeferredModalContent active={shoppingRangeOpen} minHeight={180}>
                 {shoppingRangeMealIds.length === 0 ? (
                     <Box style={{ textAlign: "center", padding: "24px 0" }}>
-                        <Typography.Text type="secondary">Không có thực đơn nào trong khoảng ngày đã chọn</Typography.Text>
+                        <Typography.Text type="secondary">{AppCopy.scheduledMeal.rangeShoppingEmpty}</Typography.Text>
                     </Box>
                 ) : (
-                    <ShoppingListAddWidget
-                        date={selectedRange ? selectedRange[0].toDate() : new Date()}
-                        initialName={selectedRange ? getVietnameseWeekShoppingListName(selectedRange[0], selectedRange[1]) : undefined}
-                        scheduledMealIds={shoppingRangeMealIds}
-                        onDone={() => setShoppingRangeOpen(false)}
-                        onCreated={(shoppingList) => navigate(RootRoutes.AuthorizedRoutes.ShoppingListRoutes.Detail(shoppingList.id))}
-                    />
+                    <Box style={{ padding: 16 }}>
+                        <ShoppingListAddWidget
+                            date={selectedRange ? selectedRange[0].toDate() : new Date()}
+                            initialName={selectedRange ? getVietnameseWeekShoppingListName(selectedRange[0], selectedRange[1]) : undefined}
+                            scheduledMealIds={shoppingRangeMealIds}
+                            onDone={() => setShoppingRangeOpen(false)}
+                            onCreated={(shoppingList) => navigate(RootRoutes.AuthorizedRoutes.ShoppingListRoutes.Detail(shoppingList.id))}
+                        />
+                    </Box>
                 )}
                 </DeferredModalContent>
-            </Modal>
+            </Sheet>
 
             {detailSlot && <ScheduledMealSlotDetailModal
                 open={Boolean(detailSlot)}
@@ -595,21 +603,25 @@ const SlotSummaryCard = ({ aggregate, dishNameById, servingsByDishKind, onOpen, 
             <div style={{ minWidth: 0 }}>
                 <Typography.Text strong style={{ display: "block", color: meta.color, fontSize: 15, lineHeight: "20px" }}>{meta.label}</Typography.Text>
                 <Typography.Text type="secondary" style={{ display: "block", fontSize: 12, lineHeight: "16px" }}>
-                    {dishIds.length} món · {aggregate.planCount} kế hoạch
+                    {AppCopy.scheduledMeal.slotSummary({ dishCount: dishIds.length, planCount: aggregate.planCount })}
                 </Typography.Text>
             </div>
             <RightOutlined style={{ color: meta.color, fontSize: 13 }} />
         </div>
 
         {dishIds.length === 0 ? (
-            <Typography.Text type="secondary" style={{ display: "block", fontSize: 12 }}>Chưa có món</Typography.Text>
+            <Typography.Text type="secondary" style={{ display: "block", fontSize: 12 }}>{AppCopy.scheduledMeal.slotEmptyDish}</Typography.Text>
         ) : <Stack wrap="wrap" gap={5}>
             {dishIds.slice(0, 4).map((id, index) => {
                 const planned = plannedByDish.get(id) ?? 0;
                 const available = _availableServings(id);
                 // Highlight green when inventory already covers the planned servings for this dish.
                 const enough = planned > 0 && available >= planned;
-                const servingLabel = planned > 0 ? `${available}/${planned} phần` : available > 0 ? `còn ${available} phần` : null;
+                const servingLabel = planned > 0
+                    ? AppCopy.scheduledMeal.slotServingsPlanned({ available, planned })
+                    : available > 0
+                        ? AppCopy.scheduledMeal.slotServingsAvailable({ available })
+                        : null;
                 return <Tag key={`${id}-${index}`} color={enough ? "green" : undefined} style={{ marginInlineEnd: 0, fontSize: 11, borderRadius: 999, maxWidth: "100%", overflow: "hidden", textOverflow: "ellipsis", fontWeight: enough ? 600 : undefined }}>
                     {_dishName(id)}{servingLabel ? ` · ${servingLabel}` : ""}
                 </Tag>;
@@ -619,13 +631,13 @@ const SlotSummaryCard = ({ aggregate, dishNameById, servingsByDishKind, onOpen, 
 
         {dishIds.length > 0 && (slotFinished ? <Stack align="center" gap={6} style={{ marginTop: 10, padding: "8px 10px", borderRadius: 8, background: "#f6ffed", border: "1px solid #b7eb8f" }}>
             <CheckCircleFilled style={{ color: "#52c41a" }} />
-            <Typography.Text style={{ fontSize: 12, color: "#389e0d", fontWeight: 600 }}>Đã hoàn tất bữa này. Mở để xem lại hoặc gửi phản hồi.</Typography.Text>
+            <Typography.Text style={{ fontSize: 12, color: "#389e0d", fontWeight: 600 }}>{AppCopy.scheduledMeal.slotFinishedNote}</Typography.Text>
         </Stack> : <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 10 }}>
             <ActionButton tone="warning" block icon={<FireOutlined />} onClick={(e) => { e.stopPropagation(); onStartCooking(); }}>
-                Bắt đầu nấu
+                {AppCopy.scheduledMeal.startCooking}
             </ActionButton>
             <ActionButton tone="success" block icon={<RestOutlined />} onClick={(e) => { e.stopPropagation(); onFinishMeal(); }}>
-                Hoàn tất bữa
+                {AppCopy.scheduledMeal.finishMeal}
             </ActionButton>
         </div>)}
     </Box>;
@@ -636,9 +648,9 @@ const SlotSummaryCard = ({ aggregate, dishNameById, servingsByDishKind, onOpen, 
 // management dropdown (detail / copy / edit / delete). Cooking, completion and skip
 // actions now live in the slot detail modal, scoped per plan-item.
 const slotCountLabels: Array<{ slot: ScheduledMealSlotKey; label: string }> = [
-    { slot: 'breakfast', label: 'Sáng' },
-    { slot: 'lunch', label: 'Trưa' },
-    { slot: 'dinner', label: 'Tối' },
+    { slot: 'breakfast', label: AppCopy.scheduledMeal.slotMorning },
+    { slot: 'lunch', label: AppCopy.scheduledMeal.slotNoon },
+    { slot: 'dinner', label: AppCopy.scheduledMeal.slotEvening },
 ];
 
 const ScheduledMealPlanRow = ({ item, selected, dishNameById, onDelete }: { item: ScheduledMeal; selected: boolean; dishNameById: Map<string, string>; onDelete: (item: ScheduledMeal) => void }) => {
@@ -694,7 +706,7 @@ const ScheduledMealPlanRow = ({ item, selected, dishNameById, onDelete }: { item
                         <Typography.Text strong style={{ display: "block", color: "#111827", fontSize: 14, lineHeight: "19px", overflowWrap: "anywhere" }}>{item.name}</Typography.Text>
                         <Stack wrap="wrap" gap={5} style={{ marginTop: 5 }}>
                             {memberIds.length === 0
-                                ? <Tag icon={<TeamOutlined />} style={{ marginInlineEnd: 0, fontSize: 11 }}>Cả nhà</Tag>
+                                ? <Tag icon={<TeamOutlined />} style={{ marginInlineEnd: 0, fontSize: 11 }}>{AppCopy.scheduledMeal.wholeFamily}</Tag>
                                 : memberIds.map(id => <Tag key={id} color="purple" style={{ marginInlineEnd: 0, fontSize: 11 }}>{memberNameById.get(id)}</Tag>)}
                         </Stack>
                         <Stack wrap="wrap" gap={6} style={{ marginTop: 6 }}>
@@ -702,103 +714,110 @@ const ScheduledMealPlanRow = ({ item, selected, dishNameById, onDelete }: { item
                                 const skipped = Boolean(item.skipMeals?.[slot]);
                                 const count = (item.meals?.[slot] ?? []).length;
                                 return <Typography.Text key={slot} type="secondary" style={{ fontSize: 12 }}>
-                                    {label}: {skipped ? "không nấu" : `${count} món`}
+                                    {label}: {skipped ? AppCopy.scheduledMeal.slotSkippedShort : AppCopy.scheduledMeal.slotDishCountShort({ count })}
                                 </Typography.Text>;
                             })}
                         </Stack>
                     </div>
                     <Dropdown menu={{
                         items: [
-                            { label: "Chi tiết", key: "detail", icon: <CalendarOutlined /> },
-                            { label: "Sao chép", key: "copy", icon: <CopyOutlined /> },
-                            { label: "Sửa", key: "edit", icon: <EditOutlined /> },
+                            { label: AppCopy.scheduledMeal.actionDetail, key: "detail", icon: <CalendarOutlined /> },
+                            { label: AppCopy.scheduledMeal.actionCopy, key: "copy", icon: <CopyOutlined /> },
+                            { label: AppCopy.scheduledMeal.actionEdit, key: "edit", icon: <EditOutlined /> },
                             { type: "divider" },
-                            { label: "Xóa", key: "delete", icon: <DeleteOutlined />, danger: true },
+                            { label: AppCopy.scheduledMeal.actionDelete, key: "delete", icon: <DeleteOutlined />, danger: true },
                         ],
                         onClick: _onMoreActionClick,
                     }} placement="bottomRight">
-                        <Button aria-label="Thao tác thực đơn" type="text" icon={<MoreOutlined />} style={mealItemMenuButtonStyle} />
+                        <Button aria-label={AppCopy.scheduledMeal.mealActionAria} type="text" icon={<MoreOutlined />} style={mealItemMenuButtonStyle} />
                     </Dropdown>
                 </div>
             </Box>
 
-            {toggleEditModal.value && <Modal
+            {toggleEditModal.value && <Sheet
                 open={toggleEditModal.value}
                 title={<Space>
                     <Image src={DietPlanIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
-                    Sửa thực đơn
+                    {AppCopy.scheduledMeal.editTitle}
                 </Space>}
-                destroyOnClose
-                onCancel={toggleEditModal.hide}
-                footer={null}
+                onClose={toggleEditModal.hide}
             >
                 <DeferredModalContent active={toggleEditModal.value}>
-                    <ScheduledMealEditWidget item={item} onDone={toggleEditModal.hide} />
+                    <Box style={{ padding: 16 }}>
+                        <ScheduledMealEditWidget item={item} onDone={toggleEditModal.hide} />
+                    </Box>
                 </DeferredModalContent>
-            </Modal>}
+            </Sheet>}
 
-            {toggleMealModal.value && <Modal
-                style={{ top: 50 }}
+            {toggleMealModal.value && <Sheet
                 open={toggleMealModal.value}
                 title={<Space>
                     <Image src={DietPlanIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
-                    Thực đơn
+                    {AppCopy.scheduledMeal.mealDetailTitle}
                 </Space>}
-                destroyOnClose
-                onCancel={toggleMealModal.hide}
-                footer={null}
+                onClose={toggleMealModal.hide}
             >
                 <DeferredModalContent active={toggleMealModal.value} minHeight={220}>
-                    <Box style={{ maxHeight: 550, overflowY: "auto" }}>
+                    <Box style={{ padding: 16, maxHeight: 550, overflowY: "auto" }}>
                         <ShoppingListMealDetailWidget mealId={item.id} />
                         <Box style={{ marginTop: 10 }}>
                             <MemberDishFeedbackHistoryWidget lockedDate={item.plannedDate} compact maxRows={8} />
                         </Box>
                     </Box>
                 </DeferredModalContent>
-            </Modal>}
+            </Sheet>}
 
-            {toggleCopyModal.value && <Modal
+            {toggleCopyModal.value && <Sheet
                 open={toggleCopyModal.value}
                 title={<Space>
                     <CopyOutlined />
-                    Sao chép sang ngày khác
+                    {AppCopy.scheduledMeal.copyTitle}
                 </Space>}
-                onOk={_onCopyConfirm}
-                onCancel={() => { toggleCopyModal.hide(); setCopyDate(null); }}
-                okText="Sao chép"
-                cancelText="Huỷ"
-                okButtonProps={{ disabled: !copyDate }}
-                destroyOnClose
+                onClose={() => { toggleCopyModal.hide(); setCopyDate(null); }}
             >
                 <DeferredModalContent active={toggleCopyModal.value} minHeight={96}>
-                <Box style={{ padding: "12px 0" }}>
-                    <Typography.Text style={{ display: "block", marginBottom: 10 }}>
-                        Chọn ngày muốn sao chép thực đơn <strong>"{item.name}"</strong> sang:
+                <Stack direction="column" gap={12} fullwidth align="stretch" style={{ padding: 16 }}>
+                    <Typography.Text style={{ display: "block" }}>
+                        {AppCopy.scheduledMeal.copyHint({ name: item.name })}
                     </Typography.Text>
                     <DatePicker
                         style={{ width: "100%" }}
                         format="DD/MM/YYYY"
-                        placeholder="Chọn ngày"
+                        placeholder={AppCopy.scheduledMeal.copyDatePlaceholder}
                         onChange={setCopyDate}
                         disabledDate={d => d.isSame(dayjs(item.plannedDate), "day")}
                     />
-                </Box>
+                    <Stack direction="column" gap={8} fullwidth>
+                        <Button type="primary" size="large" disabled={!copyDate} onClick={_onCopyConfirm} style={{ width: "100%", minHeight: 44 }}>
+                            {AppCopy.scheduledMeal.copyAction}
+                        </Button>
+                        <Button size="large" onClick={() => { toggleCopyModal.hide(); setCopyDate(null); }} style={{ width: "100%", minHeight: 44 }}>
+                            {AppCopy.common.cancel}
+                        </Button>
+                    </Stack>
+                </Stack>
                 </DeferredModalContent>
-            </Modal>}
+            </Sheet>}
 
-            {toggleDeleteConfirm.value && <Modal
+            {toggleDeleteConfirm.value && <Sheet
                 open={toggleDeleteConfirm.value}
-                title={<Space><DeleteOutlined style={{ color: "red" }} />Xác nhận xóa</Space>}
-                onCancel={toggleDeleteConfirm.hide}
-                onOk={() => { onDelete(item); toggleDeleteConfirm.hide(); }}
-                okText="Xóa"
-                cancelText="Hủy"
-                okButtonProps={{ danger: true }}
-                destroyOnClose
+                title={<Space><DeleteOutlined style={{ color: "red" }} />{AppCopy.scheduledMeal.deleteConfirmTitle}</Space>}
+                onClose={toggleDeleteConfirm.hide}
             >
-                Bạn có chắc muốn xóa thực đơn <b>{item.name}</b> không? Hành động này không thể hoàn tác.
-            </Modal>}
+                <Stack direction="column" gap={12} fullwidth align="stretch" style={{ padding: 16 }}>
+                    <Typography.Text style={{ fontSize: 14, lineHeight: "20px" }}>
+                        {AppCopy.scheduledMeal.deleteConfirmBody({ name: item.name })}
+                    </Typography.Text>
+                    <Stack direction="column" gap={8} fullwidth>
+                        <Button type="primary" danger size="large" onClick={() => { onDelete(item); toggleDeleteConfirm.hide(); }} style={{ width: "100%", minHeight: 44 }}>
+                            {AppCopy.scheduledMeal.actionDelete}
+                        </Button>
+                        <Button size="large" onClick={toggleDeleteConfirm.hide} style={{ width: "100%", minHeight: 44 }}>
+                            {AppCopy.common.cancel}
+                        </Button>
+                    </Stack>
+                </Stack>
+            </Sheet>}
         </React.Fragment>
     );
 };
