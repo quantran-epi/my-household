@@ -1,7 +1,7 @@
 // AppCopy — the single source of truth for user-facing Vietnamese strings.
 //
-// Structure (locked this phase; phrasing is [ASSUMED] placeholder content
-// pending Phase 5 household-user validation):
+// Structure (locked this phase; phrasing is refined in Phase 5 and remains
+// centralized here for household-user review):
 //   - common:      shared actions/messages reused across screens
 //   - wizard:      seeds for the Phase 4 "what to cook" guided flow
 //   - emptyStates: friendly empty-state scaffold for Phase 5
@@ -93,17 +93,17 @@ export const AppCopy = {
         // SidebarDrawer — data section
         dataSectionTitle: "Dữ liệu",
         dataBackupButton: "Dữ liệu & sao lưu",
-        dataHealthButton: "Sức khỏe dữ liệu",
-        dataSectionHint: "Đồng bộ dùng chung, sao lưu cá nhân và trạng thái backup được gom vào một nơi.",
+        dataHealthButton: "Kiểm tra dữ liệu",
+        dataSectionHint: "Đồng bộ dùng chung, sao lưu cá nhân và trạng thái sao lưu được gom vào một nơi.",
         // SidebarDrawer — help section
         helpSectionTitle: "Trợ giúp",
         helpGuideButton: "Hướng dẫn sử dụng",
         // SidebarDrawer — account section
         accountSectionTitle: "Tài khoản",
-        adminModeActive: "Đang ở chế độ Admin",
-        lockButton: "Khoá",
-        adminModeHint: 'Nhấn "Khoá" để thoát chế độ admin và ẩn các công cụ quản trị.',
-        adminLoginButton: "Đăng nhập Admin",
+        adminModeActive: "Đang ở chế độ quản trị",
+        lockButton: "Khóa",
+        adminModeHint: 'Nhấn "Khóa" để thoát chế độ quản trị và ẩn các công cụ quản trị.',
+        adminLoginButton: "Đăng nhập quản trị",
         adminLoginHint: "Nhập mã PIN để mở quyền thêm / sửa / xoá nguyên liệu và món ăn.",
         // SidebarDrawer — PIN sheet
         pinTitle: "Nhập mã PIN",
@@ -113,7 +113,7 @@ export const AppCopy = {
         // SidebarDrawer — backup sheet
         backupTitle: "Dữ liệu & sao lưu",
         backupSharedTitle: "Dữ liệu dùng chung",
-        backupSharedDesc: "Cập nhật nguyên liệu, món ăn, mục tiêu dinh dưỡng và cấu hình tồn kho mới nhất được admin xuất bản.",
+        backupSharedDesc: "Cập nhật nguyên liệu, món ăn, mục tiêu dinh dưỡng và cấu hình tồn kho mới nhất do người quản trị xuất bản.",
         backupSyncNow: "Đồng bộ mới",
         backupSharedUpToDate: "Dữ liệu dùng chung đã mới nhất",
         backupSyncFailed: (args: { reason: string }) => `Đồng bộ thất bại: ${args.reason}`,
@@ -131,21 +131,21 @@ export const AppCopy = {
         inventorySaved: "Đã lưu cấu hình tồn kho dùng chung",
         // SidebarDrawer — publish admin
         publishAdminTitle: "Quản trị xuất bản",
-        publishAdminDesc: "Đẩy nguyên liệu, món ăn và cấu hình dùng chung hiện tại lên GitHub để các thiết bị khác đồng bộ thủ công.",
-        publishTokenPlaceholder: "Token có quyền ghi repo contents",
-        publishSaveToken: "Lưu token",
-        publishTestToken: "Kiểm tra token",
-        publishClearToken: "Xoá token",
-        publishTokenSaved: "Đã lưu GitHub token xuất bản trên thiết bị này",
-        publishTokenCleared: "Đã xoá GitHub token xuất bản trên thiết bị này",
+        publishAdminDesc: "Đưa nguyên liệu, món ăn và cấu hình dùng chung hiện tại lên GitHub để các thiết bị khác đồng bộ thủ công.",
+        publishTokenPlaceholder: "Mã truy cập có quyền ghi dữ liệu",
+        publishSaveToken: "Lưu mã truy cập",
+        publishTestToken: "Kiểm tra mã truy cập",
+        publishClearToken: "Xóa mã truy cập",
+        publishTokenSaved: "Đã lưu mã truy cập xuất bản trên thiết bị này",
+        publishTokenCleared: "Đã xóa mã truy cập xuất bản trên thiết bị này",
         publishButton: "Xuất bản dữ liệu dùng chung",
         publishLastAt: (args: { when: string }) => `Xuất bản lần cuối: ${args.when}`,
         publishConfirmTitle: "Xác nhận xuất bản dữ liệu dùng chung",
         publishConfirmBody: "Thao tác này sẽ ghi nguyên liệu, món ăn và cấu hình dùng chung lên GitHub để các thiết bị khác đồng bộ. Bạn có chắc muốn xuất bản dữ liệu hiện tại?",
         publishConfirmOk: "Xuất bản",
-        publishTokenStatusLocal: "Đang dùng token lưu trên thiết bị này.",
-        publishTokenStatusBuild: "Đang dùng token cấu hình sẵn. Bạn có thể nhập token khác để ghi đè trên thiết bị này.",
-        publishTokenStatusNone: "Chưa có token xuất bản. Token chỉ lưu trong trình duyệt của thiết bị này.",
+        publishTokenStatusLocal: "Đang dùng mã truy cập lưu trên thiết bị này.",
+        publishTokenStatusBuild: "Đang dùng mã truy cập cấu hình sẵn. Bạn có thể nhập mã khác để ghi đè trên thiết bị này.",
+        publishTokenStatusNone: "Chưa có mã truy cập xuất bản. Mã này chỉ lưu trong trình duyệt của thiết bị này.",
         // SidebarDrawer — personal backup
         personalBackupTitle: "Sao lưu cá nhân",
         personalBackupDesc: "Sao lưu tồn kho, lịch mua sắm, thực đơn và mẫu dùng lại vào GitHub Gist.",
@@ -242,27 +242,27 @@ export const AppCopy = {
         addModalTitle: "Thêm lịch mua sắm",
         searchPlaceholder: "Tìm kiếm",
         loadedCount: (args: { loaded: number; total: number }) => `Đã tải ${args.loaded}/${args.total}`,
-        actionCreateFromTemplate: "Tạo từ mẫu",
+        actionCreateFromTemplate: "Thêm từ mẫu",
         // Screen — status filter chips + per-item status pills
         statusAll: "Tất cả",
         statusBuying: "Đang mua",
         statusOverdue: "Quá hạn",
-        statusChecklistDone: "Checklist xong",
+        statusChecklistDone: "Danh sách xong",
         statusCompleted: "Đã hoàn tất",
-        statusEmptyChecklist: "Chưa checklist",
-        statusNoChecklist: "Chưa có checklist",
+        statusEmptyChecklist: "Chưa có món cần mua",
+        statusNoChecklist: "Chưa có danh sách",
         // Screen — per-item summary
         dishCount: (args: { count: number }) => `${args.count} món`,
         scheduledMealCount: (args: { count: number }) => `${args.count} thực đơn`,
         completedShortLabel: (args: { when: string }) => `Xong ${args.when}`,
         plannedDateLabel: "Ngày mua",
-        createdDateLabel: "Ngày tạo",
+        createdDateLabel: "Ngày thêm",
         plannedDateUnset: "Chưa đặt",
-        checklistLabel: "Checklist",
+        checklistLabel: "Danh sách",
         ingredientProgress: (args: { done: number; total: number }) => `${args.done}/${args.total} nguyên liệu`,
         // Screen — row primary + dropdown actions
         openAction: "Mở",
-        generateAction: "Tạo",
+        generateAction: "Lập danh sách",
         openDetailPageAction: "Mở trang chi tiết",
         exportAction: "Xuất danh sách",
         regenerateMenuAction: "Tải lại",
@@ -271,14 +271,14 @@ export const AppCopy = {
         // Screen — regenerate confirm + toast
         reloadConfirmContent: "Tải lại danh sách nguyên liệu?",
         reloadConfirmOk: "Đồng ý",
-        regenerateSuccessToast: "Đã tạo lại checklist nguyên liệu",
+        regenerateSuccessToast: "Đã cập nhật lại danh sách nguyên liệu",
         // Screen — apply-template Sheet
-        templateModalTitle: "Tạo lịch mua từ mẫu",
-        templateCreateAction: "Tạo lịch mua",
+        templateModalTitle: "Thêm lịch mua từ mẫu",
+        templateCreateAction: "Thêm lịch mua",
         templateLabel: "Mẫu mua sắm",
         templatePlaceholder: "Chọn mẫu mua sắm",
-        templateNoneHint: "Chưa có mẫu mua sắm. Vào trang Mẫu dùng lại để tạo mẫu trước.",
-        templatePreview: (args: { dishCount: number }) => `Mẫu này có ${args.dishCount} món. App sẽ tạo checklist nguyên liệu ngay sau khi tạo lịch mua.`,
+        templateNoneHint: "Chưa có mẫu mua sắm. Vào trang Mẫu dùng lại để thêm mẫu trước.",
+        templatePreview: (args: { dishCount: number }) => `Mẫu này có ${args.dishCount} món. Ứng dụng sẽ lập danh sách nguyên liệu ngay sau khi thêm lịch mua.`,
         // Screen — delete-confirm Sheet
         deleteConfirmTitle: "Xác nhận xóa",
         deleteConfirmBody: (args: { name: string }) => `Bạn có chắc muốn xóa lịch ${args.name} không? Hành động này không thể hoàn tác.`,
@@ -298,20 +298,20 @@ export const AppCopy = {
         mealsCount: (args: { count: number }) => `${args.count} thực đơn`,
         // Page actions
         actionSmartPlanner: "Gợi ý thực đơn",
-        actionTemplate: "Tạo từ mẫu",
-        actionRangeShopping: "Tạo giỏ theo khoảng ngày",
+        actionTemplate: "Thêm từ mẫu",
+        actionRangeShopping: "Thêm lịch mua theo khoảng ngày",
         actionCookDay: "Nấu cả ngày",
         actionAddMeal: "Thêm thực đơn",
         addMenuLabel: "Thêm thực đơn",
         // Empty + plan-list toggle
-        emptyDay: "Chưa có thực đơn trong ngày này",
-        hidePlanListLabel: "Ẩn danh sách kế hoạch",
-        showPlanListLabel: (args: { count: number }) => `Xem theo kế hoạch (${args.count})`,
+        emptyDay: "Chưa có thực đơn cho ngày này",
+        hidePlanListLabel: "Ẩn danh sách món",
+        showPlanListLabel: (args: { count: number }) => `Xem danh sách món (${args.count})`,
         // Slot summary card
         slotMorning: "Sáng",
         slotNoon: "Trưa",
         slotEvening: "Tối",
-        slotSummary: (args: { dishCount: number; planCount: number }) => `${args.dishCount} món · ${args.planCount} kế hoạch`,
+        slotSummary: (args: { dishCount: number; planCount: number }) => `${args.dishCount} món · ${args.planCount} mục`,
         slotEmptyDish: "Chưa có món",
         slotServingsPlanned: (args: { available: number; planned: number }) => `${args.available}/${args.planned} phần`,
         slotServingsAvailable: (args: { available: number }) => `còn ${args.available} phần`,
@@ -330,22 +330,22 @@ export const AppCopy = {
         // Day cooking modal title (passed through to ScheduledMealCookingModal)
         dayCookingTitle: (args: { date: string }) => `Nấu cả ngày - ${args.date}`,
         // Template apply Sheet
-        templateModalTitle: "Tạo thực đơn từ mẫu",
-        templateCreateAction: "Tạo",
-        templateScopeLabel: "Tạo cho",
+        templateModalTitle: "Thêm thực đơn từ mẫu",
+        templateCreateAction: "Thêm",
+        templateScopeLabel: "Áp dụng cho",
         templateScopeDay: "Một ngày",
         templateScopeWeek: "Một tuần",
         templateWeekLabel: "Tuần áp dụng",
         templateLabel: "Mẫu",
         templatePlaceholderDay: "Chọn mẫu ngày",
         templatePlaceholderWeek: "Chọn mẫu tuần",
-        templateNoneHint: (args: { scope: string }) => `Chưa có mẫu phù hợp. Vào trang Mẫu dùng lại để tạo mẫu ${args.scope}.`,
+        templateNoneHint: (args: { scope: string }) => `Chưa có mẫu phù hợp. Vào trang Mẫu dùng lại để thêm mẫu ${args.scope}.`,
         templateScopeWordDay: "ngày",
         templateScopeWordWeek: "tuần",
-        templateCreatedToast: (args: { count: number }) => `Đã tạo ${args.count} thực đơn từ mẫu`,
+        templateCreatedToast: (args: { count: number }) => `Đã thêm ${args.count} thực đơn từ mẫu`,
         // Range picker Sheet
-        rangeModalTitle: "Chọn khoảng ngày để tạo giỏ hàng",
-        rangeCreateAction: "Tạo giỏ hàng",
+        rangeModalTitle: "Chọn khoảng ngày để thêm lịch mua",
+        rangeCreateAction: "Thêm lịch mua",
         rangeFromPlaceholder: "Từ ngày",
         rangeToPlaceholder: "Đến ngày",
         rangePreset7Days: "7 ngày tới",
@@ -353,7 +353,7 @@ export const AppCopy = {
         rangePresetNextWeek: "Tuần tới",
         rangeFoundCount: (args: { count: number }) => `Tìm thấy ${args.count} thực đơn trong khoảng ngày đã chọn`,
         // Range shopping Sheet
-        rangeShoppingTitle: "Tạo lịch mua sắm",
+        rangeShoppingTitle: "Thêm lịch mua sắm",
         rangeShoppingEmpty: "Không có thực đơn nào trong khoảng ngày đã chọn",
         // Helper: localized week-of-month shopping list name
         weekShoppingListName: (args: { weekOfMonth: number; date: string }) => `Tuần ${args.weekOfMonth}, ${args.date}`,
@@ -369,7 +369,7 @@ export const AppCopy = {
         deleteConfirmBody: (args: { name: string }) => `Bạn có chắc muốn xóa thực đơn ${args.name} không? Hành động này không thể hoàn tác.`,
         // Add widget — form fields, slots, summary, save
         defaultMenuName: "Thực đơn chưa đặt tên",
-        createdToast: "Đã tạo thực đơn",
+        createdToast: "Đã thêm thực đơn",
         nameLabel: "Tên gợi nhớ",
         namePlaceholder: "Nhập tên",
         plannedDateLabel: "Ngày kế hoạch",
@@ -382,7 +382,7 @@ export const AppCopy = {
     },
     dishSuggester: {
         // Header / hosts
-        title: "Nấu gì hôm nay?",
+        title: "Hôm nay nấu gì?",
         openPageAriaLabel: "Mở trang Nấu gì riêng",
         backAriaLabel: "Quay lại",
         // Mode tabs
@@ -394,9 +394,9 @@ export const AppCopy = {
         cookAction: "Nấu",
         cookCountAriaLabel: (args: { count: number }) => `Bắt đầu nấu ${args.count} món`,
         moreActionsAriaLabel: (args: { count: number }) => `Thao tác khác cho ${args.count} món`,
-        actionShopping: "Tạo lịch mua",
-        actionExpense: "Kế hoạch chi phí",
-        actionSuitability: "Độ hợp nhà mình",
+        actionShopping: "Thêm lịch mua",
+        actionExpense: "Tính chi phí",
+        actionSuitability: "Mức hợp nhà mình",
         actionNutrition: "Tính dinh dưỡng",
         // Toasts
         startedCookingOne: (args: { name: string }) => `Đã bắt đầu nấu ${args.name}`,
@@ -408,11 +408,11 @@ export const AppCopy = {
         pendingNutrition: "Đang tính gợi ý dinh dưỡng...",
         // Empty / no-match states
         emptyNoMatch: "Không tìm thấy món phù hợp",
-        inventoryEmpty: "Tủ lạnh trống — hãy cập nhật tồn kho trước",
+        inventoryEmpty: "Tủ lạnh đang trống — cập nhật nguyên liệu trước nhé",
         noMatchInFilter: "Không có món nào chứa đủ các nguyên liệu đã chọn",
         noMatchWithInventory: "Không tìm thấy món phù hợp với nguyên liệu hiện có",
         nutritionEmpty: "Chưa có món nào hợp mục tiêu. Bạn có thể bổ sung dinh dưỡng cho món sau.",
-        nutritionGoalEmpty: "Chưa có mục tiêu dinh dưỡng. Hãy tạo mục tiêu trước.",
+        nutritionGoalEmpty: "Chưa có mục tiêu dinh dưỡng. Hãy thêm mục tiêu trước.",
         durationNotFound: (args: { minutes: number }) => `Không có món nào nấu được trong ${args.minutes} phút`,
         // Filters
         ingredientFilterPlaceholder: "Lọc món chứa nguyên liệu...",
@@ -422,16 +422,16 @@ export const AppCopy = {
         minutesUnit: (args: { minutes: number }) => `${args.minutes} phút`,
         // Ingredients step 0 + duration prompt
         suggestDishesCount: (args: { count: number }) => `Gợi ý món (${args.count})`,
-        durationPrompt: "⏱ Bạn có bao nhiêu thời gian để nấu?",
+        durationPrompt: "Bạn có bao nhiêu thời gian để nấu?",
         // Inventory summary
-        inventoryCountSummary: (args: { count: number }) => `🧊 ${args.count} nguyên liệu trong tủ lạnh — bấm để xem`,
+        inventoryCountSummary: (args: { count: number }) => `Có ${args.count} nguyên liệu trong tủ lạnh — bấm để xem`,
         // Nutrition mode
         nutritionGoalTitle: "Chọn mục tiêu dinh dưỡng",
         nutritionGoalManage: "Quản lý",
-        nutritionGoalCriteriaCount: (args: { count: number }) => `${args.count} điều cần theo`,
-        nutritionGoalLabel: (args: { name: string; count: number }) => `${args.name} - ${args.count} điều`,
+        nutritionGoalCriteriaCount: (args: { count: number }) => `${args.count} tiêu chí`,
+        nutritionGoalLabel: (args: { name: string; count: number }) => `${args.name} - ${args.count} tiêu chí`,
         nutritionGoalReasonPrefix: "Gợi ý theo mục tiêu",
-        nutritionMatchPhrase: (args: { matched: number; total: number }) => `${args.matched}/${args.total} điều hợp`,
+        nutritionMatchPhrase: (args: { matched: number; total: number }) => `${args.matched}/${args.total} tiêu chí hợp`,
         suggestByGoal: (args: { name: string }) => `Gợi ý theo ${args.name}`,
         suggestByNutrition: "Gợi ý theo dinh dưỡng",
         nutritionMissingInfo: (args: { count: number }) => `Cần bổ sung thông tin cho ${args.count} nguyên liệu.`,
@@ -443,7 +443,7 @@ export const AppCopy = {
         nutritionFiber: "xơ",
         viewGoals: "Xem mục tiêu",
         // Results footer
-        enoughForAll: "🎉 Đủ nguyên liệu cho tất cả món đã chọn!",
+        enoughForAll: "Đủ nguyên liệu cho tất cả món đã chọn!",
         needMoreIngredientsPrefix: "Cần mua thêm",
         needMoreIngredientsSuffix: "nguyên liệu:",
         moreSuffix: (args: { count: number }) => `+${args.count} khác`,
@@ -451,10 +451,10 @@ export const AppCopy = {
         availableOf: (args: { available: number; total: number }) => `${args.available}/${args.total} có sẵn`,
         needLabel: (args: { amount: number; unit: string }) => `(cần ${args.amount}${args.unit})`,
         // Sheet/Modal-host titles
-        shoppingListAddTitle: "Tạo lịch mua sắm",
+        shoppingListAddTitle: "Thêm lịch mua sắm",
         expensePlannerTitle: "Tính chi phí",
         nutritionCalculatorTitle: "Máy tính dinh dưỡng",
-        suitabilityTitle: "Độ phù hợp với nhà mình",
+        suitabilityTitle: "Mức phù hợp với nhà mình",
         // Suitability content
         suitabilityNoMembers: "Chưa có hồ sơ thành viên để đánh giá.",
         openHouseholdAction: "Mở Nhà mình",
@@ -471,42 +471,42 @@ export const AppCopy = {
         loadedCount: (args: { loaded: number; total: number }) => `Đã tải ${args.loaded}/${args.total}`,
         // Status filter chips
         statusAll: "Tất cả",
-        statusReady: "Hoàn thiện",
-        statusNeedsUpdate: "Cần cập nhật",
+        statusReady: "Đủ thông tin",
+        statusNeedsUpdate: "Cần bổ sung",
         statusHasIngredients: "Có nguyên liệu",
         statusHasSteps: "Có bước nấu",
         // Tag filter
-        allTagsLabel: "Tất cả tag",
+        allTagsLabel: "Tất cả nhãn",
         // Add modal
         addModalTitle: "Thêm món ăn",
         // Duration popover
         durationPopoverTitle: "Thời lượng",
         durationEmpty: "Chưa nhập thời lượng cho món này.",
-        durationOwnDishLabel: "Món chính",
-        durationIncludedDishesLabel: "Món bao gồm",
+        durationOwnDishLabel: "Món này",
+        durationIncludedDishesLabel: "Món kèm",
         // Row badges
         durationBadgeEmpty: "Chưa có",
-        statusComplete: "Hoàn thiện",
-        statusNeedsUpdateBadge: "Cần cập nhật",
+        statusComplete: "Đủ thông tin",
+        statusNeedsUpdateBadge: "Cần bổ sung",
         servingsTag: (args: { count: number }) => `${args.count} phần`,
         // Row dropdown menu
         menuStartCooking: "Bắt đầu nấu",
         menuExport: "Xuất dữ liệu",
         menuEdit: "Sửa món ăn",
         menuDuration: "Thời lượng",
-        menuDuplicate: "Nhân bản",
+        menuDuplicate: "Sao chép",
         menuDelete: "Xóa",
         // Row metric cards
         ingredientsLabel: "Nguyên liệu",
         ingredientsCount: (args: { count: number }) => `${args.count} nguyên liệu`,
         emptyShort: "Chưa có",
         optionalCount: (args: { count: number }) => `${args.count} tùy chọn`,
-        stepsLabel: "Quy trình",
+        stepsLabel: "Các bước",
         stepsCount: (args: { count: number }) => `${args.count} bước`,
         includedDishCount: (args: { count: number }) => `${args.count} món kèm`,
         // Row footer status
         readyShort: "Sẵn sàng",
-        needsUpdateShort: "Cần cập nhật",
+        needsUpdateShort: "Cần bổ sung",
         requiredIngredientCount: (args: { count: number }) => `${args.count} nguyên liệu bắt buộc`,
         rowCookAction: "Nấu",
         rowNutritionAction: "Dinh dưỡng",
@@ -514,15 +514,15 @@ export const AppCopy = {
         detailFooterClose: "Đóng",
         detailFooterOpenPage: "Mở trang chi tiết",
         // Edit / duration / cooking modals
-        editModalTitle: "Chỉnh sửa món ăn",
+        editModalTitle: "Sửa món ăn",
         durationModalTitle: "Thời lượng",
         cookingModalSuffix: "Bắt đầu nấu",
         // Toasts / inline messages
         savedCookTimeToast: "Đã lưu thời gian món ăn",
-        cannotDeleteUsedIn: (args: { dishNames: string }) => `Không thể xóa! Món ăn này đang được dùng trong: ${args.dishNames}.`,
+        cannotDeleteUsedIn: (args: { dishNames: string }) => `Chưa thể xóa. Món này đang được dùng trong: ${args.dishNames}.`,
         // Delete confirm Sheet
         deleteConfirmTitle: "Xác nhận xóa",
-        deleteConfirmBody: (args: { name: string }) => `Bạn có chắc muốn xóa món ${args.name} không? Hành động này không thể hoàn tác.`,
+        deleteConfirmBody: (args: { name: string }) => `Bạn muốn xóa món ${args.name}? Hành động này không thể hoàn tác.`,
     },
     ingredient: {
         // Screen header / page-level
@@ -533,7 +533,7 @@ export const AppCopy = {
         // Stock filter chips
         stockAll: "Tất cả",
         stockInStock: "Đang có",
-        stockNeedStock: "Cần nhập",
+        stockNeedStock: "Cần mua",
         stockLowStock: "Sắp hết",
         stockUrgent: "Sắp hết hạn",
         stockAlwaysAvailable: "Luôn có",
@@ -545,16 +545,16 @@ export const AppCopy = {
         // Add modal
         addModalTitle: "Thêm nguyên liệu",
         // Inventory modal
-        inventoryModalTitle: (args: { name: string }) => `Tồn kho - ${args.name}`,
+        inventoryModalTitle: (args: { name: string }) => `Kho nguyên liệu - ${args.name}`,
         // Row inventory status states
         statusAlwaysAvailable: "Luôn có",
         statusAlwaysAvailableDetail: "Không cần quản lý tồn kho",
-        statusNoInventory: "Chưa có tồn kho",
-        statusNoInventoryDetail: "Bấm để nhập lô đầu tiên",
-        statusOutOfStock: "Hết khả dụng",
+        statusNoInventory: "Chưa có trong kho",
+        statusNoInventoryDetail: "Bấm để thêm lô đầu tiên",
+        statusOutOfStock: "Không còn dùng được",
         statusOutOfStockDetail: "Không còn lô dùng được",
-        statusLowDetail: "Tồn kho thấp",
-        statusOkDetail: "Tồn kho ổn",
+        statusLowDetail: "Sắp thiếu",
+        statusOkDetail: "Đủ dùng",
         // Row aria + tooltip
         aria_viewNutrition: "Xem dinh dưỡng",
         aria_viewNutritionDetail: "Xem chi tiết dinh dưỡng",
@@ -564,17 +564,17 @@ export const AppCopy = {
         menuEdit: "Sửa",
         menuDelete: "Xóa",
         // Row metric cards
-        labelUsableInventory: "Tồn kho khả dụng",
-        labelRecipeUnits: "Đơn vị công thức",
-        labelInventoryUnits: (args: { units: string }) => `Nhập kho: ${args.units}`,
+        labelUsableInventory: "Có thể dùng",
+        labelRecipeUnits: "Đơn vị khi nấu",
+        labelInventoryUnits: (args: { units: string }) => `Theo dõi bằng: ${args.units}`,
         latestBatch: (args: { label: string }) => `Lô gần nhất: ${args.label}`,
         // Edit / nutrition modal titles
-        editModalTitle: "Chỉnh sửa nguyên liệu",
-        nutritionModalTitle: (args: { name: string }) => `Dinh dưỡng - ${args.name}`,
+        editModalTitle: "Sửa nguyên liệu",
+        nutritionModalTitle: (args: { name: string }) => `Dinh dưỡng của ${args.name}`,
         nutritionModalClose: "Đóng",
         // Delete confirm Sheet
         deleteConfirmTitle: "Xác nhận xóa",
-        deleteConfirmBody: (args: { name: string }) => `Bạn có chắc muốn xóa nguyên liệu ${args.name} không? Hành động này không thể hoàn tác.`,
+        deleteConfirmBody: (args: { name: string }) => `Bạn muốn xóa nguyên liệu ${args.name}? Hành động này không thể hoàn tác.`,
     },
     emptyStates: {
         noDishes: "Chưa có món nào — thêm món đầu tiên nhé",
@@ -583,7 +583,7 @@ export const AppCopy = {
         emptyCatalogTitle: "Chưa có món nào",
         emptyCatalogBody: "Thêm món đầu tiên để bắt đầu lên thực đơn.",
         emptyCatalogCta: "Thêm món đầu tiên",
-        noPreferences: "Chưa có sở thích để chọn. Bạn có thể bỏ qua bước này.",
+        noPreferences: "Chưa có sở thích để chọn. Bước này có thể để tùy bạn.",
     },
 } as const;
 
