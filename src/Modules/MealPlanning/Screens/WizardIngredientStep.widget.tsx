@@ -1,4 +1,5 @@
 import { AppstoreAddOutlined } from "@ant-design/icons";
+import { AppCopy } from "@common/Copy";
 import { Box } from "@components/Layout/Box";
 import { Stack } from "@components/Layout/Stack";
 import { Sheet } from "@components/Sheet";
@@ -25,7 +26,7 @@ export const WizardIngredientStep: React.FC<WizardIngredientStepProps> = ({ onNe
                 level={4}
                 style={{ fontSize: 20, fontWeight: 600, lineHeight: 1.25, margin: 0, marginBottom: 16 }}
             >
-                Bạn có sẵn nguyên liệu gì?
+                {AppCopy.wizard.ingredientStepTitle}
             </Typography.Title>
 
             <Box
@@ -49,12 +50,12 @@ export const WizardIngredientStep: React.FC<WizardIngredientStepProps> = ({ onNe
                     <AppstoreAddOutlined style={{ color: "#7436dc", fontSize: 18 }} />
                     <Typography.Text style={{ fontSize: 16 }}>
                         {selectedIds.length > 0
-                            ? `Đã chọn ${selectedIds.length} nguyên liệu`
-                            : "Chọn nguyên liệu"}
+                            ? AppCopy.wizard.selectedIngredients({ count: selectedIds.length })
+                            : AppCopy.wizard.ingredientPickerTrigger}
                     </Typography.Text>
                 </Stack>
                 <Typography.Text style={{ fontSize: 13, fontWeight: 600, color: "#7436dc" }}>
-                    {selectedIds.length > 0 ? "Sửa" : "Chọn"}
+                    {selectedIds.length > 0 ? AppCopy.wizard.editAction : AppCopy.wizard.chooseAction}
                 </Typography.Text>
             </Box>
 
@@ -66,7 +67,7 @@ export const WizardIngredientStep: React.FC<WizardIngredientStepProps> = ({ onNe
                     onClick={() => onNext({ selectedIngredientIds: selectedIds })}
                     style={{ width: "100%", borderRadius: 12, background: "#7436dc", borderColor: "#7436dc" }}
                 >
-                    Tiếp tục
+                    {AppCopy.wizard.continueAction}
                 </Button>
                 <Button
                     type="text"
@@ -75,13 +76,13 @@ export const WizardIngredientStep: React.FC<WizardIngredientStepProps> = ({ onNe
                     onClick={() => onNext({ selectedIngredientIds: [] })}
                     style={{ width: "100%", borderRadius: 12, color: "#595959", fontWeight: 600 }}
                 >
-                    Tùy bạn
+                    {AppCopy.common.skip}
                 </Button>
             </Stack>
 
             <Sheet
                 open={sheetOpen}
-                title="Chọn nguyên liệu"
+                title={AppCopy.wizard.ingredientSheetTitle}
                 onClose={() => setSheetOpen(false)}
                 data-testid="wizard-ingredient-sheet"
             >

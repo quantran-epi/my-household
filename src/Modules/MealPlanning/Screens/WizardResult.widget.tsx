@@ -1,3 +1,4 @@
+import { AppCopy } from "@common/Copy";
 import { Button } from "@components/Button";
 import { DatePicker } from "@components/Form/DatePicker";
 import { Box } from "@components/Layout/Box";
@@ -51,7 +52,7 @@ const ResultRow: React.FunctionComponent<ResultRowProps> = ({ dish, meta, onAddT
             </Typography.Text>}
         </Stack>
         {meta && <Typography.Text type="secondary" style={{ fontSize: 16, lineHeight: 1.5 }}>
-            {`${meta.matched} đủ · ${meta.missing} thiếu`}
+            {AppCopy.wizard.ingredientMatchSummary({ matched: meta.matched, missing: meta.missing })}
         </Typography.Text>}
         <Stack direction="column" gap={8} fullwidth style={{ marginTop: 4 }}>
             <Button
@@ -60,13 +61,13 @@ const ResultRow: React.FunctionComponent<ResultRowProps> = ({ dish, meta, onAddT
                 onClick={onAddToday}
                 style={{ width: "100%", borderRadius: 20, paddingInline: 20 }}
             >
-                Thêm vào hôm nay
+                {AppCopy.wizard.addToToday}
             </Button>
             <Button
                 onClick={onPickDay}
                 style={{ width: "100%", borderRadius: 20, paddingInline: 20 }}
             >
-                Chọn ngày khác
+                {AppCopy.wizard.pickOtherDay}
             </Button>
         </Stack>
     </Box>;
@@ -75,7 +76,7 @@ const ResultRow: React.FunctionComponent<ResultRowProps> = ({ dish, meta, onAddT
 const scoredMeta = (item: ScoredDish): ResultRowProps["meta"] => {
     const matchPercent = Math.round(item.score * 100);
     const accent = matchPercent >= 100 ? ACCENT_FULL : matchPercent >= 50 ? ACCENT_PARTIAL : ACCENT_LOW;
-    const label = matchPercent >= 100 ? "Đủ đồ" : matchPercent >= 50 ? "Gần đủ" : "Cần mua";
+    const label = matchPercent >= 100 ? AppCopy.wizard.matchFull : matchPercent >= 50 ? AppCopy.wizard.matchPartial : AppCopy.wizard.matchLow;
     return {
         matched: item.matchedIngredientIds.length,
         missing: item.missingIngredientIds.length,
@@ -106,7 +107,7 @@ export const WizardResult: React.FunctionComponent = () => {
             createdDate: new Date(),
         };
         dispatch(addScheduledMeal(meal));
-        message.success("Đã thêm vào thực đơn");
+        message.success(AppCopy.wizard.addedToTodayToast);
         dispatch(completeWizard());
     };
 
@@ -134,17 +135,17 @@ export const WizardResult: React.FunctionComponent = () => {
             }}
         >
             <Typography.Title level={4} style={{ margin: 0, fontSize: 20, fontWeight: 600 }}>
-                Chưa có món nào
+                {AppCopy.emptyStates.emptyCatalogTitle}
             </Typography.Title>
             <Typography.Text type="secondary" style={{ fontSize: 16, lineHeight: 1.5 }}>
-                Thêm món đầu tiên để bắt đầu lên thực đơn.
+                {AppCopy.emptyStates.emptyCatalogBody}
             </Typography.Text>
             <Button
                 type="primary"
                 onClick={() => navigate(RootRoutes.AuthorizedRoutes.DishesRoutes.List())}
                 style={{ borderRadius: 20, paddingInline: 20 }}
             >
-                Thêm món đầu tiên
+                {AppCopy.emptyStates.emptyCatalogCta}
             </Button>
         </Box>;
     }
@@ -170,7 +171,7 @@ export const WizardResult: React.FunctionComponent = () => {
             // (b) FULL-CATALOG FALLBACK — friendly suggestion, neutral tone, never a red error.
             : <>
                 <Typography.Text type="secondary" style={{ fontSize: 16, lineHeight: 1.5 }}>
-                    Chưa có món khớp — đây là vài gợi ý từ toàn bộ món của bạn
+                    {AppCopy.wizard.fullCatalogFallback}
                 </Typography.Text>
                 {dishes.slice(0, 5).map(dish => (
                     <ResultRow
@@ -191,12 +192,12 @@ export const WizardResult: React.FunctionComponent = () => {
             }}
             style={{ width: "100%", borderRadius: 20, paddingInline: 20 }}
         >
-            Xong
+            {AppCopy.wizard.finishAction}
         </Button>
 
         <Sheet
             open={pickerDish !== null}
-            title="Chọn ngày khác"
+            title={AppCopy.wizard.daySheetTitle}
             onClose={() => setPickerDish(null)}
             data-testid="wizard-day-sheet"
         >
@@ -213,7 +214,7 @@ export const WizardResult: React.FunctionComponent = () => {
                     onClick={confirmPickedDay}
                     style={{ borderRadius: 20, paddingInline: 20 }}
                 >
-                    Thêm vào ngày này
+                    {AppCopy.wizard.addToDay}
                 </Button>
             </Stack>
         </Sheet>

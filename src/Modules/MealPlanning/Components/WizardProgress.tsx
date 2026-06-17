@@ -1,4 +1,5 @@
 import { LeftOutlined } from "@ant-design/icons";
+import { AppCopy } from "@common/Copy";
 import { ActionButton } from "@components/Button";
 import { Typography } from "@components/Typography";
 import React from "react";
@@ -45,7 +46,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({ current, total, 
                     <ActionButton
                         shape="circle"
                         height={40}
-                        aria-label="Quay lại"
+                        aria-label={AppCopy.common.back}
                         onClick={onBack}
                         icon={<LeftOutlined />}
                         style={backIconButtonStyle}
@@ -70,7 +71,7 @@ export const WizardProgress: React.FC<WizardProgressProps> = ({ current, total, 
             <Typography.Text
                 style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.4, color: NEUTRAL_TEXT, whiteSpace: "nowrap" }}
             >
-                {`Bước ${current + 1}/${total}`}
+                {AppCopy.wizard.progressStep({ current: current + 1, total })}
             </Typography.Text>
         </div>
     );

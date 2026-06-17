@@ -1,4 +1,5 @@
 import { ArrowLeftOutlined, CheckOutlined } from "@ant-design/icons";
+import { AppCopy } from "@common/Copy";
 import { Box } from "@components/Layout/Box";
 import { Stack } from "@components/Layout/Stack";
 import { Sheet } from "@components/Sheet";
@@ -94,7 +95,7 @@ export const WizardPreferenceStep: React.FC<WizardPreferenceStepProps> = ({ onNe
                 >
                     <ArrowLeftOutlined style={{ fontSize: 14 }} />
                     <Typography.Text style={{ fontSize: 13, fontWeight: 600, color: "#595959" }}>
-                        Quay lại
+                        {AppCopy.common.back}
                     </Typography.Text>
                 </Box>
             </Stack>
@@ -103,13 +104,13 @@ export const WizardPreferenceStep: React.FC<WizardPreferenceStepProps> = ({ onNe
                 level={4}
                 style={{ fontSize: 20, fontWeight: 600, lineHeight: 1.25, margin: 0, marginBottom: 24 }}
             >
-                Bạn thích món kiểu nào?
+                {AppCopy.wizard.preferenceStepTitle}
             </Typography.Title>
 
             {availableTags.length === 0 ? (
                 <Box style={{ marginBottom: 32 }}>
                     <Typography.Text style={{ fontSize: 16, color: "#595959" }}>
-                        Chưa có sở thích để chọn. Bạn có thể bỏ qua bước này.
+                        {AppCopy.emptyStates.noPreferences}
                     </Typography.Text>
                 </Box>
             ) : useSheet ? (
@@ -131,10 +132,10 @@ export const WizardPreferenceStep: React.FC<WizardPreferenceStepProps> = ({ onNe
                     }}
                 >
                     <Typography.Text style={{ fontSize: 16 }}>
-                        {selectedTags.length > 0 ? `Đã chọn ${selectedTags.length} sở thích` : "Chọn sở thích"}
+                        {selectedTags.length > 0 ? AppCopy.wizard.selectedPreferences({ count: selectedTags.length }) : AppCopy.wizard.preferencePickerTrigger}
                     </Typography.Text>
                     <Typography.Text style={{ fontSize: 13, fontWeight: 600, color: "#7436dc" }}>
-                        {selectedTags.length > 0 ? "Sửa" : "Chọn"}
+                        {selectedTags.length > 0 ? AppCopy.wizard.editAction : AppCopy.wizard.chooseAction}
                     </Typography.Text>
                 </Box>
             ) : (
@@ -149,7 +150,7 @@ export const WizardPreferenceStep: React.FC<WizardPreferenceStepProps> = ({ onNe
                     onClick={() => onNext({ preferredTags: selectedTags })}
                     style={{ width: "100%", borderRadius: 12, background: "#7436dc", borderColor: "#7436dc" }}
                 >
-                    Tiếp tục
+                    {AppCopy.wizard.continueAction}
                 </Button>
                 <Button
                     type="text"
@@ -158,14 +159,14 @@ export const WizardPreferenceStep: React.FC<WizardPreferenceStepProps> = ({ onNe
                     onClick={() => onNext({})}
                     style={{ width: "100%", borderRadius: 12, color: "#595959", fontWeight: 600 }}
                 >
-                    Tùy bạn
+                    {AppCopy.common.skip}
                 </Button>
             </Stack>
 
             {useSheet && (
                 <Sheet
                     open={sheetOpen}
-                    title="Sở thích"
+                    title={AppCopy.wizard.preferenceSheetTitle}
                     onClose={() => setSheetOpen(false)}
                     data-testid="wizard-preference-sheet"
                 >
