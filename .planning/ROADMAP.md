@@ -156,7 +156,7 @@ Plans:
 
 **Wave 4** *(blocked on 05-04)*
 
-- [ ] 05-05-PLAN.md — ScheduledMeal cluster: copy + Modal sweep + ScheduledMealAdd footer CTA retune (COPY-03, MOB-03, MOB-01, MOB-02)
+- [x] 05-05-PLAN.md — ScheduledMeal cluster: copy + Modal sweep + ScheduledMealAdd footer CTA retune (COPY-03, MOB-03, MOB-01, MOB-02)
 
 **Wave 5** *(blocked on 05-05)*
 
@@ -197,5 +197,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Shell Safety & Extraction | 5/5 | Complete   | 2026-06-15 |
 | 3. Wizard State Slice | 3/3 | Complete    | 2026-06-16 |
 | 4. Wizard UI & Hero Entry | 6/6 | Complete   | 2026-06-16 |
-| 5. Mobile Tuning & Copy Rollout | 4/7 | In Progress|  |
+| 5. Mobile Tuning & Copy Rollout | 5/7 | In Progress|  |
 | 6. Differentiator Enhancements | 0/TBD | Deferred | - |
