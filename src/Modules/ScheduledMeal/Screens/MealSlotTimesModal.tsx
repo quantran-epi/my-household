@@ -3,7 +3,8 @@ import { ActionButton, Button } from '@components/Button';
 import { Box } from '@components/Layout/Box';
 import { Stack } from '@components/Layout/Stack';
 import { useMessage } from '@components/Message';
-import { DeferredModalContent, Modal } from '@components/Modal';
+import { DeferredModalContent } from '@components/Modal';
+import { Sheet } from '@components/Sheet';
 import { Typography } from '@components/Typography';
 import { DEFAULT_MEAL_SLOT_TIMES, MealSlotTimeKey, MealSlotTimes, updateHouseholdPreferenceProfile } from '@store/Reducers/AppContextReducer';
 import { selectMealSlotTimes } from '@store/Selectors';
@@ -45,21 +46,11 @@ export const MealSlotTimesModal: React.FC<MealSlotTimesModalProps> = ({ open, on
 
     const _reset = () => setDraft(DEFAULT_MEAL_SLOT_TIMES);
 
-    return <Modal
+    return <Sheet
         open={open}
         title={<Stack align='center' gap={8}><ClockCircleOutlined />Giờ bữa ăn</Stack>}
-        onCancel={onClose}
-        onOk={_save}
-        okText='Lưu'
-        cancelText='Huỷ'
-        destroyOnClose
-        footer={<Stack justify='space-between' style={{ width: '100%' }}>
-            <Button onClick={_reset}>Đặt lại mặc định</Button>
-            <Stack gap={8}>
-                <Button onClick={onClose}>Huỷ</Button>
-                <Button type='primary' onClick={_save}>Lưu</Button>
-            </Stack>
-        </Stack>}
+        onClose={onClose}
+        data-testid='meal-slot-times-sheet'
     >
         <DeferredModalContent active={open} minHeight={220}>
             <Stack direction='column' align='stretch' gap={10}>
@@ -82,7 +73,14 @@ export const MealSlotTimesModal: React.FC<MealSlotTimesModalProps> = ({ open, on
                         <Typography.Text type='secondary' style={{ display: 'block', fontSize: 12, lineHeight: '18px' }}>{row.hint}</Typography.Text>
                     </Box>}
                 </Box>)}
+                <Stack justify='space-between' style={{ width: '100%', marginTop: 4 }}>
+                    <Button onClick={_reset}>Đặt lại mặc định</Button>
+                    <Stack gap={8}>
+                        <Button onClick={onClose}>Huỷ</Button>
+                        <Button type='primary' onClick={_save}>Lưu</Button>
+                    </Stack>
+                </Stack>
             </Stack>
         </DeferredModalContent>
-    </Modal>;
+    </Sheet>;
 };

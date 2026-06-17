@@ -1,10 +1,12 @@
 import React from "react";
 import { Button } from "@components/Button";
-import { DeferredModalContent, Modal } from "@components/Modal";
+import { DeferredModalContent } from "@components/Modal";
+import { Sheet } from "@components/Sheet";
 import { Typography } from "@components/Typography";
 import { ShoppingList } from "@store/Models/ShoppingList";
 import { Ingredient } from "@store/Models/Ingredient";
 import { Box } from "@components/Layout/Box";
+import { Stack } from "@components/Layout/Stack";
 import { Space } from "@components/Layout/Space";
 import { useMessage } from "@components/Message";
 import ShoppingListIcon from "../../../../assets/icons/shoppingList.png";
@@ -100,28 +102,26 @@ export const ShoppingListExportWidget: React.FC<ShoppingListExportWidgetProps> =
     };
 
     return (
-        <>
-            <Modal
-                open={open}
-                onCancel={onClose}
-                title={
-                    <Space>
-                        <Image src={ShoppingListIcon} preview={false} width={20} style={{ marginBottom: 3 }} />
-                        Xuất danh sách — {shoppingList.name}
-                    </Space>
-                }
-                footer={
-                    <Space>
-                        <Button disabled={!exportText} onClick={_onCopy}>Sao chép</Button>
-                        <Button disabled={!exportText} type="primary" onClick={_onDownload}>Tải file .txt</Button>
-                    </Space>
-                }
-                destroyOnClose
-            >
+        <Sheet
+            open={open}
+            onClose={onClose ?? (() => undefined)}
+            title={
+                <Space>
+                    <Image src={ShoppingListIcon} preview={false} width={20} style={{ marginBottom: 3 }} />
+                    Xuất danh sách — {shoppingList.name}
+                </Space>
+            }
+            data-testid="shopping-list-export-sheet"
+        >
+            <Stack direction="column" gap={16} fullwidth align="stretch">
                 <DeferredModalContent active={open} minHeight={180}>
                     <ShoppingListExportBody shoppingList={shoppingList} allIngredients={allIngredients} onTextReady={setExportText} />
                 </DeferredModalContent>
-            </Modal>
-        </>
+                <Stack gap={8} justify="flex-end" fullwidth>
+                    <Button disabled={!exportText} onClick={_onCopy}>Sao chép</Button>
+                    <Button disabled={!exportText} type="primary" onClick={_onDownload}>Tải file .txt</Button>
+                </Stack>
+            </Stack>
+        </Sheet>
     );
 };

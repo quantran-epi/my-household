@@ -4,8 +4,7 @@ import { Dropdown } from '@components/Dropdown';
 import { Box } from '@components/Layout/Box';
 import { Stack } from '@components/Layout/Stack';
 import { useMessage } from '@components/Message';
-import { Modal } from '@components/Modal';
-import { useModal } from '@components/Modal/ModalProvider';
+import { Sheet } from '@components/Sheet';
 import { Tag } from '@components/Tag';
 import { Typography } from '@components/Typography';
 import { MealFeedbackTitleHelper } from '@common/Helpers/MealFeedbackTitleHelper';
@@ -50,8 +49,6 @@ const itemKind = (item: LeftoverTrackerItem): DishServingKind => item.kind === '
 const getKindVisual = (item: LeftoverTrackerItem) => itemKind(item) === 'fresh'
     ? { color: 'volcano', label: 'Mới nấu' }
     : { color: 'gold', label: 'Phần dư' };
-
-const LEFTOVER_CONFIRM_Z_INDEX = 5200;
 
 const getStatusVisual = (item: LeftoverTrackerItem) => {
     if (item.status === 'discarded') return { color: 'default', label: 'Đã bỏ', accent: '#9ca3af', background: '#f3f4f6', border: '#e5e7eb' };
@@ -149,7 +146,6 @@ export const LeftoverManagementScreen: React.FC = () => {
     useScreenTitle({ value: 'Phần còn lại', deps: [] });
     const dispatch = useDispatch();
     const message = useMessage();
-    const modal = useModal();
     const items = useSelector(selectLeftoverTrackerItems);
     const dishes = useSelector(selectDishes);
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('available');
@@ -162,6 +158,8 @@ export const LeftoverManagementScreen: React.FC = () => {
     // Discard modal state (which item, and the optional reason).
     const [discardItem, setDiscardItem] = useState<LeftoverTrackerItem | null>(null);
     const [discardReason, setDiscardReason] = useState<string>('');
+    // Finish-confirm state (lifted from an imperative modal.confirm to a declarative Sheet — D-06 case c).
+    const [finishItem, setFinishItem] = useState<LeftoverTrackerItem | null>(null);
     // Manual-add modal.
     const { show: showAddModal, hide: hideAddModal, value: addModalOpen } = useToggle();
     const [addForm, setAddForm] = useState<AddLeftoverForm>(createAddForm);
@@ -222,15 +220,14 @@ export const LeftoverManagementScreen: React.FC = () => {
     };
 
     const _confirmFinish = (item: LeftoverTrackerItem) => {
-        modal.confirm({
-            title: 'Đánh dấu đã hết?',
-            content: `"${item.dishName}" sẽ được chuyển sang trạng thái đã hết.`,
-            okText: 'Đã hết',
-            cancelText: 'Hủy',
-            centered: true,
-            zIndex: LEFTOVER_CONFIRM_Z_INDEX,
-            onOk: () => { dispatch(finishLeftoverItem(item.id)); message.success('Đã đánh dấu hết'); },
-        });
+        setFinishItem(item);
+    };
+
+    const _doFinish = () => {
+        if (!finishItem) return;
+        dispatch(finishLeftoverItem(finishItem.id));
+        message.success('Đã đánh dấu hết');
+        setFinishItem(null);
     };
 
     const _openDiscard = (item: LeftoverTrackerItem) => {
@@ -363,19 +360,14 @@ export const LeftoverManagementScreen: React.FC = () => {
             />)}
         </div>}
 
-        {/* ── Eat part-of modal ── */}
-        <Modal
+        {/* ── Eat part-of sheet ── */}
+        <Sheet
             open={Boolean(eatPartItem)}
-            onCancel={() => setEatPartItem(null)}
+            onClose={() => setEatPartItem(null)}
             title='Ăn một phần'
-            okText='Ghi nhận'
-            cancelText='Hủy'
-            centered
-            destroyOnClose
-            zIndex={LEFTOVER_CONFIRM_Z_INDEX}
-            onOk={_confirmEatPart}
+            data-testid='leftover-eat-part-sheet'
         >
-            {eatPartItem && <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {eatPartItem && <Stack direction='column' align='stretch' gap={10}>
                 <Typography.Text type='secondary' style={{ fontSize: 13, lineHeight: '19px' }}>
                     "{eatPartItem.dishName}" còn {eatPartItem.portions} phần. Nhập số phần đã ăn để trừ khỏi phần còn lại.
                 </Typography.Text>
@@ -390,23 +382,39 @@ export const LeftoverManagementScreen: React.FC = () => {
                         style={{ width: '100%' }}
                     />
                 </div>
-            </div>}
-        </Modal>
+                <Stack gap={8} justify='flex-end' style={{ width: '100%' }}>
+                    <Button onClick={() => setEatPartItem(null)}>Hủy</Button>
+                    <Button type='primary' onClick={_confirmEatPart}>Ghi nhận</Button>
+                </Stack>
+            </Stack>}
+        </Sheet>
 
-        {/* ── Discard (throw away) modal ── */}
-        <Modal
-            open={Boolean(discardItem)}
-            onCancel={() => setDiscardItem(null)}
-            title='Bỏ phần còn lại'
-            okText='Bỏ'
-            cancelText='Hủy'
-            centered
-            destroyOnClose
-            okButtonProps={{ danger: true }}
-            zIndex={LEFTOVER_CONFIRM_Z_INDEX}
-            onOk={_confirmDiscard}
+        {/* ── Mark-finished confirm sheet (lifted from imperative modal.confirm) ── */}
+        <Sheet
+            open={Boolean(finishItem)}
+            onClose={() => setFinishItem(null)}
+            title='Đánh dấu đã hết?'
+            data-testid='leftover-finish-sheet'
         >
-            {discardItem && <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {finishItem && <Stack direction='column' align='stretch' gap={12}>
+                <Typography.Text type='secondary' style={{ fontSize: 13, lineHeight: '19px' }}>
+                    "{finishItem.dishName}" sẽ được chuyển sang trạng thái đã hết.
+                </Typography.Text>
+                <Stack gap={8} justify='flex-end' style={{ width: '100%' }}>
+                    <Button onClick={() => setFinishItem(null)}>Hủy</Button>
+                    <Button type='primary' onClick={_doFinish}>Đã hết</Button>
+                </Stack>
+            </Stack>}
+        </Sheet>
+
+        {/* ── Discard (throw away) sheet ── */}
+        <Sheet
+            open={Boolean(discardItem)}
+            onClose={() => setDiscardItem(null)}
+            title='Bỏ phần còn lại'
+            data-testid='leftover-discard-sheet'
+        >
+            {discardItem && <Stack direction='column' align='stretch' gap={10}>
                 <Typography.Text type='secondary' style={{ fontSize: 13, lineHeight: '19px' }}>
                     "{discardItem.dishName}" sẽ được đánh dấu đã bỏ và không còn nằm trong phần đang còn.
                 </Typography.Text>
@@ -419,21 +427,21 @@ export const LeftoverManagementScreen: React.FC = () => {
                         autoSize={{ minRows: 2, maxRows: 4 }}
                     />
                 </div>
-            </div>}
-        </Modal>
+                <Stack gap={8} justify='flex-end' style={{ width: '100%' }}>
+                    <Button onClick={() => setDiscardItem(null)}>Hủy</Button>
+                    <Button type='primary' danger onClick={_confirmDiscard}>Bỏ</Button>
+                </Stack>
+            </Stack>}
+        </Sheet>
 
-        {/* ── Manual add modal ── */}
-        <Modal
+        {/* ── Manual add sheet ── */}
+        <Sheet
             open={addModalOpen}
-            onCancel={hideAddModal}
+            onClose={hideAddModal}
             title='Thêm phần còn lại'
-            okText='Thêm'
-            cancelText='Hủy'
-            centered
-            destroyOnClose
-            onOk={_submitAdd}
+            data-testid='leftover-add-sheet'
         >
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <Stack direction='column' align='stretch' gap={12}>
                 <div>
                     <Typography.Text strong style={{ display: 'block', fontSize: 12, marginBottom: 5 }}>Món có sẵn</Typography.Text>
                     <Select
@@ -483,8 +491,12 @@ export const LeftoverManagementScreen: React.FC = () => {
                         autoSize={{ minRows: 2, maxRows: 4 }}
                     />
                 </div>
-            </div>
-        </Modal>
+                <Stack gap={8} justify='flex-end' style={{ width: '100%' }}>
+                    <Button onClick={hideAddModal}>Hủy</Button>
+                    <Button type='primary' onClick={_submitAdd}>Thêm</Button>
+                </Stack>
+            </Stack>
+        </Sheet>
     </Box>;
 };
 

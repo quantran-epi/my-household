@@ -1,5 +1,6 @@
 import { AppstoreOutlined, PieChartOutlined } from "@ant-design/icons";
-import { DeferredModalContent, Modal } from "@components/Modal";
+import { DeferredModalContent } from "@components/Modal";
+import { Sheet } from "@components/Sheet";
 import { useToggle } from "@hooks";
 import { ShoppingListAddWidget } from "@modules/ShoppingList/Screens/ShoppingListAdd.widget";
 import { removeAllSelectedMeals } from "@store/Reducers/ScheduledMealReducer";
@@ -133,12 +134,12 @@ export const ScheduledMealToolkitWidget: React.FC<ScheduledMealToolkitWidgetProp
             <FloatButton description="Nguyên liệu" tooltip="Nguyên liệu" icon={<Image preview={false} src={IngredientIcon} width={20} style={floatIconStyle} />} onClick={() => _navigate(RootRoutes.AuthorizedRoutes.IngredientRoutes.List())} />
         </FloatButton.Group>
 
-        {toggleAddModal.value && <Modal open={toggleAddModal.value} title={
+        {toggleAddModal.value && <Sheet open={toggleAddModal.value} title={
             <Space>
                 <Image src={ShoppinglistIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
                 Thêm lịch mua sắm
             </Space>
-        } destroyOnClose={true} onCancel={toggleAddModal.hide} footer={null}>
+        } onClose={toggleAddModal.hide} data-testid="scheduled-meal-add-shopping-list-sheet">
             <DeferredModalContent active={toggleAddModal.value}>
                 <ShoppingListAddWidget
                     date={null}
@@ -147,6 +148,6 @@ export const ScheduledMealToolkitWidget: React.FC<ScheduledMealToolkitWidgetProp
                     onCreated={(shoppingList) => navigate(RootRoutes.AuthorizedRoutes.ShoppingListRoutes.Detail(shoppingList.id))}
                 />
             </DeferredModalContent>
-        </Modal>}
+        </Sheet>}
     </React.Fragment>
 }
