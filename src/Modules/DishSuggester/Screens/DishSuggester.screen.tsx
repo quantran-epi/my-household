@@ -763,7 +763,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                             icon={<BulbOutlined />}
                             style={{ borderRadius: 20, paddingInline: 20 }}
                         >
-                            Gợi ý món ({selectedIngredientIds.length})
+                            {AppCopy.dishSuggester.suggestDishesCount({ count: selectedIngredientIds.length })}
                         </Button>
                     </Stack>
                 </>
@@ -772,10 +772,10 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
             {mode === "ingredients" && step === 1 && (
                 <>
                     {ingredientSuggestionsPending
-                        ? <PendingCalculationBox text="Đang tính gợi ý món..." />
+                        ? <PendingCalculationBox text={AppCopy.dishSuggester.pendingIngredient} />
                         : ingredientGroups.length === 0
                         ? <Box style={{ textAlign: "center", padding: "32px 0" }}>
-                            <Typography.Text type="secondary">Không tìm thấy món phù hợp</Typography.Text>
+                            <Typography.Text type="secondary">{AppCopy.dishSuggester.emptyNoMatch}</Typography.Text>
                         </Box>
                         : <DishSuggestionList
                             groups={ingredientGroups}
@@ -793,7 +793,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                     {inventoryIngredientIds.length === 0 ? (
                         <Box style={{ textAlign: "center", padding: "32px 0" }}>
                             <Typography.Text type="secondary">
-                                Tủ lạnh trống — hãy cập nhật tồn kho trước
+                                {AppCopy.dishSuggester.inventoryEmpty}
                             </Typography.Text>
                         </Box>
                     ) : (
@@ -806,7 +806,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                                     key: "inv",
                                     label: (
                                         <Typography.Text style={{ fontSize: 12, color: "#0958d9" }}>
-                                            🧊 <strong>{inventoryIngredientIds.length}</strong> nguyên liệu trong tủ lạnh — bấm để xem
+                                            {AppCopy.dishSuggester.inventoryCountSummary({ count: inventoryIngredientIds.length })}
                                         </Typography.Text>
                                     ),
                                     children: (
@@ -838,7 +838,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                             <Select
                                 mode="multiple"
                                 allowClear
-                                placeholder="Lọc món chứa nguyên liệu..."
+                                placeholder={AppCopy.dishSuggester.ingredientFilterPlaceholder}
                                 value={fridgeSearchIds}
                                 onChange={_onFridgeSearchChange}
                                 style={{ width: "100%", marginBottom: 10 }}
@@ -849,13 +849,13 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                                 options={ingredientOptions}
                             />
                             {inventorySuggestionsPending
-                                ? <PendingCalculationBox text="Đang tính món phù hợp với tủ lạnh..." />
+                                ? <PendingCalculationBox text={AppCopy.dishSuggester.pendingInventory} />
                                 : filteredInventoryGroups.length === 0
                                 ? <Box style={{ textAlign: "center", padding: "32px 0" }}>
                                     <Typography.Text type="secondary">
                                         {fridgeSearchIds.length > 0
-                                            ? `Không có món nào chứa đủ các nguyên liệu đã chọn`
-                                            : 'Không tìm thấy món phù hợp với nguyên liệu hiện có'}
+                                            ? AppCopy.dishSuggester.noMatchInFilter
+                                            : AppCopy.dishSuggester.noMatchWithInventory}
                                     </Typography.Text>
                                 </Box>
                                 : <DishSuggestionList
@@ -878,7 +878,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                         border: "1px solid #e8e8e8", marginBottom: 16,
                     }}>
                         <Typography.Text style={{ display: "block", marginBottom: 10, fontWeight: 500 }}>
-                            ⏱ Bạn có bao nhiêu thời gian để nấu?
+                            {AppCopy.dishSuggester.durationPrompt}
                         </Typography.Text>
                         <Stack gap={10} align="center" wrap="wrap">
                             <NumberStepper
@@ -895,7 +895,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                                         onClick={() => _onMaxMinutesChange(m)}
                                         style={{ borderRadius: 14 }}
                                     >
-                                        {m} phút
+                                        {AppCopy.dishSuggester.minutesUnit({ minutes: m })}
                                     </Button>
                                 ))}
                             </Stack>
@@ -908,7 +908,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                             onClick={_onNext}
                             style={{ borderRadius: 20, paddingInline: 20 }}
                         >
-                            Tìm món ≤ {maxMinutes} phút
+                            {AppCopy.dishSuggester.findInMinutes({ minutes: maxMinutes })}
                         </Button>
                     </Stack>
                 </>
@@ -917,11 +917,11 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
             {mode === "duration" && step === 1 && (
                 <>
                     {durationPending ? (
-                        <PendingCalculationBox text="Đang lọc món theo thời gian..." />
+                        <PendingCalculationBox text={AppCopy.dishSuggester.pendingDuration} />
                     ) : durationFiltered.length === 0 ? (
                         <Box style={{ textAlign: "center", padding: "32px 0" }}>
                             <Typography.Text type="secondary">
-                                Không có món nào nấu được trong {maxMinutes} phút
+                                {AppCopy.dishSuggester.durationNotFound({ minutes: maxMinutes })}
                             </Typography.Text>
                         </Box>
                     ) : filteredDurationDishes.length === 0 ? (
@@ -929,7 +929,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                             <Select
                                 mode="multiple"
                                 allowClear
-                                placeholder="Lọc món chứa nguyên liệu..."
+                                placeholder={AppCopy.dishSuggester.ingredientFilterPlaceholder}
                                 value={durationSearchIds}
                                 onChange={_onDurationSearchChange}
                                 style={{ width: "100%", marginBottom: 10 }}
@@ -940,7 +940,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                                 options={ingredientOptions}
                             />
                             <Typography.Text type="secondary">
-                                Không có món nào chứa đủ các nguyên liệu đã chọn
+                                {AppCopy.dishSuggester.noMatchInFilter}
                             </Typography.Text>
                         </Box>
                     ) : (
@@ -948,7 +948,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                             <Select
                                 mode="multiple"
                                 allowClear
-                                placeholder="Lọc món chứa nguyên liệu..."
+                                placeholder={AppCopy.dishSuggester.ingredientFilterPlaceholder}
                                 value={durationSearchIds}
                                 onChange={_onDurationSearchChange}
                                 style={{ width: "100%", marginBottom: 10 }}
@@ -959,7 +959,9 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                                 options={ingredientOptions}
                             />
                             <Typography.Text type="secondary" style={{ fontSize: 12, display: "block", marginBottom: 10 }}>
-                                {filteredDurationDishes.length}{durationSearchIds.length > 0 ? ` / ${durationFiltered.length}` : ''} món nấu được trong ≤ {maxMinutes} phút
+                                {durationSearchIds.length > 0
+                                    ? AppCopy.dishSuggester.durationDishesFoundOf({ filtered: filteredDurationDishes.length, total: durationFiltered.length, minutes: maxMinutes })
+                                    : AppCopy.dishSuggester.durationDishesFound({ count: filteredDurationDishes.length, minutes: maxMinutes })}
                             </Typography.Text>
                             <Box style={{ maxHeight: 380, overflowY: "auto" }}>
                                 {filteredDurationDishes.map(dish => {
@@ -993,7 +995,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                                                 <Stack gap={6} align="center">
                                                     {ingredients.length > 0 && (
                                                         <span style={{ fontSize: 11, color: availableCount === ingredients.length ? "#389e0d" : "#888" }}>
-                                                            {availableCount}/{ingredients.length} có sẵn
+                                                            {AppCopy.dishSuggester.availableOf({ available: availableCount, total: ingredients.length })}
                                                         </span>
                                                     )}
                                                     <Tag style={{ marginRight: 0, color: tempo.color, background: tempo.background, borderColor: tempo.border }}>
@@ -1048,7 +1050,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                                                                 )}
                                                                 {missing && needed > 0 && (
                                                                     <span style={{ marginLeft: 4 }}>
-                                                                        (cần {needed}{req.unit ?? ""})
+                                                                        {AppCopy.dishSuggester.needLabel({ amount: needed, unit: req.unit ?? "" })}
                                                                     </span>
                                                                 )}
                                                             </div>
@@ -1063,7 +1065,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                         </>
                     )}
                     <Stack justify="space-between" style={{ marginTop: 12 }}>
-                        <ActionButton shape="circle" height={40} aria-label="Quay lại" onClick={_onBack} icon={<LeftOutlined />} style={backIconButtonStyle} />
+                        <ActionButton shape="circle" height={44} aria-label={AppCopy.dishSuggester.backAriaLabel} onClick={_onBack} icon={<LeftOutlined />} style={backIconButtonStyle} />
                         <ResultsActions dishIds={selectedDishIds} pending={durationPending} />
                     </Stack>
                 </>
@@ -1081,7 +1083,9 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                             onClick={_onNext}
                             style={{ borderRadius: 20, paddingInline: 20 }}
                         >
-                            Gợi ý theo {selectedNutritionGoal?.name ?? "dinh dưỡng"}
+                            {selectedNutritionGoal
+                                ? AppCopy.dishSuggester.suggestByGoal({ name: selectedNutritionGoal.name })
+                                : AppCopy.dishSuggester.suggestByNutrition}
                         </Button>
                     </Stack>
                 </>
@@ -1090,40 +1094,38 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
             {mode === "nutrition" && step === 1 && (
                 <>
                     {nutritionPending
-                        ? <PendingCalculationBox text="Đang tính gợi ý dinh dưỡng..." />
+                        ? <PendingCalculationBox text={AppCopy.dishSuggester.pendingNutrition} />
                         : nutritionSuggestions.length === 0
                         ? <Box style={{ textAlign: "center", padding: "32px 0" }}>
-                            <Typography.Text type="secondary">Chưa có món nào hợp mục tiêu. Bạn có thể bổ sung dinh dưỡng cho món sau.</Typography.Text>
+                            <Typography.Text type="secondary">{AppCopy.dishSuggester.nutritionEmpty}</Typography.Text>
                             <ActionButton
                                 icon={<SettingOutlined />}
                                 onClick={() => { navigate(RootRoutes.AuthorizedRoutes.NutritionGoals()); _onClose(); }}
                                 style={{ marginTop: 8, color: "#7436dc", borderColor: "rgba(116,54,220,0.20)" }}
                             >
-                                Xem mục tiêu
+                                {AppCopy.dishSuggester.viewGoals}
                             </ActionButton>
                         </Box>
                         : renderNutritionSuggestionList()
                     }
                     <Stack justify="space-between" style={{ marginTop: 12 }}>
-                        <ActionButton shape="circle" height={40} aria-label="Quay lại" onClick={_onBack} icon={<LeftOutlined />} style={backIconButtonStyle} />
+                        <ActionButton shape="circle" height={44} aria-label={AppCopy.dishSuggester.backAriaLabel} onClick={_onBack} icon={<LeftOutlined />} style={backIconButtonStyle} />
                         <ResultsActions dishIds={selectedDishIds} pending={nutritionPending} />
                     </Stack>
                 </>
             )}
     </>;
 
-    const shoppingListModal = toggleShoppingListAdd.value ? <Modal
+    const shoppingListModal = toggleShoppingListAdd.value ? <Sheet
             open={toggleShoppingListAdd.value}
-            onCancel={toggleShoppingListAdd.hide}
-            footer={null}
-            destroyOnClose
+            onClose={toggleShoppingListAdd.hide}
             title={
                 <Space>
                     <Image src={ShoppingListIcon} preview={false} width={22} style={{ marginBottom: 3 }} />
-                    Tạo lịch mua sắm
+                    {AppCopy.dishSuggester.shoppingListAddTitle}
                 </Space>
             }
-            style={{ top: 30 }}
+            data-testid="dish-suggester-shopping-list-sheet"
         >
             <DeferredModalContent active={toggleShoppingListAdd.value}>
                 <ShoppingListAddWidget
@@ -1143,60 +1145,51 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                     }}
                 />
             </DeferredModalContent>
-        </Modal> : null;
+        </Sheet> : null;
 
-    const expensePlannerModal = toggleExpensePlanner.value ? <Modal
+    const expensePlannerModal = toggleExpensePlanner.value ? <Sheet
         open={toggleExpensePlanner.value}
-        onCancel={toggleExpensePlanner.hide}
-        footer={null}
-        destroyOnClose
-        width='min(900px, calc(100vw - 24px))'
-        title={<Space><CalculatorOutlined />Tính chi phí</Space>}
-        bodyStyle={{ maxHeight: 'calc(100vh - 128px)', overflowY: 'auto', padding: '18px' }}
+        onClose={toggleExpensePlanner.hide}
+        title={<Space><CalculatorOutlined />{AppCopy.dishSuggester.expensePlannerTitle}</Space>}
+        data-testid="dish-suggester-expense-planner-sheet"
     >
         <DeferredModalContent active={toggleExpensePlanner.value} minHeight={360}>
             <DishExpensePlannerWidget initialDishes={selectedDishesForActions} allowDishSelection />
         </DeferredModalContent>
-    </Modal> : null;
+    </Sheet> : null;
 
-    const nutritionCalculatorModal = toggleNutritionCalculator.value ? <Modal
+    const nutritionCalculatorModal = toggleNutritionCalculator.value ? <Sheet
         open={toggleNutritionCalculator.value}
-        onCancel={toggleNutritionCalculator.hide}
-        footer={null}
-        destroyOnClose
-        width='min(980px, calc(100vw - 24px))'
-        title={<Space><PieChartOutlined />Máy tính dinh dưỡng</Space>}
-        bodyStyle={{ maxHeight: 'calc(100vh - 128px)', overflowY: 'auto', padding: '22px 18px 18px' }}
+        onClose={toggleNutritionCalculator.hide}
+        title={<Space><PieChartOutlined />{AppCopy.dishSuggester.nutritionCalculatorTitle}</Space>}
+        data-testid="dish-suggester-nutrition-calculator-sheet"
     >
         <DeferredModalContent active={toggleNutritionCalculator.value} minHeight={520}>
             <NutritionCalculatorModalContent initialSelection={nutritionInitialSelection} />
         </DeferredModalContent>
-    </Modal> : null;
+    </Sheet> : null;
 
     const suitabilityMembers = selectedHouseholdMemberIds.length > 0
         ? householdMembers.filter(member => selectedHouseholdMemberIds.includes(member.id))
         : householdMembers;
     const suitabilityResults = selectedDishesForActions.map(dish => HouseholdSuitabilityHelper.evaluateDishForMembers(dish, suitabilityMembers, dishes, ingredientsById, nutritionGoals));
-    const suitabilityModal = toggleSuitabilityModal.value ? <Modal
+    const suitabilityModal = toggleSuitabilityModal.value ? <Sheet
         open={toggleSuitabilityModal.value}
-        onCancel={toggleSuitabilityModal.hide}
-        footer={null}
-        destroyOnClose={false}
-        width='min(860px, calc(100vw - 24px))'
-        title={<Space><TeamOutlined />Độ phù hợp với nhà mình</Space>}
-        bodyStyle={{ maxHeight: 'calc(100vh - 128px)', overflowY: 'auto', padding: '18px' }}
+        onClose={toggleSuitabilityModal.hide}
+        title={<Space><TeamOutlined />{AppCopy.dishSuggester.suitabilityTitle}</Space>}
+        data-testid="dish-suggester-suitability-sheet"
     >
         <DeferredModalContent active={toggleSuitabilityModal.value} minHeight={240}>
             {householdMembers.length === 0 ? <Box style={{ textAlign: 'center', padding: '26px 0' }}>
-                <Typography.Text type='secondary' style={{ display: 'block', marginBottom: 10 }}>Chưa có hồ sơ thành viên để đánh giá.</Typography.Text>
-                <Button type='primary' icon={<TeamOutlined />} onClick={() => { navigate(RootRoutes.AuthorizedRoutes.HouseholdProfiles()); toggleSuitabilityModal.hide(); if (!pageInline) _onClose(); }}>
-                    Mở Nhà mình
+                <Typography.Text type='secondary' style={{ display: 'block', marginBottom: 10 }}>{AppCopy.dishSuggester.suitabilityNoMembers}</Typography.Text>
+                <Button type='primary' size='large' icon={<TeamOutlined />} style={{ minHeight: 44 }} onClick={() => { navigate(RootRoutes.AuthorizedRoutes.HouseholdProfiles()); toggleSuitabilityModal.hide(); if (!pageInline) _onClose(); }}>
+                    {AppCopy.dishSuggester.openHouseholdAction}
                 </Button>
             </Box> : selectedDishesForActions.length === 0 ? <Box style={{ textAlign: 'center', padding: '26px 0' }}>
-                <Typography.Text type='secondary'>Chọn ít nhất một món để đánh giá.</Typography.Text>
+                <Typography.Text type='secondary'>{AppCopy.dishSuggester.suitabilityNoSelection}</Typography.Text>
             </Box> : <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 12 }}>
                 <Box style={{ border: '1px solid #e6f4ff', borderRadius: 8, background: '#f8fbff', padding: 10 }}>
-                    <Typography.Text strong style={{ display: 'block', fontSize: 12, marginBottom: 6 }}>Thành viên dùng để đánh giá</Typography.Text>
+                    <Typography.Text strong style={{ display: 'block', fontSize: 12, marginBottom: 6 }}>{AppCopy.dishSuggester.suitabilityMembersTitle}</Typography.Text>
                     <Select
                         mode='multiple'
                         allowClear
@@ -1204,7 +1197,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                         maxTagPlaceholder={renderResponsiveTagPlaceholder}
                         dropdownRender={createSelectedOptionsDropdownRender({ mode: 'multiple', value: selectedHouseholdMemberIds, options: householdMemberOptions })}
                         value={selectedHouseholdMemberIds}
-                        placeholder='Tất cả thành viên'
+                        placeholder={AppCopy.dishSuggester.allMembersPlaceholder}
                         onChange={_onSelectedHouseholdMembersChange}
                         options={householdMemberOptions}
                         style={{ width: '100%' }}
@@ -1215,7 +1208,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                     <Stack justify='space-between' align='flex-start' gap={10} style={{ marginBottom: 10 }}>
                         <div style={{ minWidth: 0 }}>
                             <Typography.Text strong style={{ display: 'block', color: '#111827', fontSize: 16, lineHeight: '21px', overflowWrap: 'anywhere' }}>{result.dish.name}</Typography.Text>
-                            <Typography.Text type='secondary' style={{ display: 'block', fontSize: 12, lineHeight: '17px' }}>{result.positiveCount} điểm hợp · {result.warningCount} lưu ý</Typography.Text>
+                            <Typography.Text type='secondary' style={{ display: 'block', fontSize: 12, lineHeight: '17px' }}>{AppCopy.dishSuggester.suitabilityScoreSummary({ positives: result.positiveCount, warnings: result.warningCount })}</Typography.Text>
                         </div>
                         <Tag color={result.averageScore >= 76 ? 'green' : result.averageScore >= 58 ? 'blue' : 'volcano'} style={{ marginRight: 0 }}>{result.averageScore}%</Tag>
                     </Stack>
@@ -1241,13 +1234,13 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                 </Box>)}
             </div>}
         </DeferredModalContent>
-    </Modal> : null;
+    </Sheet> : null;
 
     if (previewInline || pageInline) {
         return <Box data-testid={pageInline ? "dish-suggester-page-content" : "dish-suggester-inline-preview"} style={{ height: pageInline ? undefined : "100%", minHeight: 0, overflowY: "auto", padding: pageInline ? 0 : 12, background: "#fff" }}>
             <Stack align="center" gap={8} style={{ marginBottom: 12 }}>
                 <Image src={NoodlesIcon} preview={false} width={22} style={{ marginBottom: 3 }} />
-                <Typography.Text strong style={{ fontSize: 16, lineHeight: "21px", color: "#111827" }}>Nấu gì hôm nay?</Typography.Text>
+                <Typography.Text strong style={{ fontSize: 16, lineHeight: "21px", color: "#111827" }}>{AppCopy.dishSuggester.title}</Typography.Text>
             </Stack>
             {content}
             {shoppingListModal}
@@ -1258,6 +1251,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
     }
 
     return <>
+        {/* MOB-03 left-as-is (multi-step) — DishSuggester host modal carries 4 modes × 2 steps and is not a single-step picker; the four nested action hosts (shoppingList/expense/nutrition/suitability) are converted to <Sheet> above. */}
         <Modal
             open={open}
             onCancel={_onClose}
@@ -1266,15 +1260,15 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
             title={
                 <Space>
                     <Image src={NoodlesIcon} preview={false} width={22} style={{ marginBottom: 3 }} />
-                    Nấu gì hôm nay?
+                    {AppCopy.dishSuggester.title}
                 </Space>
             }
             headerActions={<Button
-                aria-label="Mở trang Nấu gì riêng"
+                aria-label={AppCopy.dishSuggester.openPageAriaLabel}
                 data-testid="dish-suggester-open-page-button"
                 icon={<ExportOutlined />}
                 onClick={_onOpenSeparatePage}
-                style={{ width: 34, height: 34, borderRadius: 10, paddingInline: 0, color: "#7436dc", borderColor: "rgba(116,54,220,0.20)" }}
+                style={{ width: 44, height: 44, minWidth: 44, borderRadius: 12, paddingInline: 0, color: "#7436dc", borderColor: "rgba(116,54,220,0.20)" }}
             />}
             style={{ top: 24 }}
         >
