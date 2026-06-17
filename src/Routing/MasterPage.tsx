@@ -1,4 +1,5 @@
 import { SearchOutlined } from "@ant-design/icons";
+import { AppCopy } from "@common/Copy";
 import { Button } from "@components/Button";
 import { Content } from "@components/Layout/Content";
 import { Header } from "@components/Layout/Header";
@@ -135,7 +136,7 @@ export const MasterPage = () => {
                         </span>
                         <Button
                             type="text"
-                            aria-label="Tìm kiếm toàn cục"
+                            aria-label={AppCopy.shell.searchAriaLabel}
                             data-testid="global-search-button"
                             icon={<SearchOutlined style={{ fontSize: 18 }} />}
                             onClick={toggleSearch.show}
@@ -158,7 +159,7 @@ export const MasterPage = () => {
                         color: '#7c6000',
                     }}>
                         <span>📴</span>
-                        <span>Không có mạng — Dữ liệu vẫn được lưu cục bộ</span>
+                        <span>{AppCopy.shell.offlineBanner}</span>
                     </div>
                 )}
                 <Outlet />

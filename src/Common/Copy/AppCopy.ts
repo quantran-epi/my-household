@@ -63,6 +63,11 @@ export const AppCopy = {
         addedToTodayToast: "Đã thêm vào thực đơn",
         progressStep: (args: { current: number; total: number }) => `Bước ${args.current}/${args.total}`,
     },
+    shell: {
+        // MasterPage chrome
+        searchAriaLabel: "Tìm kiếm toàn cục",
+        offlineBanner: "Không có mạng — Dữ liệu vẫn được lưu cục bộ",
+    },
     emptyStates: {
         noDishes: "Chưa có món nào — thêm món đầu tiên nhé",
         noSchedule: "Chưa có bữa nào được lên lịch — bắt đầu nhé",
