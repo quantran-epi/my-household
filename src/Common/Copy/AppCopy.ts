@@ -383,6 +383,7 @@ export const AppCopy = {
     dishSuggester: {
         // Header / hosts
         title: "Hôm nay nấu gì?",
+        pageSubtitle: "Chọn món hợp với nguyên liệu, tủ lạnh, thời gian rảnh và mục tiêu hôm nay.",
         openPageAriaLabel: "Mở trang Nấu gì riêng",
         backAriaLabel: "Quay lại",
         // Mode tabs

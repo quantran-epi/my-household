@@ -1,3 +1,4 @@
+import { AppCopy } from '@common/Copy';
 import { Image } from '@components/Image';
 import { Box } from '@components/Layout/Box';
 import { Stack } from '@components/Layout/Stack';
@@ -43,7 +44,7 @@ const pageCss = `
 `;
 
 export const DishSuggesterPageScreen: React.FC = () => {
-    useScreenTitle({ value: 'Nấu gì?', deps: [] });
+    useScreenTitle({ value: AppCopy.dishSuggester.title, deps: [] });
 
     return <Box className='dish-suggester-page' data-testid='dish-suggester-page'>
         <style>{pageCss}</style>
@@ -54,8 +55,8 @@ export const DishSuggesterPageScreen: React.FC = () => {
                 </span>
                 <div style={{ minWidth: 0 }}>
                     <Typography.Text style={{ display: 'block', color: '#7436dc', fontSize: 12, lineHeight: '16px', fontWeight: 800 }}>My Recipes</Typography.Text>
-                    <Typography.Text strong style={{ display: 'block', color: '#111827', fontSize: 24, lineHeight: '31px' }}>Nấu gì hôm nay?</Typography.Text>
-                    <Typography.Text type='secondary' style={{ display: 'block', fontSize: 12, lineHeight: '18px', marginTop: 3 }}>Chọn món hợp với nguyên liệu, tủ lạnh, thời gian rảnh và mục tiêu hôm nay.</Typography.Text>
+                    <Typography.Text strong style={{ display: 'block', color: '#111827', fontSize: 24, lineHeight: '31px' }}>{AppCopy.dishSuggester.title}</Typography.Text>
+                    <Typography.Text type='secondary' style={{ display: 'block', fontSize: 12, lineHeight: '18px', marginTop: 3 }}>{AppCopy.dishSuggester.pageSubtitle}</Typography.Text>
                 </div>
             </Stack>
         </Box>
