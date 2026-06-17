@@ -160,7 +160,7 @@ Plans:
 
 **Wave 5** *(blocked on 05-05)*
 
-- [ ] 05-06-PLAN.md — DishSuggester/Dishes/Ingredient list cluster: copy + picker Sheet + 44px targets (COPY-03, MOB-03, MOB-01, MOB-02)
+- [x] 05-06-PLAN.md — DishSuggester/Dishes/Ingredient list cluster: copy + picker Sheet + 44px targets (COPY-03, MOB-03, MOB-01, MOB-02)
 
 **Wave 6** *(blocked on all copy-migration plans)*
 
