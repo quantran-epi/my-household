@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 5 Plan 7 complete
-last_updated: "2026-06-17T15:50:12.000Z"
-last_activity: 2026-06-17 -- Phase 05 Plan 07 (AppCopy voice refinement) complete
+status: complete
+stopped_at: Phase 5 verified; deployment requested
+last_updated: "2026-06-17T16:04:03.000Z"
+last_activity: 2026-06-17 -- Phase 05 reviewed and verified; automated gates passed
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 22
   completed_plans: 22
   percent: 100
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-14)
 
 **Core value:** A local Vietnamese household member can open the app and go from "what do we eat?" to a planned meal quickly, in familiar language, without it feeling like an admin tool.
-**Current focus:** Phase 05 — mobile-tuning-copy-rollout
+**Current focus:** Phase 05 deployment — mobile-tuning-copy-rollout complete; Phase 06 remains deferred
 
 ## Current Position
 
-Phase: 05 (mobile-tuning-copy-rollout) — VERIFYING
+Phase: 05 (mobile-tuning-copy-rollout) — COMPLETE
 Plan: 7 of 7
-Status: Ready for verification
-Last activity: 2026-06-17 -- Phase 05 Plan 07 (AppCopy voice refinement) complete
+Status: Verified; deployment requested
+Last activity: 2026-06-17 -- Phase 05 reviewed and verified; automated gates passed
 
 Progress: [▓▓▓▓▓▓▓▓▓▓] 100%
 
@@ -84,6 +84,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 05-05]: scheduledMeal namespace consolidates ScheduledMealList.screen + ScheduledMealAdd.widget copy; all 9 list-cluster Modals (5 list-level + 4 plan-row) -> Sheet; Add footer worst-offender CTA retuned to wizard thumb-zone idiom (size=large minHeight 44 width 100%); diacritic normalization "Huỷ" -> "Hủy" via common.cancel
 - [Phase ?]: [Phase 05-06]: dishSuggester/dishes/ingredient namespaces complete the high-traffic copy migration; DishesList delete confirm and IngredientList direct list hosts moved to Sheet; RootRouter basename now follows PUBLIC_URL so /my-recipes route tests and GitHub Pages align
 - [Phase ?]: [Phase 05-07]: AppCopy voice pass changed values only (475 key count unchanged), replaced displayed Admin/Token/Checklist/tag/App leftovers with Vietnamese phrasing, and left native-speaker approval for phase-level UAT
+- [Phase ?]: [Phase 05 Verification]: Review found and fixed the missed DishSuggester route-wrapper copy; final AppCopy key count is 476, automated gates passed, and native-speaker copy review remains follow-up UAT
 
 ### Pending Todos
 
@@ -110,6 +111,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-17T15:50:12.000Z
-Stopped at: Phase 5 Plan 7 complete
+Last session: 2026-06-17T16:04:03.000Z
+Stopped at: Phase 5 verified; deployment requested
 Resume file: .planning/phases/05-mobile-tuning-copy-rollout/05-VERIFICATION.md

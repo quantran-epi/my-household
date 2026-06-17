@@ -12,7 +12,7 @@ Requirements for this UI/UX refactor milestone. Each maps to roadmap phases. Thi
 - [x] **COPY-01**: A single typed copy module (`AppCopy`) is the source of truth for user-facing Vietnamese strings, with a derived key union for build-time safety
 - [x] **COPY-02**: A glossary enforces one Vietnamese term per concept (no synonym drift across screens)
 - [x] **COPY-03**: Inline user-facing strings across modules and navigation are migrated to reference `AppCopy`
-- [ ] **COPY-04**: All user-facing labels and descriptions read natural to a local Vietnamese user — no English or technical-jargon leftovers
+- [x] **COPY-04**: All user-facing labels and descriptions read natural to a local Vietnamese user — no English or technical-jargon leftovers (automated clean in Phase 5; native-speaker UAT follow-up recorded)
 - [x] **COPY-05**: Journey screens show inviting, friendly empty-states instead of blank or technical messages
 
 ### Guided Wizard (Meal Planning)
@@ -37,7 +37,7 @@ Requirements for this UI/UX refactor milestone. Each maps to roadmap phases. Thi
 - [x] **MOB-01**: Journey screens use a phone-first layout with primary CTAs in the thumb zone
 - [x] **MOB-02**: Interactive controls in the journey meet ~44px touch-target sizing
 - [x] **MOB-03**: Pickers and confirmations use a bottom-sheet pattern (`@components/Sheet` over antd `Drawer placement="bottom"`)
-- [ ] **MOB-04**: Desktop layout remains intact — mobile changes do not regress the desktop experience
+- [x] **MOB-04**: Retired as written for v1 — phone-only user; desktop no longer gated per Phase 5 CONTEXT D-07
 
 ### Foundation & Safety
 
@@ -96,9 +96,9 @@ Each v1 requirement maps to exactly one phase. v2 requirements are carried in Ph
 | MOB-01 | Phase 5 | Complete |
 | MOB-02 | Phase 5 | Complete |
 | MOB-03 | Phase 5 | Complete |
-| MOB-04 | Phase 5 | Pending |
+| MOB-04 | Phase 5 | Retired (D-07) |
 | COPY-03 | Phase 5 | Complete |
-| COPY-04 | Phase 5 | Pending |
+| COPY-04 | Phase 5 | Complete (automated; human UAT follow-up) |
 | COPY-05 | Phase 5 | Complete |
 | WIZ2-01 | Phase 6 (v2) | Deferred |
 | WIZ2-02 | Phase 6 (v2) | Deferred |

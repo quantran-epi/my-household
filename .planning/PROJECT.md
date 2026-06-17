@@ -31,6 +31,8 @@ A local Vietnamese household member can open the app and go from "what do we eat
 - ✓ Vietnamese locale (Ant Design `viVN`) — existing (`App.tsx`)
 - ✓ Typed copy foundation — Phase 1 (`@common/Copy`, `CopyKey`, glossary)
 - ✓ Resume-safe wizard state foundation — Phase 3 (`wizard` RTK slice under `personal`, `selectWizard*` selectors)
+- ✓ Guided meal-planning journey — Phase 4 (Home hero, persisted wizard UI, add-to-meal result flow, route reachability)
+- ✓ Phone-first high-traffic copy rollout — Phase 5 (journey/shell/shopping/scheduled-meal/dish-suggester/dishes/ingredient surfaces migrated to `AppCopy` and Sheet patterns; native-speaker copy UAT remains follow-up)
 
 ### Active
 
@@ -54,6 +56,7 @@ A local Vietnamese household member can open the app and go from "what do we eat
 
 - Phase 1 complete (2026-06-14): typed `AppCopy` copy foundation under `src/Common/Copy/` (`@common/Copy`) — source of truth, build-gated `CopyKey` union, review-only glossary. App-wide copy *migration* is Phase 5.
 - Phase 3 complete (2026-06-16): wizard progress/answers persist under the existing `personal` redux-persist root through a `wizard` RTK slice, with `selectWizard*` as the defensive read path and DishScorer characterization tests pinning result behavior before UI wiring.
+- Phase 5 complete (2026-06-17): phone-first journey polish and high-traffic Vietnamese copy migration are automated-verified; `AppCopy` final key count is 476 after a review-time wrapper subtitle fix; native Vietnamese household-user sign-off remains the main follow-up risk.
 - Brownfield project. Existing codebase mapped under `.planning/codebase/` (ARCHITECTURE, STACK, STRUCTURE, CONVENTIONS, INTEGRATIONS, TESTING, CONCERNS).
 - Stack: React 18, Redux Toolkit, React Router 6, Ant Design 5, TypeScript, CRACO build, Workbox PWA. UI is built on local wrappers in `src/Components` over Ant Design.
 - Feature modules (vertical slices) live in `src/Modules`: Dishes, Ingredient, ShoppingList, ScheduledMeal, DishSuggester, Home.
@@ -80,6 +83,7 @@ A local Vietnamese household member can open the app and go from "what do we eat
 | App-wide Vietnamese copy pass this milestone (not just meal planning) | Friendly, familiar language is a cross-cutting need | — Pending |
 | Typed `AppCopy` module as single source of truth for copy (build-gated keys, named-arg interpolation, review-only glossary) | Avoids hand-editing ~408 inline strings twice; makes a bad key a build error | ✓ Built in Phase 1 |
 | Keep wizard state under the existing `personal` persisted root and expose it through selectors | Preserves local user data and avoids a new persist root while making Phase 4 UI reload-safe | ✓ Built in Phase 3 |
+| Treat Phase 5 native-speaker copy review as follow-up UAT, not a deploy blocker | The user explicitly requested deployment in this run; automated copy/build/e2e gates passed, but tone still benefits from household-user review | ✓ Recorded in Phase 5 verification |
 
 | Adopt a typed `AppCopy` source of truth before rewording any screens | Avoid hand-editing ~408 inline strings twice; make a bad key a build error | Validated in Phase 1: Copy Infrastructure |
 
@@ -101,4 +105,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-16 after Phase 3: Wizard State Slice*
+*Last updated: 2026-06-17 after Phase 5: Mobile Tuning & Copy Rollout*

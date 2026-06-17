@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Shell Safety & Extraction** - Error boundary, decompose `MasterPage.tsx`, route reachability inventory, `Sheet` wrapper (completed 2026-06-15)
 - [x] **Phase 3: Wizard State Slice** - Resume-safe RTK slice in the `personal` root, selectors, scorer characterization tests (completed 2026-06-16)
 - [x] **Phase 4: Wizard UI & Hero Entry** - Guided journey from Home to a scheduled meal, nav reframe with no lost routes (completed 2026-06-16)
-- [ ] **Phase 5: Mobile Tuning & Copy Rollout** - Phone-first journey + journey/high-traffic Vietnamese copy migration (phone-only; desktop no longer gated)
+- [x] **Phase 5: Mobile Tuning & Copy Rollout** - Phone-first journey + journey/high-traffic Vietnamese copy migration (phone-only; desktop no longer gated) (completed 2026-06-17)
 - [ ] **Phase 6: Differentiator Enhancements** - Post-validation v2 steps and conveniences (deferred)
 
 ## Phase Details
@@ -197,5 +197,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Shell Safety & Extraction | 5/5 | Complete   | 2026-06-15 |
 | 3. Wizard State Slice | 3/3 | Complete    | 2026-06-16 |
 | 4. Wizard UI & Hero Entry | 6/6 | Complete   | 2026-06-16 |
-| 5. Mobile Tuning & Copy Rollout | 5/7 | In Progress|  |
+| 5. Mobile Tuning & Copy Rollout | 7/7 | Complete | 2026-06-17 |
 | 6. Differentiator Enhancements | 0/TBD | Deferred | - |
