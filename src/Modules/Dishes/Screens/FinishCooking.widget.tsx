@@ -135,6 +135,8 @@ export const FinishCookingWidget: React.FunctionComponent<FinishCookingWidgetPro
         onDone();
     };
 
+    // MOB-03: imperative confirm left as-is (multi-step cooking flow, double-gated by the Popconfirm
+    // below and nested inside the finish step), see 05-02 SUMMARY.
     const _onUpdateDuration = () => {
         if (!dish || !cookTime.phaseMinutes) return;
         const nextDuration = DishDurationHelper.normalize(cookTime.phaseMinutes as Partial<DishDuration>);

@@ -4,7 +4,7 @@ import { Box } from "@components/Layout/Box";
 import { Option, Select } from "@components/Form/Select";
 import { NumberStepper } from "@components/Form/NumberStepper";
 import { Stack } from "@components/Layout/Stack";
-import { Popconfirm } from "@components/Popconfirm";
+import { Sheet } from "@components/Sheet";
 import { Typography } from "@components/Typography";
 import { useMessage } from "@components/Message";
 import { InventoryHelper } from "@common/Helpers/InventoryHelper";
@@ -61,6 +61,8 @@ export const IngredientInventoryWidget: React.FC<IngredientInventoryWidgetProps>
         }));
     });
     const [discardHistory, setDiscardHistory] = useState<InventoryBatchDiscard[]>(() => inventory?.discardedBatches ?? []);
+    // Discard-expired-batch confirm, lifted from an inline Popconfirm to a declarative Sheet (D-06 case c).
+    const [discardBatchRow, setDiscardBatchRow] = useState<BatchRow | null>(null);
 
     if (item.alwaysAvailable) {
         return <Alert
@@ -193,17 +195,9 @@ export const IngredientInventoryWidget: React.FC<IngredientInventoryWidgetProps>
                         </Typography.Text>
                         <Stack gap={4} align="center">
                             {_isExpiredBatch(batch) && (
-                                <Popconfirm
-                                    title="Bỏ lô hết hạn?"
-                                    description="Lô này sẽ được xóa khỏi tồn kho và ghi vào lịch sử bỏ lô sau khi lưu."
-                                    okText="Bỏ lô"
-                                    okButtonProps={{ danger: true }}
-                                    onConfirm={() => _discardExpiredBatch(batch)}
-                                >
-                                    <ActionButton tone="warning">
-                                        Bỏ lô hết hạn
-                                    </ActionButton>
-                                </Popconfirm>
+                                <ActionButton tone="warning" onClick={() => setDiscardBatchRow(batch)}>
+                                    Bỏ lô hết hạn
+                                </ActionButton>
                             )}
                             {batches.length > 1 && (
                                 <ActionButton
@@ -364,6 +358,32 @@ export const IngredientInventoryWidget: React.FC<IngredientInventoryWidgetProps>
             </Stack>
 
             <Button type="primary" fullwidth onClick={_onSave}>Lưu</Button>
+
+            <Sheet
+                open={discardBatchRow !== null}
+                onClose={() => setDiscardBatchRow(null)}
+                title="Bỏ lô hết hạn?"
+                data-testid="ingredient-inventory-discard-batch-sheet"
+            >
+                <Stack direction="column" gap={16} fullwidth align="stretch">
+                    <Typography.Text type="secondary">
+                        Lô này sẽ được xóa khỏi tồn kho và ghi vào lịch sử bỏ lô sau khi lưu.
+                    </Typography.Text>
+                    <Stack gap={8} justify="flex-end" fullwidth>
+                        <Button onClick={() => setDiscardBatchRow(null)}>Hủy</Button>
+                        <Button
+                            type="primary"
+                            danger
+                            onClick={() => {
+                                if (discardBatchRow) _discardExpiredBatch(discardBatchRow);
+                                setDiscardBatchRow(null);
+                            }}
+                        >
+                            Bỏ lô
+                        </Button>
+                    </Stack>
+                </Stack>
+            </Sheet>
         </div>
     );
 };

@@ -1,12 +1,13 @@
 import React from "react";
 import { DishDurationHelper } from "@common/Helpers/DishDurationHelper";
 import { Button } from "@components/Button";
-import { Modal } from "@components/Modal";
+import { Sheet } from "@components/Sheet";
 import { Typography } from "@components/Typography";
 import { useMessage } from "@components/Message";
 import { Dishes } from "@store/Models/Dishes";
 import { Ingredient } from "@store/Models/Ingredient";
 import { Box } from "@components/Layout/Box";
+import { Stack } from "@components/Layout/Stack";
 import { Space } from "@components/Layout/Space";
 import { useSelector } from "react-redux";
 import { selectDishesById } from "@store/Selectors";
@@ -111,30 +112,28 @@ export const DishesExportWidget: React.FC<DishesExportWidgetProps> = ({ dish, al
     };
 
     return (
-        <>
-            <Modal
-                open={open}
-                onCancel={onClose}
-                title={
-                    <Space>
-                        <Image src={NoodlesIcon} preview={false} width={20} style={{ marginBottom: 3 }} />
-                        Xuất công thức — {dish.name}
-                    </Space>
-                }
-                footer={
-                    <Space>
-                        <Button onClick={_onCopy}>Sao chép</Button>
-                        <Button type="primary" onClick={_onDownload}>Tải file .txt</Button>
-                    </Space>
-                }
-                destroyOnClose
-            >
+        <Sheet
+            open={open}
+            onClose={onClose}
+            title={
+                <Space>
+                    <Image src={NoodlesIcon} preview={false} width={20} style={{ marginBottom: 3 }} />
+                    Xuất công thức — {dish.name}
+                </Space>
+            }
+            data-testid="dishes-export-sheet"
+        >
+            <Stack direction="column" gap={16} fullwidth align="stretch">
                 <Box style={{ background: "#f5f5f5", borderRadius: 8, padding: 16, maxHeight: 400, overflowY: "auto" }}>
                     <Typography.Text>
                         <pre style={{ margin: 0, whiteSpace: "pre-wrap", fontSize: 14, fontFamily: "inherit" }}>{text}</pre>
                     </Typography.Text>
                 </Box>
-            </Modal>
-        </>
+                <Stack gap={8} justify="flex-end" fullwidth>
+                    <Button onClick={_onCopy}>Sao chép</Button>
+                    <Button type="primary" onClick={_onDownload}>Tải file .txt</Button>
+                </Stack>
+            </Stack>
+        </Sheet>
     );
 };

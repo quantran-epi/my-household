@@ -4,6 +4,7 @@ import { Divider } from "@components/Layout/Divider"
 import { Space } from "@components/Layout/Space"
 import { Stack } from "@components/Layout/Stack"
 import { DeferredModalContent, Modal } from "@components/Modal"
+import { Sheet } from "@components/Sheet"
 import { useToggle } from "@hooks"
 import { Dishes } from "@store/Models/Dishes"
 import { test } from "@store/Reducers/DishesReducer"
@@ -113,17 +114,18 @@ export const DishesDetailWidget: React.FunctionComponent<DishDetailWidgetProps> 
         </Space></Divider>
         <DishStepListWidget currentDist={props.dish} />
 
-        {currentIncludeDish && dish && <Modal style={{ top: 50 }} open={toggleDishesDetail.value} title={
+        {currentIncludeDish && dish && <Sheet open={toggleDishesDetail.value} title={
             <Space>
                 <Image src={NoodlesIcon} preview={false} width={24} style={{ marginBottom: 3 }} />
                 {dish.name}
             </Space>
-        } destroyOnClose={true} onCancel={toggleDishesDetail.hide} footer={null} zIndex={DISH_DETAIL_NESTED_MODAL_Z_INDEX}>
+        } onClose={toggleDishesDetail.hide} data-testid="dish-detail-include-sheet">
             <DeferredModalContent active={toggleDishesDetail.value} minHeight={220}>
                 <DishesDetailWidget dish={dish} />
             </DeferredModalContent>
-        </Modal>}
+        </Sheet>}
 
+        {/* MOB-03: cooking-session host left as-is (multi-step cooking flow, no single declarative Sheet equivalent), see 05-02 SUMMARY */}
         <Modal
             open={toggleCooking.value}
             title={<Space><FireOutlined style={{ color: "#fa8c16" }} />{props.dish.name} — Bắt đầu nấu</Space>}
@@ -137,13 +139,11 @@ export const DishesDetailWidget: React.FunctionComponent<DishDetailWidgetProps> 
             </DeferredModalContent>
         </Modal>
 
-        <Modal
+        <Sheet
             open={toggleShoppingList.value}
             title={<Space><ShoppingCartOutlined />{props.dish.name} — Tạo lịch mua sắm</Space>}
-            destroyOnClose
-            onCancel={toggleShoppingList.hide}
-            footer={null}
-            zIndex={DISH_DETAIL_NESTED_MODAL_Z_INDEX}
+            onClose={toggleShoppingList.hide}
+            data-testid="dish-detail-shopping-list-sheet"
         >
             <DeferredModalContent active={toggleShoppingList.value}>
                 <ShoppingListAddWidget
@@ -153,6 +153,6 @@ export const DishesDetailWidget: React.FunctionComponent<DishDetailWidgetProps> 
                     onCreated={(shoppingList) => navigate(RootRoutes.AuthorizedRoutes.ShoppingListRoutes.Detail(shoppingList.id))}
                 />
             </DeferredModalContent>
-        </Modal>
+        </Sheet>
     </React.Fragment>
 }
