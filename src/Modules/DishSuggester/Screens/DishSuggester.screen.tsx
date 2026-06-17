@@ -4,6 +4,7 @@ import { DishNutritionHelper, DishNutritionSummary } from "@common/Helpers/DishN
 import { DishServingHelper } from "@common/Helpers/DishServingHelper";
 import { HouseholdSuitabilityHelper } from "@common/Helpers/HouseholdSuitabilityHelper";
 import { NutritionGoalHelper, NutritionGoalMatch } from "@common/Helpers/NutritionGoalHelper";
+import { AppCopy } from "@common/Copy";
 import { ActionButton, Button } from "@components/Button";
 import { Dropdown } from "@components/Dropdown";
 import { createSelectedOptionsDropdownRender, renderResponsiveTagPlaceholder } from "@components/Form/Select";
@@ -13,6 +14,7 @@ import { Space } from "@components/Layout/Space";
 import { Stack } from "@components/Layout/Stack";
 import { useMessage } from "@components/Message";
 import { DeferredModalContent, Modal } from "@components/Modal";
+import { Sheet } from "@components/Sheet";
 import { Tag } from "@components/Tag";
 import { Typography } from "@components/Typography";
 import { useScheduledCalculation, useToggle } from "@hooks";
@@ -105,7 +107,7 @@ const createEmptyNutritionDishCalculation = (): NutritionDishCalculation => ({
 });
 
 const getNutritionReason = (summary: DishNutritionSummary, match: NutritionGoalMatch): string => {
-    return `${match.matchedCriteriaCount}/${match.totalCriteriaCount} điều hợp · ${DishNutritionHelper.formatCalories(summary.perServing.calories)}`;
+    return `${AppCopy.dishSuggester.nutritionMatchPhrase({ matched: match.matchedCriteriaCount, total: match.totalCriteriaCount })} · ${DishNutritionHelper.formatCalories(summary.perServing.calories)}`;
 };
 
 const PendingCalculationBox: React.FunctionComponent<{ text: string }> = ({ text }) => {
@@ -425,14 +427,17 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
         });
         // Unlock audio within this tap so the first phase's expiry chime can play under autoplay policy.
         if (anyTimerPhases) cookingTimer.unlockAudio();
-        message.success(targetDishes.length === 1 ? `Đã bắt đầu nấu ${targetDishes[0].name}` : `Đã bắt đầu nấu ${targetDishes.length} món`);
+        message.success(targetDishes.length === 1
+            ? AppCopy.dishSuggester.startedCookingOne({ name: targetDishes[0].name })
+            : AppCopy.dishSuggester.startedCookingMany({ count: targetDishes.length })
+        );
         if (!pageInline) _onClose();
     };
 
     const backIconButtonStyle: React.CSSProperties = {
-        width: 40,
-        height: 40,
-        minWidth: 40,
+        width: 44,
+        height: 44,
+        minWidth: 44,
         paddingInline: 0,
         borderRadius: 999,
         color: "#595959",
@@ -464,13 +469,15 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
             <Typography.Text data-testid="dish-suggester-selected-count" style={selectedCountStyle(dishIds.length)}>({dishIds.length})</Typography.Text>
             <Button
                 type="primary"
+                size="large"
                 disabled={disabled}
-                aria-label={`Bắt đầu nấu ${dishIds.length} món`}
+                aria-label={AppCopy.dishSuggester.cookCountAriaLabel({ count: dishIds.length })}
                 data-testid="dish-suggester-start-cooking-button"
                 icon={<FireOutlined />}
                 onClick={() => _onStartCookingSession(dishIds)}
+                style={{ minHeight: 44 }}
             >
-                Nấu
+                {AppCopy.dishSuggester.cookAction}
             </Button>
             <Dropdown
                 placement="topRight"
@@ -484,17 +491,17 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                         if (key === "nutrition") _onOpenNutritionCalculator(dishIds);
                     },
                     items: [
-                        { key: "shopping", label: "Tạo lịch mua", icon: <ShoppingCartOutlined /> },
-                        { key: "expense", label: "Kế hoạch chi phí", icon: <CalculatorOutlined /> },
-                        { key: "suitability", label: "Độ hợp nhà mình", icon: <TeamOutlined /> },
-                        { key: "nutrition", label: "Tính dinh dưỡng", icon: <PieChartOutlined /> },
+                        { key: "shopping", label: AppCopy.dishSuggester.actionShopping, icon: <ShoppingCartOutlined /> },
+                        { key: "expense", label: AppCopy.dishSuggester.actionExpense, icon: <CalculatorOutlined /> },
+                        { key: "suitability", label: AppCopy.dishSuggester.actionSuitability, icon: <TeamOutlined /> },
+                        { key: "nutrition", label: AppCopy.dishSuggester.actionNutrition, icon: <PieChartOutlined /> },
                     ],
                 }}
             >
                 <Button
                     type="text"
                     disabled={disabled}
-                    aria-label={`Thao tác khác cho ${dishIds.length} món`}
+                    aria-label={AppCopy.dishSuggester.moreActionsAriaLabel({ count: dishIds.length })}
                     data-testid="dish-suggester-more-actions-button"
                     icon={<MoreOutlined />}
                 />
@@ -512,12 +519,12 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                 }}>
                     {missingIngredientIds.length === 0 ? (
                         <Typography.Text style={{ fontSize: 12, color: "#389e0d" }}>
-                            🎉 Đủ nguyên liệu cho tất cả món đã chọn!
+                            {AppCopy.dishSuggester.enoughForAll}
                         </Typography.Text>
                     ) : (
                         <>
                             <Typography.Text style={{ fontSize: 12, color: "#d46b08", display: "block", marginBottom: 6 }}>
-                                Cần mua thêm <strong>{missingIngredientIds.length}</strong> nguyên liệu:
+                                {AppCopy.dishSuggester.needMoreIngredientsPrefix} <strong>{missingIngredientIds.length}</strong> {AppCopy.dishSuggester.needMoreIngredientsSuffix}
                             </Typography.Text>
                             <Stack wrap="wrap" gap={5}>
                                 {missingIngredientIds.slice(0, 8).map(id => (
@@ -530,7 +537,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                                 ))}
                                 {missingIngredientIds.length > 8 && (
                                     <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-                                        +{missingIngredientIds.length - 8} khác
+                                        {AppCopy.dishSuggester.moreSuffix({ count: missingIngredientIds.length - 8 })}
                                     </Typography.Text>
                                 )}
                             </Stack>
@@ -540,7 +547,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
             )}
             <div style={footerRowStyle}>
                 {mode !== "inventory" && (
-                    <ActionButton shape="circle" height={40} aria-label="Quay lại" onClick={_onBack} icon={<LeftOutlined />} style={backIconButtonStyle} />
+                    <ActionButton shape="circle" height={44} aria-label={AppCopy.dishSuggester.backAriaLabel} onClick={_onBack} icon={<LeftOutlined />} style={backIconButtonStyle} />
                 )}
                 <ResultsActions dishIds={dishIds} pending={pending} />
             </div>
@@ -555,10 +562,10 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
             marginBottom: 16,
         }}>
             {([
-                { key: "ingredients" as Mode, label: "Nguyên liệu", icon: <BulbOutlined /> },
-                { key: "inventory" as Mode, label: "Tủ lạnh", icon: <ThunderboltOutlined /> },
-                { key: "duration" as Mode, label: "Thời gian", icon: <ClockCircleOutlined /> },
-                { key: "nutrition" as Mode, label: "Dinh dưỡng", icon: <Image src={DietIcon} preview={false} width={18} alt="" /> },
+                { key: "ingredients" as Mode, label: AppCopy.dishSuggester.modeIngredients, icon: <BulbOutlined /> },
+                { key: "inventory" as Mode, label: AppCopy.dishSuggester.modeInventory, icon: <ThunderboltOutlined /> },
+                { key: "duration" as Mode, label: AppCopy.dishSuggester.modeDuration, icon: <ClockCircleOutlined /> },
+                { key: "nutrition" as Mode, label: AppCopy.dishSuggester.modeNutrition, icon: <Image src={DietIcon} preview={false} width={18} alt="" /> },
             ]).map(tab => (
                 <button
                     key={tab.key}
@@ -600,18 +607,18 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
     const NutritionGoalPicker = () => (
         <Box style={{ padding: 12, borderRadius: 8, background: "#fbf9ff", border: "1px solid #ece5ff", marginBottom: 14 }}>
             <Stack justify="space-between" align="center" gap={8} style={{ marginBottom: 9 }}>
-                <Typography.Text strong>Chọn mục tiêu dinh dưỡng</Typography.Text>
+                <Typography.Text strong>{AppCopy.dishSuggester.nutritionGoalTitle}</Typography.Text>
                 <ActionButton
                     icon={<SettingOutlined />}
                     onClick={() => { navigate(RootRoutes.AuthorizedRoutes.NutritionGoals()); _onClose(); }}
                     style={{ color: "#7436dc", borderColor: "rgba(116,54,220,0.20)" }}
                 >
-                    Quản lý
+                    {AppCopy.dishSuggester.nutritionGoalManage}
                 </ActionButton>
             </Stack>
             {nutritionGoals.length === 0 ? (
                 <Box style={{ border: "1px dashed #d9d9d9", borderRadius: 8, padding: 14, textAlign: "center", background: "#fff" }}>
-                    <Typography.Text type="secondary">Chưa có mục tiêu dinh dưỡng. Hãy tạo mục tiêu trước.</Typography.Text>
+                    <Typography.Text type="secondary">{AppCopy.dishSuggester.nutritionGoalEmpty}</Typography.Text>
                 </Box>
             ) : <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(138px, 1fr))", gap: 8 }}>
                 {nutritionGoals.map(goal => {
@@ -635,7 +642,7 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                             <span style={{ width: 9, height: 9, borderRadius: 99, background: tone, marginTop: 5, flexShrink: 0 }} />
                             <div style={{ minWidth: 0 }}>
                                 <Typography.Text strong style={{ display: "block", color: active ? tone : "#111827", fontSize: 13, lineHeight: "17px", overflowWrap: "anywhere" }}>{goal.name}</Typography.Text>
-                                <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "15px" }}>{goal.criteria.length} điều cần theo</Typography.Text>
+                                <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "15px" }}>{AppCopy.dishSuggester.nutritionGoalCriteriaCount({ count: goal.criteria.length })}</Typography.Text>
                             </div>
                         </Stack>
                     </button>;
@@ -652,14 +659,14 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
             <Stack align="center" gap={8} style={{ marginBottom: 10 }}>
                 <BarChartOutlined style={{ color: tone }} />
                 <Typography.Text type="secondary" style={{ fontSize: 12, flex: 1 }}>
-                    Gợi ý theo mục tiêu <strong style={{ color: tone }}>{goal.name}</strong>
+                    {AppCopy.dishSuggester.nutritionGoalReasonPrefix} <strong style={{ color: tone }}>{goal.name}</strong>
                 </Typography.Text>
             </Stack>
             <Select
                 value={goal.id}
                 onChange={_onNutritionGoalChange}
                 style={{ width: "100%", marginBottom: 10 }}
-                options={nutritionGoals.map(item => ({ value: item.id, label: `${item.name} - ${item.criteria.length} điều` }))}
+                options={nutritionGoals.map(item => ({ value: item.id, label: AppCopy.dishSuggester.nutritionGoalLabel({ name: item.name, count: item.criteria.length }) }))}
             />
             <Box style={{ maxHeight: 430, overflowY: "auto", paddingRight: 2 }}>
                 {nutritionSuggestions.map(item => {
@@ -701,14 +708,14 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                                 <Typography.Text type="secondary" style={{ display: "block", fontSize: 11, lineHeight: "15px", marginTop: 2 }}>{item.reason}</Typography.Text>
                                 {expanded && <>
                                     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(72px, 1fr))", gap: 6, marginTop: 6 }}>
-                                        <NutritionMetric label="kcal" value={DishNutritionHelper.formatCalories(item.nutrition.perServing.calories)} tone="#7436dc" />
-                                        <NutritionMetric label="đạm" value={DishNutritionHelper.formatGram(item.nutrition.perServing.protein)} tone="#1677ff" />
-                                        <NutritionMetric label="béo" value={DishNutritionHelper.formatGram(item.nutrition.perServing.fat)} tone="#d46b08" />
-                                        <NutritionMetric label="xơ" value={DishNutritionHelper.formatGram(item.nutrition.perServing.fiber)} tone="#389e0d" />
+                                        <NutritionMetric label={AppCopy.dishSuggester.nutritionCalories} value={DishNutritionHelper.formatCalories(item.nutrition.perServing.calories)} tone="#7436dc" />
+                                        <NutritionMetric label={AppCopy.dishSuggester.nutritionProtein} value={DishNutritionHelper.formatGram(item.nutrition.perServing.protein)} tone="#1677ff" />
+                                        <NutritionMetric label={AppCopy.dishSuggester.nutritionFat} value={DishNutritionHelper.formatGram(item.nutrition.perServing.fat)} tone="#d46b08" />
+                                        <NutritionMetric label={AppCopy.dishSuggester.nutritionFiber} value={DishNutritionHelper.formatGram(item.nutrition.perServing.fiber)} tone="#389e0d" />
                                     </div>
                                     {(item.nutrition.missingNutritionIngredientIds.length > 0 || item.nutrition.missingConversionIngredientIds.length > 0) && (
                                         <Typography.Text type="secondary" style={{ display: "block", fontSize: 10, lineHeight: "14px", marginTop: 8 }}>
-                                            Cần bổ sung thông tin cho {item.nutrition.missingNutritionIngredientIds.length + item.nutrition.missingConversionIngredientIds.length} nguyên liệu.
+                                            {AppCopy.dishSuggester.nutritionMissingInfo({ count: item.nutrition.missingNutritionIngredientIds.length + item.nutrition.missingConversionIngredientIds.length })}
                                         </Typography.Text>
                                     )}
                                 </>}
@@ -723,7 +730,9 @@ export const DishSuggesterScreen: React.FC<DishSuggesterScreenProps> = ({ open, 
                                         _toggleNutritionDetails(item.dish.id, event);
                                     }
                                 }}
-                                aria-label={`${expanded ? "Ẩn" : "Xem"} dinh dưỡng của ${item.dish.name}`}
+                                aria-label={expanded
+                                    ? AppCopy.dishSuggester.collapseNutritionAriaLabel({ name: item.dish.name })
+                                    : AppCopy.dishSuggester.expandNutritionAriaLabel({ name: item.dish.name })}
                                 style={{ padding: "4px 6px", cursor: "pointer", color: "#aaa", flexShrink: 0, marginTop: 8 }}
                             >
                                 {expanded ? <MinusOutlined /> : <PlusOutlined />}
