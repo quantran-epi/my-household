@@ -48,8 +48,20 @@ const CrashTestScreen = () => {
     throw new Error('crash-test');
 };
 
+const getRouterBasename = (): string => {
+    const publicUrl = process.env.PUBLIC_URL;
+    if (!publicUrl) return "/";
+
+    try {
+        const pathname = new URL(publicUrl, window.location.origin).pathname.replace(/\/$/, "");
+        return pathname || "/";
+    } catch {
+        return publicUrl.replace(/\/$/, "") || "/";
+    }
+};
+
 export const RootRouter = () => {
-    return <BrowserRouter basename="/my-household">
+    return <BrowserRouter basename={getRouterBasename()}>
         <Routes>
             <Route path={RootRoutes.AuthorizedRoutes.UserGuideWelcome()} element={<React.Suspense fallback={<RouteLoadingFallback />}><UserGuideWelcomeScreen /></React.Suspense>} />
             <Route path={RootRoutes.AuthorizedRoutes.UserGuideTour()} element={<React.Suspense fallback={<RouteLoadingFallback />}><UserGuideTourScreen /></React.Suspense>} />

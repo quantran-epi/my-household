@@ -19,7 +19,8 @@ jest.mock('nanoid', () => ({
 }));
 
 test('renders the dashboard at the configured basename', async () => {
-  window.history.pushState({}, '', '/my-household/');
+  const basename = (process.env.PUBLIC_URL || '').replace(/\/$/, '') || '/';
+  window.history.pushState({}, '', basename);
   window.HTMLElement.prototype.scrollTo = jest.fn();
   const App = require('./App').default;
 
