@@ -14,6 +14,15 @@ const normalizeExtras = (extras?: WizardAnswers['extras'] | null): Record<string
     return extras;
 };
 
+const cloneWizardAnswers = (answers?: WizardAnswers): WizardAnswers => ({
+    ...(answers ?? {}),
+    selectedIngredientIds: answers?.selectedIngredientIds ? [...answers.selectedIngredientIds] : undefined,
+    memberIds: answers?.memberIds ? [...answers.memberIds] : undefined,
+    preferredTags: answers?.preferredTags ? [...answers.preferredTags] : undefined,
+    avoidedTags: answers?.avoidedTags ? [...answers.avoidedTags] : undefined,
+    extras: answers?.extras ? { ...answers.extras } : undefined,
+});
+
 export const wizardSlice = createSlice({
     name: 'wizard',
     initialState,
@@ -41,6 +50,9 @@ export const wizardSlice = createSlice({
         advanceWizardStep: (state, action: PayloadAction<WizardStepKey>) => {
             state.currentStep = action.payload;
             state.status = 'in_progress';
+            if (action.payload === 'result') {
+                state.lastCompletedAnswers = cloneWizardAnswers(state.answers);
+            }
         },
         goBackWizardStep: (state, action: PayloadAction<WizardStepKey>) => {
             state.currentStep = action.payload;
@@ -50,11 +62,20 @@ export const wizardSlice = createSlice({
             return state;
         },
         restartWizard: state => {
+            state.answers = cloneWizardAnswers(state.lastCompletedAnswers);
+            state.currentStep = WIZARD_FIRST_STEP;
+            state.status = 'in_progress';
+        },
+        startFreshWizard: state => {
             state.answers = {};
             state.currentStep = WIZARD_FIRST_STEP;
             state.status = 'in_progress';
         },
+        clearWizardDefaults: state => {
+            state.lastCompletedAnswers = undefined;
+        },
         completeWizard: state => {
+            state.lastCompletedAnswers = cloneWizardAnswers(state.answers);
             state.status = 'completed';
         },
     },
@@ -66,6 +87,8 @@ export const {
     goBackWizardStep,
     resumeWizard,
     restartWizard,
+    startFreshWizard,
+    clearWizardDefaults,
     completeWizard,
 } = wizardSlice.actions;
 

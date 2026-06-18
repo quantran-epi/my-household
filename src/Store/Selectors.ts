@@ -57,6 +57,7 @@ export const selectSmartPlannerTemplates = (state: RootState) => state.personal.
 export const selectWizard = (state: RootState): WizardState => state.personal.wizard ?? DEFAULT_WIZARD_STATE;
 export const selectWizardStep = (state: RootState): WizardStepKey => state.personal.wizard?.currentStep ?? WIZARD_FIRST_STEP;
 export const selectWizardAnswers = (state: RootState): WizardState['answers'] => state.personal.wizard?.answers ?? DEFAULT_WIZARD_STATE.answers;
+export const selectWizardDefaults = (state: RootState): WizardState['lastCompletedAnswers'] => state.personal.wizard?.lastCompletedAnswers;
 export const selectWizardStatus = (state: RootState): WizardStatus => state.personal.wizard?.status ?? 'idle';
 export const selectIsWizardResumable = createSelector(
     [selectWizardStatus],

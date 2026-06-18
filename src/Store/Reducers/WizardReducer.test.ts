@@ -2,9 +2,11 @@ import reducer, {
     advanceWizardStep,
     commitWizardAnswer,
     completeWizard,
+    clearWizardDefaults,
     goBackWizardStep,
     restartWizard,
     resumeWizard,
+    startFreshWizard,
 } from './WizardReducer';
 import type { WizardState } from '@store/Models/Wizard';
 
@@ -101,13 +103,77 @@ describe('WizardReducer', () => {
                 servingCount: 4,
                 selectedIngredientIds: ['ing-1'],
             },
+            lastCompletedAnswers: {
+                servingCount: 3,
+                selectedIngredientIds: ['ing-2'],
+            },
         };
 
         const nextState = reducer(initialState, restartWizard());
 
-        expect(nextState.answers).toEqual({});
+        expect(nextState.answers).toEqual({
+            servingCount: 3,
+            selectedIngredientIds: ['ing-2'],
+        });
         expect(nextState.currentStep).toBe('ingredients');
         expect(nextState.status).toBe('in_progress');
+    });
+
+    it('starts fresh without deleting remembered defaults', () => {
+        const initialState: WizardState = {
+            status: 'in_progress',
+            currentStep: 'preferences',
+            answers: {
+                servingCount: 4,
+                selectedIngredientIds: ['ing-1'],
+            },
+            lastCompletedAnswers: {
+                servingCount: 3,
+                memberIds: ['member-1'],
+            },
+        };
+
+        const nextState = reducer(initialState, startFreshWizard());
+
+        expect(nextState.answers).toEqual({});
+        expect(nextState.lastCompletedAnswers).toEqual(initialState.lastCompletedAnswers);
+        expect(nextState.currentStep).toBe('ingredients');
+        expect(nextState.status).toBe('in_progress');
+    });
+
+    it('saves defaults when the user reaches result or completes the wizard', () => {
+        const initialState: WizardState = {
+            status: 'in_progress',
+            currentStep: 'preferences',
+            answers: {
+                servingCount: 4,
+                memberIds: ['member-1'],
+                selectedIngredientIds: ['ing-1'],
+                cookNowOnly: true,
+                preferredTags: ['Canh'],
+            },
+        };
+
+        const atResult = reducer(initialState, advanceWizardStep('result'));
+        const completed = reducer(atResult, completeWizard());
+
+        expect(atResult.lastCompletedAnswers).toEqual(initialState.answers);
+        expect(completed.lastCompletedAnswers).toEqual(initialState.answers);
+        expect(completed.status).toBe('completed');
+    });
+
+    it('clears stored defaults without touching current answers', () => {
+        const initialState: WizardState = {
+            status: 'in_progress',
+            currentStep: 'result',
+            answers: { servingCount: 4 },
+            lastCompletedAnswers: { servingCount: 2 },
+        };
+
+        const nextState = reducer(initialState, clearWizardDefaults());
+
+        expect(nextState.answers).toEqual({ servingCount: 4 });
+        expect(nextState.lastCompletedAnswers).toBeUndefined();
     });
 
     it('completes the wizard while preserving answers and current step', () => {

@@ -12,6 +12,8 @@ export type WizardPreferenceAnswers = Partial<Pick<
 
 export type WizardAnswers = WizardPreferenceAnswers & {
     selectedIngredientIds?: string[];
+    memberIds?: string[];
+    cookNowOnly?: boolean;
     extras?: Record<string, unknown>;
 }
 
@@ -19,6 +21,7 @@ export interface WizardState {
     status: WizardStatus;
     currentStep: WizardStepKey;
     answers: WizardAnswers;
+    lastCompletedAnswers?: WizardAnswers;
 }
 
 export const WIZARD_FIRST_STEP: WizardStepKey = 'ingredients';
