@@ -47,7 +47,7 @@ Requirements for this UI/UX refactor milestone. Each maps to roadmap phases. Thi
 
 ## v2 Requirements
 
-Differentiators to add after the base journey is validated. Tracked but not in this milestone's roadmap.
+Differentiators added after the base journey was validated in Phase 6.
 
 ### Wizard Enhancements
 
@@ -73,7 +73,7 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ## Traceability
 
-Each v1 requirement maps to exactly one phase. v2 requirements are carried in Phase 6 (deferred, post-validation) and are not counted in v1 coverage.
+Each v1 requirement maps to exactly one phase. v2 requirements are carried in Phase 6 (post-validation) and are not counted in v1 coverage.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
@@ -100,19 +100,19 @@ Each v1 requirement maps to exactly one phase. v2 requirements are carried in Ph
 | COPY-03 | Phase 5 | Complete |
 | COPY-04 | Phase 5 | Complete (automated; human UAT follow-up) |
 | COPY-05 | Phase 5 | Complete |
-| WIZ2-01 | Phase 6 (v2) | Deferred |
-| WIZ2-02 | Phase 6 (v2) | Deferred |
-| WIZ2-03 | Phase 6 (v2) | Deferred |
-| WIZ2-04 | Phase 6 (v2) | Deferred |
-| WIZ2-05 | Phase 6 (v2) | Deferred |
+| WIZ2-01 | Phase 6 (v2) | Complete |
+| WIZ2-02 | Phase 6 (v2) | Complete |
+| WIZ2-03 | Phase 6 (v2) | Complete |
+| WIZ2-04 | Phase 6 (v2) | Complete |
+| WIZ2-05 | Phase 6 (v2) | Complete |
 
 **Coverage:**
 
 - v1 requirements: 23 total (COPY ×5, WIZ ×7, NAV ×4, MOB ×4, FND ×3)
 - Mapped to phases: 23/23 ✓
 - Unmapped: 0
-- v2 requirements (deferred to Phase 6): 5
+- v2 requirements (completed in Phase 6): 5
 
 ---
 *Requirements defined: 2026-06-14*
-*Last updated: 2026-06-14 after roadmap creation (traceability populated)*
+*Last updated: 2026-06-18 after Phase 6 completion (WIZ2 traceability complete)*

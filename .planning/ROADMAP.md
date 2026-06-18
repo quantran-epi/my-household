@@ -18,7 +18,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: Wizard State Slice** - Resume-safe RTK slice in the `personal` root, selectors, scorer characterization tests (completed 2026-06-16)
 - [x] **Phase 4: Wizard UI & Hero Entry** - Guided journey from Home to a scheduled meal, nav reframe with no lost routes (completed 2026-06-16)
 - [x] **Phase 5: Mobile Tuning & Copy Rollout** - Phone-first journey + journey/high-traffic Vietnamese copy migration (phone-only; desktop no longer gated) (completed 2026-06-17)
-- [ ] **Phase 6: Differentiator Enhancements** - Post-validation v2 steps and conveniences (deferred)
+- [x] **Phase 6: Differentiator Enhancements** - Post-validation v2 steps and conveniences (completed 2026-06-18)
 
 ## Phase Details
 
@@ -179,12 +179,14 @@ Plans:
   4. The wizard remembers last session's answers as defaults.
   5. Each suggestion shows a one-line "why this dish" reason. (Defer the "time/effort" step — blocked on a dish attribute that may not exist.)
 
-**Plans**: TBD
+**Plans**: 3 plans
 **UI hint**: yes
 
 Plans:
 
-- [ ] 06-01: TBD
+- [x] 06-01-PLAN.md — Remembered wizard defaults plus skippable servings/member-selection step (WIZ2-01, WIZ2-04)
+- [x] 06-02-PLAN.md — Optional cook-now grouped results plus one-line and detail suggestion reasons (WIZ2-02, WIZ2-05)
+- [x] 06-03-PLAN.md — Inline selected missing ingredients to Đi chợ with duplicate skipping and create-list path (WIZ2-03)
 
 ## Progress
 
@@ -198,4 +200,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Wizard State Slice | 3/3 | Complete    | 2026-06-16 |
 | 4. Wizard UI & Hero Entry | 6/6 | Complete   | 2026-06-16 |
 | 5. Mobile Tuning & Copy Rollout | 7/7 | Complete | 2026-06-17 |
-| 6. Differentiator Enhancements | 0/TBD | Deferred | - |
+| 6. Differentiator Enhancements | 3/3 | Complete | 2026-06-18 |
