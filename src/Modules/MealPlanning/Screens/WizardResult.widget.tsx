@@ -1,7 +1,10 @@
-import { QuestionCircleOutlined } from "@ant-design/icons";
+import { QuestionCircleOutlined, ShoppingCartOutlined, UndoOutlined, UnorderedListOutlined } from "@ant-design/icons";
+import { IngredientUnitHelper } from "@common/Helpers/IngredientUnitHelper";
 import { AppCopy } from "@common/Copy";
 import { Button } from "@components/Button";
+import { Checkbox } from "@components/Form/Checkbox";
 import { DatePicker } from "@components/Form/DatePicker";
+import { Input } from "@components/Form/Input";
 import { Box } from "@components/Layout/Box";
 import { Stack } from "@components/Layout/Stack";
 import { useMessage } from "@components/Message";
@@ -11,13 +14,16 @@ import { DishScorer, ScoredDish } from "@modules/DishSuggester/Helpers/DishScore
 import { nanoid } from "@reduxjs/toolkit";
 import { RootRoutes } from "@routing/RootRoutes";
 import { Dishes } from "@store/Models/Dishes";
+import { Ingredient, IngredientUnit } from "@store/Models/Ingredient";
 import { ScheduledMeal } from "@store/Models/ScheduledMeal";
+import { ShoppingList } from "@store/Models/ShoppingList";
 import { buildHouseholdPreferenceProfile } from "@store/Reducers/AppContextReducer";
 import { addScheduledMeal } from "@store/Reducers/ScheduledMealReducer";
+import { addIngredientGroupsToShoppingList, addShoppingList, editShoppingList } from "@store/Reducers/ShoppingListReducer";
 import { completeWizard } from "@store/Reducers/WizardReducer";
-import { selectDishes, selectHouseholdMembers, selectHouseholdPreferenceProfile, selectIngredients, selectInventory, selectInventoryHealthConfig, selectWizardAnswers } from "@store/Selectors";
+import { selectDishes, selectHouseholdMembers, selectHouseholdPreferenceProfile, selectIngredients, selectInventory, selectInventoryHealthConfig, selectShoppingLists, selectWizardAnswers } from "@store/Selectors";
 import dayjs, { Dayjs } from "dayjs";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
@@ -29,7 +35,12 @@ type ResultRowProps = {
     dish: Dishes;
     meta?: { matched: number; missing: number; accent: string; label: string };
     reason: string;
+    missingCount?: number;
+    addState?: MissingAddState;
     onShowReason: () => void;
+    onOpenMissing?: () => void;
+    onManageShopping?: () => void;
+    onUndoShopping?: () => void;
     onAddToday: () => void;
     onPickDay: () => void;
 };
@@ -40,7 +51,73 @@ type DetailTarget = {
     reason: string;
 };
 
-const ResultRow: React.FunctionComponent<ResultRowProps> = ({ dish, meta, reason, onShowReason, onAddToday, onPickDay }) => {
+type MissingSheetTarget = {
+    dish: Dishes;
+    item: ScoredDish;
+};
+
+type MissingAddState = {
+    dishId: string;
+    shoppingListId: string;
+    shoppingListName: string;
+    addedIngredientIds: string[];
+    skippedIngredientIds: string[];
+};
+
+type MissingIngredientRow = {
+    ingredientId: string;
+    name: string;
+    amountLabel?: string;
+    amount?: string;
+    unit?: IngredientUnit;
+    alreadyAdded: boolean;
+};
+
+const getDateValue = (date: Date | string | null | undefined): number => {
+    const value = date ? new Date(date).valueOf() : 0;
+    return Number.isFinite(value) ? value : 0;
+};
+
+const getLatestIncompleteShoppingList = (shoppingLists: ShoppingList[]): ShoppingList | undefined => {
+    return shoppingLists
+        .filter(item => !item.completedAt)
+        .slice()
+        .sort((a, b) => getDateValue(b.createdDate) - getDateValue(a.createdDate))[0];
+};
+
+const buildMissingRows = (item: ScoredDish, allIngredients: Ingredient[], shoppingList?: ShoppingList): MissingIngredientRow[] => {
+    const ingredientById = new Map(allIngredients.map(ingredient => [ingredient.id, ingredient]));
+    const existingIds = new Set((shoppingList?.ingredients ?? []).map(group => group.ingredientId));
+
+    return item.missingIngredientIds.map(ingredientId => {
+        const detail = item.ingredientDetails?.find(row => row.ingredientId === ingredientId);
+        const amount = detail && detail.needToBuyAmount > 0
+            ? IngredientUnitHelper.formatAmount(detail.needToBuyAmount)
+            : undefined;
+        return {
+            ingredientId,
+            name: ingredientById.get(ingredientId)?.name ?? ingredientId,
+            amount,
+            unit: detail?.unit,
+            amountLabel: amount && detail?.unit ? `${amount} ${detail.unit}` : undefined,
+            alreadyAdded: existingIds.has(ingredientId),
+        };
+    });
+};
+
+const ResultRow: React.FunctionComponent<ResultRowProps> = ({
+    dish,
+    meta,
+    reason,
+    missingCount = 0,
+    addState,
+    onShowReason,
+    onOpenMissing,
+    onManageShopping,
+    onUndoShopping,
+    onAddToday,
+    onPickDay,
+}) => {
     return <Box
         data-testid={`wizard-result-item-${dish.id}`}
         style={{
@@ -82,6 +159,32 @@ const ResultRow: React.FunctionComponent<ResultRowProps> = ({ dish, meta, reason
                 style={{ width: 32, minWidth: 32, height: 32, color: "#7436dc" }}
             />
         </Stack>
+        {addState && <Box style={{ display: "flex", flexDirection: "column", gap: 8, padding: 10, background: "#f6ffed", border: "1px solid #b7eb8f", borderRadius: 8 }}>
+            <Typography.Text style={{ fontSize: 14, lineHeight: 1.4, color: "#237804" }}>
+                {addState.addedIngredientIds.length > 0
+                    ? AppCopy.wizard.missingAddedInline({ count: addState.addedIngredientIds.length, listName: addState.shoppingListName })
+                    : AppCopy.wizard.missingAlreadyInline({ listName: addState.shoppingListName })}
+            </Typography.Text>
+            <SheetActions>
+                {addState.addedIngredientIds.length > 0 && <Button
+                    size="large"
+                    icon={<UndoOutlined />}
+                    data-testid={`wizard-undo-shopping-${dish.id}`}
+                    onClick={onUndoShopping}
+                >
+                    {AppCopy.wizard.missingUndoAction}
+                </Button>}
+                <Button
+                    type="primary"
+                    size="large"
+                    icon={<UnorderedListOutlined />}
+                    data-testid={`wizard-manage-shopping-${dish.id}`}
+                    onClick={onManageShopping}
+                >
+                    {AppCopy.wizard.missingManageAction}
+                </Button>
+            </SheetActions>
+        </Box>}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, width: "100%", marginTop: 4 }}>
             <Button
                 type="primary"
@@ -100,6 +203,15 @@ const ResultRow: React.FunctionComponent<ResultRowProps> = ({ dish, meta, reason
                 {AppCopy.wizard.pickOtherDay}
             </Button>
         </div>
+        {missingCount > 0 && onOpenMissing && <Button
+            size="large"
+            icon={<ShoppingCartOutlined />}
+            data-testid={`wizard-add-missing-${dish.id}`}
+            onClick={onOpenMissing}
+            style={{ width: "100%", minHeight: 44, height: "auto", borderRadius: 8, whiteSpace: "normal", lineHeight: 1.2 }}
+        >
+            {AppCopy.wizard.addMissingToShopping}
+        </Button>}
     </Box>;
 };
 
@@ -148,15 +260,25 @@ export const WizardResult: React.FunctionComponent = () => {
     const inventoryConfig = useSelector(selectInventoryHealthConfig);
     const householdMembers = useSelector(selectHouseholdMembers);
     const householdProfile = useSelector(selectHouseholdPreferenceProfile);
+    const shoppingLists = useSelector(selectShoppingLists);
     const answers = useSelector(selectWizardAnswers);
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const message = useMessage();
     const ids = answers.selectedIngredientIds ?? [];
+    const activeShoppingList = useMemo(() => getLatestIncompleteShoppingList(shoppingLists), [shoppingLists]);
 
     const [pickerDish, setPickerDish] = useState<Dishes | null>(null);
     const [pickedDate, setPickedDate] = useState<Dayjs>(dayjs());
     const [detailTarget, setDetailTarget] = useState<DetailTarget | null>(null);
+    const [missingTarget, setMissingTarget] = useState<MissingSheetTarget | null>(null);
+    const [selectedMissingIds, setSelectedMissingIds] = useState<string[]>([]);
+    const [createShoppingListName, setCreateShoppingListName] = useState<string>(AppCopy.wizard.missingCreateListName);
+    const [lastMissingAdd, setLastMissingAdd] = useState<MissingAddState | null>(null);
+    const missingRows = useMemo(
+        () => missingTarget ? buildMissingRows(missingTarget.item, ingredients, activeShoppingList) : [],
+        [activeShoppingList, ingredients, missingTarget]
+    );
 
     const addDishToDay = (dish: Dishes, day: Date, slot: keyof ScheduledMeal["meals"] = "dinner") => {
         const meal: ScheduledMeal = {
@@ -181,6 +303,91 @@ export const WizardResult: React.FunctionComponent = () => {
     const confirmPickedDay = () => {
         if (pickerDish) addDishToDay(pickerDish, pickedDate.toDate());
         setPickerDish(null);
+    };
+
+    const openMissingSheet = (dish: Dishes, item: ScoredDish) => {
+        const rows = buildMissingRows(item, ingredients, activeShoppingList);
+        setSelectedMissingIds(rows.filter(row => !row.alreadyAdded).map(row => row.ingredientId));
+        setCreateShoppingListName(AppCopy.wizard.missingCreateListName);
+        setMissingTarget({ dish, item });
+    };
+
+    const toggleMissingIngredient = (ingredientId: string, checked: boolean) => {
+        setSelectedMissingIds(prev => {
+            if (checked) return Array.from(new Set([...prev, ingredientId]));
+            return prev.filter(id => id !== ingredientId);
+        });
+    };
+
+    const confirmAddMissingIngredients = () => {
+        if (!missingTarget) return;
+
+        const targetList = getLatestIncompleteShoppingList(shoppingLists);
+        const createdDate = new Date();
+        const shoppingList = targetList ?? {
+            id: `${(createShoppingListName.trim() || AppCopy.wizard.missingCreateListName)}${nanoid(10)}`,
+            name: createShoppingListName.trim() || AppCopy.wizard.missingCreateListName,
+            dishes: [],
+            dishServings: {},
+            ingredients: [],
+            scheduledMeals: [],
+            createdDate,
+            plannedDate: createdDate,
+            completedAt: undefined,
+            completionImports: undefined,
+        } as ShoppingList;
+        const rows = buildMissingRows(missingTarget.item, ingredients, shoppingList);
+        const selectedRows = rows.filter(row => selectedMissingIds.includes(row.ingredientId));
+        const rowsToAdd = selectedRows.filter(row => !row.alreadyAdded);
+        const skippedIds = rows.filter(row => row.alreadyAdded).map(row => row.ingredientId);
+
+        if (!targetList) dispatch(addShoppingList(shoppingList));
+        if (rowsToAdd.length > 0) {
+            dispatch(addIngredientGroupsToShoppingList({
+                shoppingListId: shoppingList.id,
+                dish: {
+                    id: missingTarget.dish.id,
+                    name: missingTarget.dish.name,
+                    baseServings: missingTarget.dish.baseServings,
+                },
+                ingredients: rowsToAdd.map(row => ({
+                    ingredientId: row.ingredientId,
+                    amount: row.amount,
+                    unit: row.unit,
+                })),
+                targetServings: answers.servingCount,
+            }));
+        }
+
+        setLastMissingAdd({
+            dishId: missingTarget.dish.id,
+            shoppingListId: shoppingList.id,
+            shoppingListName: shoppingList.name,
+            addedIngredientIds: rowsToAdd.map(row => row.ingredientId),
+            skippedIngredientIds: skippedIds,
+        });
+        setMissingTarget(null);
+        message.success(rowsToAdd.length > 0 ? AppCopy.wizard.missingAddedToast : AppCopy.wizard.missingNothingToAddToast);
+    };
+
+    const manageMissingShoppingList = (state: MissingAddState) => {
+        navigate(RootRoutes.AuthorizedRoutes.ShoppingListRoutes.Detail(state.shoppingListId));
+    };
+
+    const undoMissingShoppingAdd = (state: MissingAddState) => {
+        if (state.addedIngredientIds.length === 0) return;
+        const currentList = shoppingLists.find(list => list.id === state.shoppingListId);
+        if (!currentList || currentList.completedAt) return;
+        const addedIds = new Set(state.addedIngredientIds);
+        dispatch(editShoppingList({
+            ...currentList,
+            ingredients: currentList.ingredients.filter(group => {
+                if (!addedIds.has(group.ingredientId)) return true;
+                return !group.amounts.some(amount => amount.dishesId === state.dishId);
+            }),
+        }));
+        setLastMissingAdd(null);
+        message.success(AppCopy.wizard.missingUndoToast);
     };
 
     // (c) EMPTY CATALOG — never render a dish list; route to add the first dish.
@@ -243,6 +450,7 @@ export const WizardResult: React.FunctionComponent = () => {
     const detailIngredientNames = (ingredientIds: string[]) => ingredientIds
         .map(id => ingredients.find(ingredient => ingredient.id === id)?.name)
         .filter((name): name is string => Boolean(name));
+    const selectedMissingCount = missingRows.filter(row => selectedMissingIds.includes(row.ingredientId) && !row.alreadyAdded).length;
 
     return <Box
         data-testid="wizard-step-result"
@@ -260,13 +468,19 @@ export const WizardResult: React.FunctionComponent = () => {
                     </Typography.Text>}
                     {group.dishes.map(item => {
                         const reason = getReason(item);
+                        const addState = lastMissingAdd?.dishId === item.dish.id ? lastMissingAdd : undefined;
                         return (
                             <ResultRow
                                 key={item.dish.id}
                                 dish={item.dish}
                                 meta={scoredMeta(item)}
                                 reason={reason}
+                                missingCount={item.missingIngredientIds.length}
+                                addState={addState}
                                 onShowReason={() => setDetailTarget({ dish: item.dish, item, reason })}
+                                onOpenMissing={() => openMissingSheet(item.dish, item)}
+                                onManageShopping={addState ? () => manageMissingShoppingList(addState) : undefined}
+                                onUndoShopping={addState ? () => undoMissingShoppingAdd(addState) : undefined}
                                 onAddToday={() => addDishToDay(item.dish, new Date())}
                                 onPickDay={() => openDayPicker(item.dish)}
                             />
@@ -326,6 +540,87 @@ export const WizardResult: React.FunctionComponent = () => {
                         style={{ borderRadius: 20, paddingInline: 20 }}
                     >
                         {AppCopy.wizard.addToDay}
+                    </Button>
+                </SheetActions>
+            </Stack>
+        </Sheet>
+
+        <Sheet
+            open={missingTarget !== null}
+            title={AppCopy.wizard.missingSheetTitle}
+            onClose={() => setMissingTarget(null)}
+            data-testid="wizard-missing-sheet"
+        >
+            <Stack direction="column" gap={16} fullwidth align="stretch" style={{ padding: 16 }}>
+                <Box style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <Typography.Title level={5} style={{ margin: 0, fontSize: 18, fontWeight: 600, lineHeight: 1.3 }}>
+                        {missingTarget?.dish.name}
+                    </Typography.Title>
+                    <Typography.Text type="secondary" style={{ fontSize: 15, lineHeight: 1.45 }}>
+                        {AppCopy.wizard.missingSheetIntro}
+                    </Typography.Text>
+                </Box>
+
+                {activeShoppingList ? <Typography.Text style={{ fontSize: 15, fontWeight: 600 }}>
+                    {AppCopy.wizard.missingTargetList({ name: activeShoppingList.name })}
+                </Typography.Text> : <Box style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <Typography.Text type="secondary" style={{ fontSize: 15, lineHeight: 1.45 }}>
+                        {AppCopy.wizard.missingNoActiveList}
+                    </Typography.Text>
+                    <Input
+                        value={createShoppingListName}
+                        placeholder={AppCopy.wizard.missingCreateListPlaceholder}
+                        onChange={event => setCreateShoppingListName(event.target.value)}
+                    />
+                </Box>}
+
+                <Stack direction="column" gap={8} fullwidth align="stretch">
+                    {missingRows.map(row => {
+                        const checked = row.alreadyAdded || selectedMissingIds.includes(row.ingredientId);
+                        return <Box
+                            key={row.ingredientId}
+                            data-testid={`wizard-missing-row-${row.ingredientId}`}
+                            style={{
+                                display: "flex",
+                                alignItems: "flex-start",
+                                gap: 10,
+                                width: "100%",
+                                padding: "10px 0",
+                                borderBottom: "1px solid #f0f0f0",
+                            }}
+                        >
+                            <Checkbox
+                                checked={checked}
+                                disabled={row.alreadyAdded}
+                                onChange={event => toggleMissingIngredient(row.ingredientId, event.target.checked)}
+                                style={{ marginTop: 2 }}
+                            />
+                            <Box style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0, flex: 1 }}>
+                                <Typography.Text style={{ fontSize: 16, lineHeight: 1.35, overflowWrap: "anywhere" }}>
+                                    {row.name}
+                                </Typography.Text>
+                                {row.amountLabel && <Typography.Text type="secondary" style={{ fontSize: 13, lineHeight: 1.35 }}>
+                                    {row.amountLabel}
+                                </Typography.Text>}
+                                {row.alreadyAdded && <Typography.Text type="secondary" style={{ fontSize: 13, lineHeight: 1.35 }}>
+                                    {AppCopy.wizard.missingAlreadyAdded}
+                                </Typography.Text>}
+                            </Box>
+                        </Box>;
+                    })}
+                </Stack>
+
+                <SheetActions>
+                    <Button size="large" onClick={() => setMissingTarget(null)}>
+                        {AppCopy.common.cancel}
+                    </Button>
+                    <Button
+                        type="primary"
+                        size="large"
+                        disabled={selectedMissingCount === 0}
+                        onClick={confirmAddMissingIngredients}
+                    >
+                        {activeShoppingList ? AppCopy.wizard.missingAddAction : AppCopy.wizard.missingCreateAndAddAction}
                     </Button>
                 </SheetActions>
             </Stack>

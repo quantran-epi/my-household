@@ -15,6 +15,7 @@ import WizardReducer, { advanceWizardStep, completeWizard } from "@store/Reducer
 import AppContextReducer, { upsertHouseholdMemberProfile } from "@store/Reducers/AppContextReducer";
 import InventoryReducer from "@store/Reducers/InventoryReducer";
 import SharedConfigReducer from "@store/Reducers/SharedConfigReducer";
+import ShoppingListReducer from "@store/Reducers/ShoppingListReducer";
 import type { Dishes } from "@store/Models/Dishes";
 import { WizardScreen } from "@modules/MealPlanning/Screens/Wizard.screen";
 
@@ -35,7 +36,8 @@ const makeDish = (): Dishes => ({
 // Mirror the production rootReducer nesting (shared/personal) WITHOUT redux-persist.
 // Only the slices the rendered tree actually reads are wired: shared.ingredient
 // (IngredientPicker), shared.dishes (preference/result steps), personal.wizard
-// (step machine). The omitted slices (shoppingList/householdHealth/cookingSession)
+// (step machine), and personal.shoppingList (result-card missing-ingredient actions).
+// The omitted slices (householdHealth/cookingSession)
 // transitively import the ESM-only `nanoid`, which Jest's transformIgnorePatterns
 // won't transpile — and the wizard tree never reads them. The selectors use optional
 // chaining for personal.*, so the trimmed personal slice resolves cleanly.
@@ -50,6 +52,7 @@ const makeTestStore = () =>
             personal: combineReducers({
                 appContext: AppContextReducer,
                 inventory: InventoryReducer,
+                shoppingList: ShoppingListReducer,
                 wizard: WizardReducer,
             }),
         }),
