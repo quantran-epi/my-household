@@ -395,7 +395,7 @@ export const DishScorer = {
     groupCookNow(scored: ScoredDish[]): ScoredDishGroup[] {
         const groups: ScoredDishGroup[] = [
             { label: "Nấu ngay", minScore: 0.75, maxScore: 1, color: "#389e0d", dishes: [] },
-            { label: "Mua thêm ít", minScore: 0.5, maxScore: 0.75, color: "#1677ff", dishes: [] },
+            { label: "Cần mua thêm ít", minScore: 0.5, maxScore: 0.75, color: "#1677ff", dishes: [] },
             { label: "Dự phòng", minScore: 0, maxScore: 0.5, color: "#fa8c16", dishes: [] },
         ];
 

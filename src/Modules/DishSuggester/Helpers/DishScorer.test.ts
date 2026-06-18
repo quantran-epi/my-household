@@ -226,7 +226,7 @@ describe('DishScorer', () => {
                 dishIds: group.dishes.map(item => item.dish.id),
             }))).toEqual([
                 { label: 'Nấu ngay', minScore: 0.75, maxScore: 1, color: '#389e0d', dishIds: ['ready-higher-score', 'ready-lower-score'] },
-                { label: 'Mua thêm ít', minScore: 0.5, maxScore: 0.75, color: '#1677ff', dishIds: ['near-by-cook-now', 'near-by-score'] },
+                { label: 'Cần mua thêm ít', minScore: 0.5, maxScore: 0.75, color: '#1677ff', dishIds: ['near-by-cook-now', 'near-by-score'] },
                 { label: 'Dự phòng', minScore: 0, maxScore: 0.5, color: '#fa8c16', dishIds: ['fallback'] },
             ]);
 
