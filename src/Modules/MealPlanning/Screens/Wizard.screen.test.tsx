@@ -97,6 +97,7 @@ describe("WizardScreen", () => {
 
         expect(screen.getByTestId("wizard-step-preferences")).toBeInTheDocument();
         expect(screen.getByTestId("wizard-back")).toBeInTheDocument();
+        expect(screen.getByTestId("wizard-cook-now-toggle")).toBeInTheDocument();
     });
 
     it("renders the result step after advancing to result", () => {

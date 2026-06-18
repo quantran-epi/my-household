@@ -57,6 +57,8 @@ export const AppCopy = {
         preferencePickerTrigger: "Chọn sở thích",
         preferenceSheetTitle: "Sở thích",
         selectedPreferences: (args: { count: number }) => `Đã chọn ${args.count} sở thích`,
+        cookNowToggle: "Ưu tiên nấu được ngay",
+        cookNowToggleHint: "Mình sẽ xếp món có sẵn nguyên liệu lên trước, nhưng vẫn giữ món dự phòng.",
         // Shared step actions
         editAction: "Sửa",
         chooseAction: "Chọn",

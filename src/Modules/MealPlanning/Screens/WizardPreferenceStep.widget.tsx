@@ -6,7 +6,7 @@ import { Sheet } from "@components/Sheet";
 import { Typography } from "@components/Typography";
 import { WizardAnswers } from "@store/Models/Wizard";
 import { selectDishes, selectWizardAnswers } from "@store/Selectors";
-import { Button } from "antd";
+import { Button, Switch } from "antd";
 import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -23,6 +23,7 @@ export const WizardPreferenceStep: React.FC<WizardPreferenceStepProps> = ({ onNe
     const answers = useSelector(selectWizardAnswers);
     const dishes = useSelector(selectDishes);
     const [selectedTags, setSelectedTags] = useState<string[]>(answers.preferredTags ?? []);
+    const [cookNowOnly, setCookNowOnly] = useState(Boolean(answers.cookNowOnly));
     const [sheetOpen, setSheetOpen] = useState(false);
 
     const availableTags = useMemo(() => {
@@ -142,26 +143,55 @@ export const WizardPreferenceStep: React.FC<WizardPreferenceStepProps> = ({ onNe
                 <Box style={{ marginBottom: 32 }}>{renderTagGrid()}</Box>
             )}
 
-            <Stack direction="column" gap={8} fullwidth>
-                <Button
-                    type="primary"
-                    size="large"
-                    data-testid="wizard-preference-advance"
-                    onClick={() => onNext({ preferredTags: selectedTags })}
-                    style={{ width: "100%", borderRadius: 12, background: "#7436dc", borderColor: "#7436dc" }}
-                >
-                    {AppCopy.wizard.continueAction}
-                </Button>
+            <Box
+                style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    padding: "12px 14px",
+                    borderRadius: 12,
+                    background: "#f5f5f5",
+                    border: "1px solid #e8e2f7",
+                    marginBottom: 24,
+                }}
+            >
+                <Stack direction="column" gap={4} style={{ minWidth: 0 }}>
+                    <Typography.Text style={{ fontSize: 16, fontWeight: 600, color: "#111827" }}>
+                        {AppCopy.wizard.cookNowToggle}
+                    </Typography.Text>
+                    <Typography.Text type="secondary" style={{ fontSize: 13, lineHeight: 1.4 }}>
+                        {AppCopy.wizard.cookNowToggleHint}
+                    </Typography.Text>
+                </Stack>
+                <Switch
+                    data-testid="wizard-cook-now-toggle"
+                    checked={cookNowOnly}
+                    onChange={setCookNowOnly}
+                    style={{ flexShrink: 0 }}
+                />
+            </Box>
+
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, width: "100%" }}>
                 <Button
                     type="text"
                     size="large"
                     data-testid="wizard-skip-preferences"
-                    onClick={() => onNext({})}
-                    style={{ width: "100%", borderRadius: 12, color: "#595959", fontWeight: 600 }}
+                    onClick={() => onNext({ cookNowOnly })}
+                    style={{ flex: "1 1 0", minWidth: 0, minHeight: 44, height: "auto", borderRadius: 12, color: "#595959", fontWeight: 600, whiteSpace: "normal", lineHeight: 1.2 }}
                 >
                     {AppCopy.common.skip}
                 </Button>
-            </Stack>
+                <Button
+                    type="primary"
+                    size="large"
+                    data-testid="wizard-preference-advance"
+                    onClick={() => onNext({ preferredTags: selectedTags, cookNowOnly })}
+                    style={{ flex: "1 1 0", minWidth: 0, minHeight: 44, height: "auto", borderRadius: 12, background: "#7436dc", borderColor: "#7436dc", whiteSpace: "normal", lineHeight: 1.2 }}
+                >
+                    {AppCopy.wizard.continueAction}
+                </Button>
+            </div>
 
             {useSheet && (
                 <Sheet
