@@ -21,8 +21,10 @@
 - `yarn test --watchAll=false --runTestsByPath src/Modules/DishSuggester/Helpers/DishScorer.test.ts` — passed, 7 tests.
 - `yarn test --watchAll=false --runTestsByPath src/Store/Reducers/ShoppingListReducer.test.ts` — passed, 2 tests.
 - `yarn test --watchAll=false --runTestsByPath src/Store/Reducers/ShoppingListReducer.test.ts src/Modules/MealPlanning/Screens/Wizard.screen.test.tsx` — passed, 8 tests.
+- `yarn test --watchAll=false --runTestsByPath src/Store/Reducers/WizardReducer.test.ts src/Modules/MealPlanning/Screens/Wizard.screen.test.tsx src/Modules/DishSuggester/Helpers/DishScorer.test.ts src/Store/Reducers/ShoppingListReducer.test.ts` — passed, 4 suites / 27 tests.
 - `yarn build` — passed with existing unrelated lint warnings.
 - `rg -n "wizard-add-missing-|addIngredientGroupsToShoppingList" src/Modules/MealPlanning/Screens/WizardResult.widget.tsx src/Store/Reducers/ShoppingListReducer.ts` — found expected result-card hook and reducer action.
+- Mobile production-build smoke at 390×844 viewport — passed: result card rendered, no horizontal overflow, reason detail Sheet opened, missing-ingredient Sheet opened with 2 rows, and inline success/manage state appeared after create-and-add. Screenshots: `test-results/mobile-smoke/wizard-result-mobile.png`, `test-results/mobile-smoke/wizard-missing-sheet-mobile.png`.
 
 ## UAT Notes
 
@@ -34,4 +36,4 @@
 ## Residual Risks
 
 - The focused wizard test still emits an existing reselect dev warning from `selectInventoryHealthConfig` / `selectSharedConfig`. It does not fail tests or build.
-- Browser/mobile rendering still needs a deployment smoke check against the built app before pushing `docs/`.
+- Browser/mobile rendering passed against the built app before deployment.
