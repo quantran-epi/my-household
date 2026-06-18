@@ -61,6 +61,17 @@ export type ShoppingListAddDishesParams = {
     dishServings?: Record<string, number>;
 }
 
+export type ShoppingListAddIngredientGroupsParams = {
+    shoppingListId: string;
+    dish: Pick<Dishes, 'id' | 'name' | 'baseServings'>;
+    ingredients: Array<{
+        ingredientId: string;
+        amount?: string;
+        unit?: IngredientUnit;
+    }>;
+    targetServings?: number;
+}
+
 export interface ShoppingListState {
     shoppingLists: ShoppingList[];
 }
@@ -286,6 +297,43 @@ export const ShoppingListSlice = createSlice({
                 return e;
             })
         },
+        addIngredientGroupsToShoppingList: (state, action: PayloadAction<ShoppingListAddIngredientGroupsParams>) => {
+            state.shoppingLists = state.shoppingLists.map(e => {
+                if (e.id !== action.payload.shoppingListId) return e;
+                if (e.completedAt) return e;
+
+                const existingIngredientIds = new Set(e.ingredients.map(group => group.ingredientId));
+                const incoming = action.payload.ingredients
+                    .filter(item => item.ingredientId && !existingIngredientIds.has(item.ingredientId));
+                if (incoming.length === 0) return e;
+
+                const newGroups: ShoppingListIngredientGroup[] = incoming.map(item => ({
+                    id: `${e.id}-${item.ingredientId}-gr-${nanoid(10)}`,
+                    ingredientId: item.ingredientId,
+                    isDone: false,
+                    amounts: [{
+                        id: `${e.id}-${item.ingredientId}-${nanoid(5)}`,
+                        ingredientId: item.ingredientId,
+                        amount: item.amount ?? '1',
+                        unit: item.unit ?? 'g',
+                        dishesId: action.payload.dish.id,
+                        required: true,
+                        isDone: false,
+                        dish: {
+                            id: action.payload.dish.id,
+                            name: action.payload.dish.name,
+                            baseServings: action.payload.dish.baseServings,
+                            targetServings: action.payload.targetServings,
+                        },
+                    }],
+                }));
+
+                return {
+                    ...e,
+                    ingredients: [...e.ingredients, ...newGroups],
+                };
+            })
+        },
         updateShoppingListIngredientMealData: (state, action: PayloadAction<ScheduledMeal>) => {
             state.shoppingLists = state.shoppingLists.map(e => {
                 if (e.completedAt) return e;
@@ -364,7 +412,7 @@ export const ShoppingListSlice = createSlice({
 // Action creators are generated for each case reducer function
 export const { add: addShoppingList, edit: editShoppingList,
     remove: removeShoppingList, generateIngredient, toggleDoneIngredientGroup, toggleDoneIngredientAmount, setIngredientBoughtAmount, completeShoppingList, addDishesToShoppingList,
-    updateShoppingListIngredientMealData, updateShoppingListIngredientDishData,
+    addIngredientGroupsToShoppingList, updateShoppingListIngredientMealData, updateShoppingListIngredientDishData,
     reset: resetShoppingList
 } = ShoppingListSlice.actions
 
