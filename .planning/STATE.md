@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: complete
-stopped_at: Phase 5 verified; deployment requested
-last_updated: "2026-06-17T16:04:03.000Z"
-last_activity: 2026-06-17 -- Phase 05 reviewed and verified; automated gates passed
+stopped_at: Phase 5 verified; UAT complete
+last_updated: "2026-06-18T14:42:46.000Z"
+last_activity: 2026-06-18 -- Phase 05 UAT completed with 7/7 checkpoints passed
 progress:
   total_phases: 6
   completed_phases: 5
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-14)
 
 **Core value:** A local Vietnamese household member can open the app and go from "what do we eat?" to a planned meal quickly, in familiar language, without it feeling like an admin tool.
-**Current focus:** Phase 05 deployment — mobile-tuning-copy-rollout complete; Phase 06 remains deferred
+**Current focus:** Phase 05 mobile-tuning-copy-rollout complete; Phase 06 remains deferred
 
 ## Current Position
 
 Phase: 05 (mobile-tuning-copy-rollout) — COMPLETE
 Plan: 7 of 7
-Status: Verified; deployment requested
-Last activity: 2026-06-17 -- Phase 05 reviewed and verified; automated gates passed
+Status: Verified; UAT complete
+Last activity: 2026-06-18 -- Phase 05 UAT completed with 7/7 checkpoints passed
 
 Progress: [▓▓▓▓▓▓▓▓▓▓] 100%
 
@@ -84,7 +84,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [Phase 05-05]: scheduledMeal namespace consolidates ScheduledMealList.screen + ScheduledMealAdd.widget copy; all 9 list-cluster Modals (5 list-level + 4 plan-row) -> Sheet; Add footer worst-offender CTA retuned to wizard thumb-zone idiom (size=large minHeight 44 width 100%); diacritic normalization "Huỷ" -> "Hủy" via common.cancel
 - [Phase ?]: [Phase 05-06]: dishSuggester/dishes/ingredient namespaces complete the high-traffic copy migration; DishesList delete confirm and IngredientList direct list hosts moved to Sheet; RootRouter basename now follows PUBLIC_URL so /my-recipes route tests and GitHub Pages align
 - [Phase ?]: [Phase 05-07]: AppCopy voice pass changed values only (475 key count unchanged), replaced displayed Admin/Token/Checklist/tag/App leftovers with Vietnamese phrasing, and left native-speaker approval for phase-level UAT
-- [Phase ?]: [Phase 05 Verification]: Review found and fixed the missed DishSuggester route-wrapper copy; final AppCopy key count is 476, automated gates passed, and native-speaker copy review remains follow-up UAT
+- [Phase ?]: [Phase 05 Verification]: Review found and fixed the missed DishSuggester route-wrapper copy; final AppCopy key count is 476, automated gates passed, and native-speaker copy review passed in UAT on 2026-06-18
 
 ### Pending Todos
 
@@ -97,7 +97,6 @@ None yet.
 [Issues that affect future work]
 
 - Phase 4: Confirm `Dishes` catalog/empty-data behavior and the cold-start fallback path (full catalog → else "add first dish"); confirm `ScheduledMeal` assembly against `ScheduledMealAdd.widget.tsx`.
-- Phase 5/copy: Validate native Vietnamese phrasing/tone with a target household user; enforce one term per concept via the glossary.
 - Phase 6: Confirm inventory granularity supports "can cook now"; confirm whether dishes carry a time/effort attribute (decides "nấu nhanh/nấu kỹ" feasibility).
 
 ## Deferred Items
@@ -111,6 +110,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-17T16:04:03.000Z
-Stopped at: Phase 5 verified; deployment requested
-Resume file: .planning/phases/05-mobile-tuning-copy-rollout/05-VERIFICATION.md
+Last session: 2026-06-18T14:42:46.000Z
+Stopped at: Phase 5 verified; UAT complete
+Resume file: .planning/phases/05-mobile-tuning-copy-rollout/05-UAT.md
