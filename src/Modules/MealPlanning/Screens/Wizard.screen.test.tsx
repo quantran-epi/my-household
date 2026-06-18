@@ -12,6 +12,7 @@ import { MemoryRouter } from "react-router-dom";
 import IngredientReducer from "@store/Reducers/IngredientReducer";
 import DishesReducer, { addDishes } from "@store/Reducers/DishesReducer";
 import WizardReducer, { advanceWizardStep, completeWizard } from "@store/Reducers/WizardReducer";
+import AppContextReducer, { upsertHouseholdMemberProfile } from "@store/Reducers/AppContextReducer";
 import type { Dishes } from "@store/Models/Dishes";
 import { WizardScreen } from "@modules/MealPlanning/Screens/Wizard.screen";
 
@@ -44,6 +45,7 @@ const makeTestStore = () =>
                 dishes: DishesReducer,
             }),
             personal: combineReducers({
+                appContext: AppContextReducer,
                 wizard: WizardReducer,
             }),
         }),
@@ -68,7 +70,27 @@ describe("WizardScreen", () => {
         expect(screen.queryByTestId("wizard-back")).not.toBeInTheDocument();
     });
 
-    it("renders the preferences step and shows the back button after advancing", () => {
+    it("renders the servings step and shows the back button after advancing", () => {
+        const store = makeTestStore();
+        store.dispatch(advanceWizardStep("servings"));
+        renderWizard(store);
+
+        expect(screen.getByTestId("wizard-step-servings")).toBeInTheDocument();
+        expect(screen.getByTestId("wizard-back")).toBeInTheDocument();
+    });
+
+    it("renders household member choices on the servings step", () => {
+        const store = makeTestStore();
+        store.dispatch(upsertHouseholdMemberProfile({ id: "member-1", name: "Mẹ" }));
+        store.dispatch(advanceWizardStep("servings"));
+        renderWizard(store);
+
+        expect(screen.getByTestId("wizard-member-member-1")).toBeInTheDocument();
+        expect(screen.getByTestId("wizard-serving-minus")).toBeInTheDocument();
+        expect(screen.getByTestId("wizard-serving-plus")).toBeInTheDocument();
+    });
+
+    it("renders the preferences step after advancing", () => {
         const store = makeTestStore();
         store.dispatch(advanceWizardStep("preferences"));
         renderWizard(store);
@@ -96,5 +118,6 @@ describe("WizardScreen", () => {
         expect(screen.getByTestId("wizard-step-ingredients")).toBeInTheDocument();
         expect(screen.queryByTestId("wizard-step-result")).not.toBeInTheDocument();
         expect(store.getState().personal.wizard.status).toBe("in_progress");
+        expect(store.getState().personal.wizard.answers).toEqual(store.getState().personal.wizard.lastCompletedAnswers);
     });
 });

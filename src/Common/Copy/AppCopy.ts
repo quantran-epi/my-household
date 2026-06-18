@@ -41,6 +41,17 @@ export const AppCopy = {
         ingredientPickerTrigger: "Chọn nguyên liệu",
         ingredientSheetTitle: "Chọn nguyên liệu",
         selectedIngredients: (args: { count: number }) => `Đã chọn ${args.count} nguyên liệu`,
+        // Servings step
+        servingsStepTitle: "Nhà mình có ai ăn bữa này?",
+        servingsStepBody: "Chọn người ăn để mình canh khẩu phần vừa hơn.",
+        servingsFallbackBody: "Chưa có thành viên nào, mình dùng số phần ăn cho bữa này.",
+        servingCount: (args: { count: number }) => `${args.count} phần`,
+        selectedMembers: (args: { count: number }) => `${args.count} người ăn`,
+        servingsMinusLabel: "Giảm phần ăn",
+        servingsPlusLabel: "Tăng phần ăn",
+        usingLastChoices: "Đang dùng lựa chọn lần trước",
+        startFreshAction: "Chọn lại từ đầu",
+        clearDefaultsAction: "Xóa lựa chọn đã nhớ",
         // Preference step
         preferenceStepTitle: "Bạn thích món kiểu nào?",
         preferencePickerTrigger: "Chọn sở thích",
