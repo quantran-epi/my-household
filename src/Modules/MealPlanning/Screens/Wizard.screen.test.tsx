@@ -13,6 +13,8 @@ import IngredientReducer from "@store/Reducers/IngredientReducer";
 import DishesReducer, { addDishes } from "@store/Reducers/DishesReducer";
 import WizardReducer, { advanceWizardStep, completeWizard } from "@store/Reducers/WizardReducer";
 import AppContextReducer, { upsertHouseholdMemberProfile } from "@store/Reducers/AppContextReducer";
+import InventoryReducer from "@store/Reducers/InventoryReducer";
+import SharedConfigReducer from "@store/Reducers/SharedConfigReducer";
 import type { Dishes } from "@store/Models/Dishes";
 import { WizardScreen } from "@modules/MealPlanning/Screens/Wizard.screen";
 
@@ -43,9 +45,11 @@ const makeTestStore = () =>
             shared: combineReducers({
                 ingredient: IngredientReducer,
                 dishes: DishesReducer,
+                config: SharedConfigReducer,
             }),
             personal: combineReducers({
                 appContext: AppContextReducer,
+                inventory: InventoryReducer,
                 wizard: WizardReducer,
             }),
         }),
