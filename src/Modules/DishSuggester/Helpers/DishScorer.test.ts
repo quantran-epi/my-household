@@ -136,6 +136,52 @@ const inventoryDishes = [
     }),
 ];
 
+// Real cook-now pipeline fixtures. baseServings defaults to 2 in getDishServingScale,
+// so a profile servingCount of 4 yields scale 2 — required amounts double.
+const cookNowGroupingIngredients = [
+    makeIngredient({ id: 'ing-A', name: 'Abundant base ingredient' }),
+    makeIngredient({ id: 'ing-B', name: 'Base-covered-only ingredient' }),
+    makeIngredient({ id: 'ing-C', name: 'Single missing ingredient' }),
+    makeIngredient({ id: 'ing-D', name: 'Missing ingredient D' }),
+    makeIngredient({ id: 'ing-E', name: 'Missing ingredient E' }),
+    makeIngredient({ id: 'ing-F', name: 'Missing ingredient F' }),
+    makeIngredient({ id: 'ing-G', name: 'Missing ingredient G' }),
+];
+
+// ing-A (stock 250) covers the scaled requirement (100 * 2 = 200).
+// ing-B (stock 120) covers only the unscaled base requirement (100), not the scaled one (200).
+const cookNowGroupingInventory: Record<string, IngredientInventory> = {
+    'ing-A': inventoryBatch('batch-ing-A', 250),
+    'ing-B': inventoryBatch('batch-ing-B', 120),
+};
+
+const cookNowGroupingDishes = [
+    makeDish({
+        id: 'cooknow-base-ready',
+        name: 'Base ready dish',
+        ingredients: [ingredient('ing-A'), ingredient('ing-B')],
+        duration: { ...emptyDuration, prepare: 10, cooking: 10 },
+    }),
+    makeDish({
+        id: 'cooknow-near-ready',
+        name: 'Near ready dish',
+        ingredients: [ingredient('ing-A'), ingredient('ing-C')],
+        duration: { ...emptyDuration, prepare: 10, cooking: 10 },
+    }),
+    makeDish({
+        id: 'cooknow-many-missing',
+        name: 'Many missing dish',
+        ingredients: [
+            ingredient('ing-A'),
+            ingredient('ing-D'),
+            ingredient('ing-E'),
+            ingredient('ing-F'),
+            ingredient('ing-G'),
+        ],
+        duration: { ...emptyDuration, prepare: 10, cooking: 10 },
+    }),
+];
+
 describe('DishScorer', () => {
     beforeAll(() => {
         jest.useFakeTimers().setSystemTime(new Date('2026-06-16T12:00:00.000Z'));
@@ -209,12 +255,13 @@ describe('DishScorer', () => {
     });
 
     describe('groupCookNow', () => {
-        it('pins cook-now bucket rules, ordering, and empty-bucket filtering', () => {
+        it('pins readiness-based cook-now bucket rules, ordering, and empty-bucket filtering', () => {
             const groups = DishScorer.groupCookNow([
                 makeScoredDish('ready-lower-score', 1, [], 0.7),
                 makeScoredDish('ready-higher-score', 1, [], 0.9),
-                makeScoredDish('near-by-score', 0.6, ['ing-2', 'ing-3'], 0.52),
-                makeScoredDish('near-by-cook-now', 0.4, ['ing-4'], 0.6),
+                makeScoredDish('near-two-missing', 0.6, ['ing-2', 'ing-3'], 0.52),
+                makeScoredDish('near-one-missing', 0.4, ['ing-4'], 0.6),
+                makeScoredDish('backup-three-missing-high-cooknow', 0.3, ['ing-5', 'ing-6', 'ing-7'], 0.6),
                 makeScoredDish('fallback', 0.2, ['ing-5', 'ing-6', 'ing-7', 'ing-8'], 0.4),
             ]);
 
@@ -226,12 +273,46 @@ describe('DishScorer', () => {
                 dishIds: group.dishes.map(item => item.dish.id),
             }))).toEqual([
                 { label: 'Nấu ngay', minScore: 0.75, maxScore: 1, color: '#389e0d', dishIds: ['ready-higher-score', 'ready-lower-score'] },
-                { label: 'Cần mua thêm ít', minScore: 0.5, maxScore: 0.75, color: '#1677ff', dishIds: ['near-by-cook-now', 'near-by-score'] },
-                { label: 'Dự phòng', minScore: 0, maxScore: 0.5, color: '#fa8c16', dishIds: ['fallback'] },
+                { label: 'Cần mua thêm ít', minScore: 0.5, maxScore: 0.75, color: '#1677ff', dishIds: ['near-one-missing', 'near-two-missing'] },
+                { label: 'Dự phòng', minScore: 0, maxScore: 0.5, color: '#fa8c16', dishIds: ['backup-three-missing-high-cooknow', 'fallback'] },
             ]);
 
             expect(DishScorer.groupCookNow([makeScoredDish('only-ready', 1, [], 0.8)]).map(group => group.label))
                 .toEqual(['Nấu ngay']);
+        });
+
+        it('routes the real scoreCookNow pipeline into all three buckets when servingCount exceeds baseServings', () => {
+            const profile = {
+                ...DEFAULT_HOUSEHOLD_PREFERENCE_PROFILE,
+                servingCount: 4,
+                maxCookMinutes: 30,
+            };
+
+            const scored = DishScorer.scoreCookNow(
+                cookNowGroupingDishes,
+                cookNowGroupingInventory,
+                cookNowGroupingDishes,
+                cookNowGroupingIngredients,
+                profile,
+            );
+
+            // Serving scaling (4 / baseServings 2 = 2x) inflates required amounts so the
+            // fully-base-stocked dish is NOT zero-missing against scaled amounts.
+            const baseReady = scored.find(item => item.dish.id === 'cooknow-base-ready');
+            expect(baseReady?.missingIngredientIds.length).toBeGreaterThan(0);
+
+            const groups = DishScorer.groupCookNow(scored);
+            const labels = groups.map(group => group.label);
+
+            expect(labels).toEqual(expect.arrayContaining(['Nấu ngay', 'Cần mua thêm ít', 'Dự phòng']));
+            expect(labels).toHaveLength(3);
+
+            const dishIdsByLabel = (label: string) =>
+                groups.find(group => group.label === label)?.dishes.map(item => item.dish.id) ?? [];
+
+            expect(dishIdsByLabel('Nấu ngay')).toContain('cooknow-base-ready');
+            expect(dishIdsByLabel('Cần mua thêm ít')).toContain('cooknow-near-ready');
+            expect(dishIdsByLabel('Dự phòng')).toContain('cooknow-many-missing');
         });
     });
 
