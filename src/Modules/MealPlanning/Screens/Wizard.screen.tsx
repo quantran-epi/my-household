@@ -1,4 +1,5 @@
 import { Box } from "@components/Layout/Box";
+import { useModal } from "@components/Modal/ModalProvider";
 import { WizardProgress } from "@modules/MealPlanning/Components/WizardProgress";
 import { WizardIngredientStep } from "@modules/MealPlanning/Screens/WizardIngredientStep.widget";
 import { WizardPreferenceStep } from "@modules/MealPlanning/Screens/WizardPreferenceStep.widget";
@@ -19,6 +20,7 @@ const WIZARD_STEPS: WizardStepKey[] = ['ingredients', 'servings', 'preferences',
 
 export const WizardScreen: React.FC = () => {
     const dispatch = useDispatch();
+    const modal = useModal();
     const step = useSelector(selectWizardStep);
     const status = useSelector(selectWizardStatus);
     const defaults = useSelector(selectWizardDefaults);
@@ -51,6 +53,20 @@ export const WizardScreen: React.FC = () => {
 
     const hasDefaults = defaults !== undefined && Object.keys(defaults).length > 0;
 
+    // Destructive: clearing remembered defaults removes them for good, so gate it
+    // behind a confirm (UI-SPEC destructive-confirmation rule) — never silent.
+    const confirmClearDefaults = () => {
+        modal.confirm({
+            title: AppCopy.wizard.clearDefaultsConfirmTitle,
+            content: AppCopy.wizard.clearDefaultsConfirmBody,
+            okText: AppCopy.wizard.clearDefaultsAction,
+            cancelText: AppCopy.common.cancel,
+            okButtonProps: { danger: true },
+            centered: true,
+            onOk: () => dispatch(clearWizardDefaults()),
+        });
+    };
+
     return (
         <Box data-testid="wizard-screen" style={{ background: "#ffffff" }}>
             {hasDefaults && currentStep !== 'result' && (
@@ -58,8 +74,8 @@ export const WizardScreen: React.FC = () => {
                     data-testid="wizard-defaults-hint"
                     style={{
                         display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
+                        flexDirection: "column",
+                        alignItems: "flex-start",
                         gap: 8,
                         padding: "8px 12px",
                         background: "#f5f5f5",
@@ -69,7 +85,7 @@ export const WizardScreen: React.FC = () => {
                     <span style={{ fontSize: 13, color: "#595959", fontWeight: 600 }}>
                         {AppCopy.wizard.usingLastChoices}
                     </span>
-                    <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                         <Button
                             type="link"
                             size="small"
@@ -83,7 +99,7 @@ export const WizardScreen: React.FC = () => {
                             type="link"
                             size="small"
                             data-testid="wizard-clear-defaults"
-                            onClick={() => dispatch(clearWizardDefaults())}
+                            onClick={confirmClearDefaults}
                             style={{ paddingInline: 4, fontWeight: 600 }}
                         >
                             {AppCopy.wizard.clearDefaultsAction}

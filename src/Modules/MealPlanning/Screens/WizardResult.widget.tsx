@@ -5,6 +5,7 @@ import { Button } from "@components/Button";
 import { Checkbox } from "@components/Form/Checkbox";
 import { DatePicker } from "@components/Form/DatePicker";
 import { Input } from "@components/Form/Input";
+import { Radio } from "@components/Form/Radio/Radio";
 import { Box } from "@components/Layout/Box";
 import { Stack } from "@components/Layout/Stack";
 import { useMessage } from "@components/Message";
@@ -274,10 +275,17 @@ export const WizardResult: React.FunctionComponent = () => {
     const [missingTarget, setMissingTarget] = useState<MissingSheetTarget | null>(null);
     const [selectedMissingIds, setSelectedMissingIds] = useState<string[]>([]);
     const [createShoppingListName, setCreateShoppingListName] = useState<string>(AppCopy.wizard.missingCreateListName);
+    // Target for the missing-ingredient add: append to the open list, or spin up
+    // a brand-new one. Defaults to the open list when one exists (UAT gap 6).
+    const [missingTargetMode, setMissingTargetMode] = useState<'existing' | 'new'>(activeShoppingList ? 'existing' : 'new');
     const [lastMissingAdd, setLastMissingAdd] = useState<MissingAddState | null>(null);
     const missingRows = useMemo(
-        () => missingTarget ? buildMissingRows(missingTarget.item, ingredients, activeShoppingList) : [],
-        [activeShoppingList, ingredients, missingTarget]
+        // In 'new' mode the target is a fresh empty list, so nothing is
+        // pre-marked as already-added; only 'existing' diffs against the open list.
+        () => missingTarget
+            ? buildMissingRows(missingTarget.item, ingredients, missingTargetMode === 'existing' ? activeShoppingList : undefined)
+            : [],
+        [activeShoppingList, ingredients, missingTarget, missingTargetMode]
     );
 
     const addDishToDay = (dish: Dishes, day: Date, slot: keyof ScheduledMeal["meals"] = "dinner") => {
@@ -309,6 +317,7 @@ export const WizardResult: React.FunctionComponent = () => {
         const rows = buildMissingRows(item, ingredients, activeShoppingList);
         setSelectedMissingIds(rows.filter(row => !row.alreadyAdded).map(row => row.ingredientId));
         setCreateShoppingListName(AppCopy.wizard.missingCreateListName);
+        setMissingTargetMode(activeShoppingList ? 'existing' : 'new');
         setMissingTarget({ dish, item });
     };
 
@@ -322,7 +331,11 @@ export const WizardResult: React.FunctionComponent = () => {
     const confirmAddMissingIngredients = () => {
         if (!missingTarget) return;
 
-        const targetList = getLatestIncompleteShoppingList(shoppingLists);
+        // 'existing' appends to the open list; 'new' always spins up a fresh list
+        // even when an open one exists (UAT gap 6). When no open list exists the
+        // mode is already pinned to 'new' by openMissingSheet.
+        const useExisting = missingTargetMode === 'existing' && Boolean(activeShoppingList);
+        const targetList = useExisting ? activeShoppingList : undefined;
         const createdDate = new Date();
         const shoppingList = targetList ?? {
             id: `${(createShoppingListName.trim() || AppCopy.wizard.missingCreateListName)}${nanoid(10)}`,
@@ -561,9 +574,26 @@ export const WizardResult: React.FunctionComponent = () => {
                     </Typography.Text>
                 </Box>
 
-                {activeShoppingList ? <Typography.Text style={{ fontSize: 15, fontWeight: 600 }}>
-                    {AppCopy.wizard.missingTargetList({ name: activeShoppingList.name })}
-                </Typography.Text> : <Box style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {activeShoppingList ? <Box style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <Radio.Group
+                        value={missingTargetMode}
+                        data-testid="wizard-missing-target-mode"
+                        onChange={event => setMissingTargetMode(event.target.value)}
+                        style={{ display: "flex", flexDirection: "column", gap: 4 }}
+                    >
+                        <Radio value="existing" data-testid="wizard-missing-target-existing">
+                            {AppCopy.wizard.missingTargetExistingOption({ name: activeShoppingList.name })}
+                        </Radio>
+                        <Radio value="new" data-testid="wizard-missing-target-new">
+                            {AppCopy.wizard.missingTargetNewOption}
+                        </Radio>
+                    </Radio.Group>
+                    {missingTargetMode === 'new' && <Input
+                        value={createShoppingListName}
+                        placeholder={AppCopy.wizard.missingCreateListPlaceholder}
+                        onChange={event => setCreateShoppingListName(event.target.value)}
+                    />}
+                </Box> : <Box style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     <Typography.Text type="secondary" style={{ fontSize: 15, lineHeight: 1.45 }}>
                         {AppCopy.wizard.missingNoActiveList}
                     </Typography.Text>
@@ -620,7 +650,9 @@ export const WizardResult: React.FunctionComponent = () => {
                         disabled={selectedMissingCount === 0}
                         onClick={confirmAddMissingIngredients}
                     >
-                        {activeShoppingList ? AppCopy.wizard.missingAddAction : AppCopy.wizard.missingCreateAndAddAction}
+                        {missingTargetMode === 'existing' && activeShoppingList
+                            ? AppCopy.wizard.missingAddAction
+                            : AppCopy.wizard.missingCreateAndAddAction}
                     </Button>
                 </SheetActions>
             </Stack>

@@ -1,2 +1,2 @@
-export { Sheet } from '@components/FastOverlay';
-export type { SheetProps } from '@components/FastOverlay';
+export { Sheet, SheetActions } from '@components/FastOverlay';
+export type { SheetProps, SheetActionsProps } from '@components/FastOverlay';
