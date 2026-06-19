@@ -17,6 +17,8 @@ export type ScoredDish = {
     missingIngredientIds: string[];
     stockedIngredientIds?: string[];
     partialIngredientIds?: string[];
+    /** True when stock covers the UNscaled base recipe, independent of serving-scaled amounts. */
+    baseReady?: boolean;
     urgentIngredients?: ScoredDishUrgentIngredient[];
     ingredientDetails?: ScoredDishIngredientDetail[];
     extraShoppingCost?: IngredientPriceRange | null;
@@ -142,15 +144,17 @@ const scoreInventoryDishes = (
         .map(dish => {
             const amounts = collectAllIngredientAmounts(dish, dishById, amountsCache);
             const scale = getScale(dish);
-            const grouped: Record<string, { required: number; unit: IngredientUnit; ingredient?: Ingredient }> = {};
+            const grouped: Record<string, { required: number; baseRequired: number; unit: IngredientUnit; ingredient?: Ingredient }> = {};
             amounts.forEach(amount => {
                 const ingredient = ingredientById.get(amount.ingredientId);
                 if (InventoryHelper.isAlwaysAvailable(ingredient)) return;
                 const baseUnit = IngredientUnitHelper.getBaseUnit(ingredient, [amount.unit]);
-                const required = (IngredientUnitHelper.toBaseAmount(ingredient, amount.amount, amount.unit, baseUnit)
-                    ?? IngredientUnitHelper.parseAmount(amount.amount)) * scale;
-                if (!grouped[amount.ingredientId]) grouped[amount.ingredientId] = { required: 0, unit: baseUnit, ingredient };
+                const baseRequired = (IngredientUnitHelper.toBaseAmount(ingredient, amount.amount, amount.unit, baseUnit)
+                    ?? IngredientUnitHelper.parseAmount(amount.amount));
+                const required = baseRequired * scale;
+                if (!grouped[amount.ingredientId]) grouped[amount.ingredientId] = { required: 0, baseRequired: 0, unit: baseUnit, ingredient };
                 grouped[amount.ingredientId].required += required;
+                grouped[amount.ingredientId].baseRequired += baseRequired;
             });
 
             const requiredIds = Object.keys(grouped);
@@ -171,6 +175,12 @@ const scoreInventoryDishes = (
                     partial: !matched && inStock > 0,
                     alwaysAvailable: false,
                 } as ScoredDishIngredientDetail;
+            });
+            // Unscaled readiness: stock covers the base recipe even if serving-scaled amounts exceed stock.
+            const baseReady = requiredIds.every(id => {
+                const item = grouped[id];
+                const inStock = InventoryHelper.availableAmount(inventory[id], item.ingredient, item.baseRequired, inventoryConfig);
+                return item.baseRequired > 0 && inStock >= item.baseRequired;
             });
             const stocked = ingredientDetails.filter(item => item.inStockAmount > 0).map(item => item.ingredientId);
             const matched = ingredientDetails.filter(item => item.matched).map(item => item.ingredientId);
@@ -200,6 +210,7 @@ const scoreInventoryDishes = (
                 missingIngredientIds: missing,
                 stockedIngredientIds: stocked,
                 partialIngredientIds: partial,
+                baseReady,
                 urgentIngredients,
                 ingredientDetails,
                 extraShoppingCost: CostEstimateHelper.hasPrice(extraShoppingSummary)
@@ -400,9 +411,12 @@ export const DishScorer = {
         ];
 
         for (const item of scored) {
-            if (item.missingIngredientIds.length === 0) {
+            // "Nấu ngay": stock covers the base recipe (unscaled), even when serving-scaled
+            // amounts leave a shortfall. Falls back to zero-missing for synthetic inputs.
+            if (item.baseReady || item.missingIngredientIds.length === 0) {
                 groups[0].dishes.push(item);
-            } else if ((item.score >= 0.5 || (item.cookNowScore ?? 0) >= 0.58) && item.missingIngredientIds.length <= 3) {
+            } else if (item.missingIngredientIds.length <= 2) {
+                // "Cần mua thêm ít": near-ready by inventory readiness, not composite score baseline.
                 groups[1].dishes.push(item);
             } else {
                 groups[2].dishes.push(item);
