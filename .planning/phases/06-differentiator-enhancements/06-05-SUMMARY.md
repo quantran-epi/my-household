@@ -127,3 +127,7 @@ None - no external service configuration required.
 ---
 *Phase: 06-differentiator-enhancements*
 *Completed: 2026-06-19*
+
+## Self-Check: PASSED
+- All modified files present on disk (SUMMARY, FastOverlay, Sheet index).
+- All task commits resolve in git log: 835bbaa, abc5571, c9085c8, 542893a, 97e2cf9.
