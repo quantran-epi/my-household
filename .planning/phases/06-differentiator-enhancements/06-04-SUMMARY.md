@@ -107,3 +107,7 @@ _TDD: RED (`3f13cb7`) then GREEN (`1f16687`)._
 ---
 *Phase: 06-differentiator-enhancements*
 *Completed: 2026-06-19*
+
+## Self-Check: PASSED
+- Files verified on disk: DishScorer.ts, DishScorer.test.ts, 06-04-SUMMARY.md, deferred-items.md
+- Commits verified in git: 3f13cb7 (test), 1f16687 (fix), 4118474 (docs), c111d0d (docs)
