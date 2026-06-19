@@ -52,6 +52,8 @@ export const AppCopy = {
         usingLastChoices: "Đang dùng lựa chọn lần trước",
         startFreshAction: "Chọn lại từ đầu",
         clearDefaultsAction: "Xóa lựa chọn đã nhớ",
+        clearDefaultsConfirmTitle: "Xóa lựa chọn đã nhớ",
+        clearDefaultsConfirmBody: "Mình sẽ xóa các lựa chọn đã nhớ từ lần trước. Lần sau bạn sẽ chọn lại từ đầu. Bạn có chắc không?",
         // Preference step
         preferenceStepTitle: "Bạn thích món kiểu nào?",
         preferencePickerTrigger: "Chọn sở thích",
