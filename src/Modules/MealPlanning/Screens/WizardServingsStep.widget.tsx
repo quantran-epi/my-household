@@ -3,8 +3,9 @@ import { AppCopy } from "@common/Copy";
 import { Box } from "@components/Layout/Box";
 import { Stack } from "@components/Layout/Stack";
 import { Typography } from "@components/Typography";
+import { HouseholdHealthStatusTag } from "@modules/Home/Screens/HouseholdHealth.widget";
 import { WizardAnswers } from "@store/Models/Wizard";
-import { selectHouseholdMembers, selectWizardAnswers } from "@store/Selectors";
+import { selectHouseholdHealthProfiles, selectHouseholdMembers, selectWizardAnswers } from "@store/Selectors";
 import { Button } from "antd";
 import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
@@ -16,9 +17,23 @@ type WizardServingsStepProps = {
 
 const clampServingCount = (value: number): number => Math.max(1, Math.min(24, Math.round(value)));
 
+// Short per-member description: prefer a free-text note, else summarise the
+// preference counts (mirrors the "X thích · Y tránh · Z chặn" pattern from
+// HouseholdProfiles.screen.tsx) so the card always says something useful.
+const buildMemberDescription = (member: ReturnType<typeof selectHouseholdMembers>[number]): string => {
+    const note = member.notes?.trim();
+    if (note) return note;
+    const likes = member.favoriteDishIds.length + member.favoriteIngredientIds.length + member.preferredTags.length;
+    const avoids = member.avoidedDishIds.length + member.avoidedIngredientIds.length + member.avoidedTags.length;
+    const blocks = member.allergenIngredientIds.length + member.hardExcludedIngredientIds.length;
+    if (likes + avoids + blocks === 0) return AppCopy.wizard.memberNoPreferences;
+    return AppCopy.wizard.memberPreferenceSummary({ likes, avoids, blocks });
+};
+
 export const WizardServingsStep: React.FC<WizardServingsStepProps> = ({ onNext, onBack }) => {
     const answers = useSelector(selectWizardAnswers);
     const members = useSelector(selectHouseholdMembers);
+    const healthProfiles = useSelector(selectHouseholdHealthProfiles);
 
     const initialMemberIds = useMemo(() => {
         if (answers.memberIds && answers.memberIds.length > 0) return answers.memberIds;
@@ -62,6 +77,7 @@ export const WizardServingsStep: React.FC<WizardServingsStepProps> = ({ onNext, 
                 <Stack direction="column" gap={8} fullwidth align="stretch" style={{ marginBottom: 20 }}>
                     {members.map(member => {
                         const active = selectedMemberIds.includes(member.id);
+                        const description = buildMemberDescription(member);
                         return (
                             <button
                                 key={member.id}
@@ -69,23 +85,31 @@ export const WizardServingsStep: React.FC<WizardServingsStepProps> = ({ onNext, 
                                 data-testid={`wizard-member-${member.id}`}
                                 onClick={() => toggleMember(member.id)}
                                 style={{
+                                    width: "100%",
                                     minHeight: 44,
                                     borderRadius: 12,
                                     border: active ? "2px solid #7436dc" : "1px solid #e8e2f7",
                                     background: active ? "#7436dc12" : "#fff",
-                                    padding: "10px 12px",
+                                    padding: 16,
                                     display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "space-between",
-                                    gap: 8,
+                                    alignItems: "flex-start",
+                                    gap: 12,
                                     textAlign: "left",
                                     cursor: "pointer",
                                 }}
                             >
-                                <Typography.Text style={{ fontSize: 16, fontWeight: active ? 600 : 400, color: "#111827", overflowWrap: "anywhere" }}>
-                                    {member.name}
-                                </Typography.Text>
-                                {active && <CheckOutlined style={{ color: "#7436dc", fontSize: 14, flexShrink: 0 }} />}
+                                <Box style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0, flex: 1 }}>
+                                    <Stack align="center" gap={8} wrap="wrap">
+                                        <Typography.Text style={{ fontSize: 16, fontWeight: active ? 600 : 500, color: "#111827", overflowWrap: "anywhere" }}>
+                                            {member.name}
+                                        </Typography.Text>
+                                        <HouseholdHealthStatusTag status={healthProfiles[member.id]?.status} compact />
+                                    </Stack>
+                                    <Typography.Text type="secondary" style={{ fontSize: 13, lineHeight: 1.4, overflowWrap: "anywhere" }}>
+                                        {description}
+                                    </Typography.Text>
+                                </Box>
+                                {active && <CheckOutlined style={{ color: "#7436dc", fontSize: 16, flexShrink: 0, marginTop: 2 }} />}
                             </button>
                         );
                     })}

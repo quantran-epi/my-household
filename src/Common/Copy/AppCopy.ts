@@ -49,6 +49,8 @@ export const AppCopy = {
         selectedMembers: (args: { count: number }) => `${args.count} người ăn`,
         servingsMinusLabel: "Giảm phần ăn",
         servingsPlusLabel: "Tăng phần ăn",
+        memberPreferenceSummary: (args: { likes: number; avoids: number; blocks: number }) => `${args.likes} thích · ${args.avoids} tránh · ${args.blocks} chặn`,
+        memberNoPreferences: "Chưa có sở thích riêng",
         usingLastChoices: "Đang dùng lựa chọn lần trước",
         startFreshAction: "Chọn lại từ đầu",
         clearDefaultsAction: "Xóa lựa chọn đã nhớ",
