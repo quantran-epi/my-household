@@ -381,3 +381,50 @@ export const Sheet: React.FunctionComponent<SheetProps> = ({
         document.body,
     );
 };
+
+// Horizontal action row for sheets and inline confirm panels (06-UI-SPEC):
+// one action stretches full width; two+ actions sit side by side with equal
+// flex so neither overflows on phone widths. Each direct child is wrapped so
+// the row controls sizing without the caller setting flex on every Button.
+export type SheetActionsProps = {
+    children?: React.ReactNode;
+    style?: React.CSSProperties;
+    "data-testid"?: string;
+};
+
+export const SheetActions: React.FunctionComponent<SheetActionsProps> = ({
+    children,
+    style,
+    "data-testid": testId,
+}) => {
+    const items = React.Children.toArray(children).filter(Boolean);
+    return (
+        <div
+            data-testid={testId}
+            style={{
+                display: "flex",
+                alignItems: "stretch",
+                gap: 8,
+                width: "100%",
+                ...style,
+            }}
+        >
+            {items.map((child, index) => {
+                // Stretch each action to share the row equally; a single action
+                // therefore fills the full width (06-UI-SPEC sheet-action rule).
+                if (React.isValidElement(child)) {
+                    const childStyle = (child.props as { style?: React.CSSProperties }).style;
+                    return React.cloneElement(child as React.ReactElement, {
+                        key: index,
+                        style: { flex: "1 1 0", minWidth: 0, ...childStyle },
+                    });
+                }
+                return (
+                    <div key={index} style={{ flex: "1 1 0", minWidth: 0 }}>
+                        {child}
+                    </div>
+                );
+            })}
+        </div>
+    );
+};
