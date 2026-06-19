@@ -45,9 +45,26 @@ A local Vietnamese household member can open the app and go from "what do we eat
 - ✓ All pre-refactor routes stay reachable; global search + bottom-nav center into wizard — v1.0 (NAV-02..04)
 - ✓ v2 differentiators (portions, cook-now filter, inline shopping, remembered defaults, "why this dish") — v1.0 Phase 6 (WIZ2-01..05)
 
+## Current Milestone: v1.1 Native iOS Feel — Sheet Pickers & Hands-On Polish
+
+**Goal:** Make the whole app feel like a native iOS app — every dropdown/combobox/datepicker becomes a gesture-driven bottom-sheet picker, with thumb-zone, safe-area-aware sheets and a cohesive iOS-flavored visual polish across high-traffic screens.
+
+**Target features:**
+- Reusable sheet-picker layer on `@components/Sheet`: SheetSelect (single), SheetMultiSelect, SheetDatePicker (date/time), SheetActionMenu (iOS action-sheet style)
+- Convert all picker sites app-wide (~80 `Select`, ~17 `DatePicker`, ~17 `Dropdown`) — high-traffic screens prioritized, admin/rare screens included
+- Native sheet gestures: drag-to-dismiss, snap points, grabber handle, backdrop dimming
+- Safe-area & thumb-zone layout: iOS safe-area insets (notch/home indicator), sticky bottom CTAs
+- iOS visual baseline defined in-milestone: spacing/radius/type-scale tokens, sheet styling, applied as targeted polish to Home, wizard, shopping, scheduled meal, dishes, ingredient
+
+**Out of scope this milestone:** haptics & spring motion transitions; full system-aesthetic reskin (iOS system fonts, segmented controls, inset-grouped tables). The 10 v1.0 deferred items remain tech debt, not part of this milestone's DoD.
+
 ### Active
 
-<!-- v2 milestone not yet scoped — define via /gsd-new-milestone -->
+<!-- v1.1 requirements defined via /gsd-new-milestone -->
+
+- [ ] Native iOS-feel sheet-picker conversion (see REQUIREMENTS.md, milestone v1.1)
+
+<!-- Carried-over tech debt — NOT in v1.1 scope -->
 
 - [ ] Native Vietnamese household-user copy sign-off (Phase 5 follow-up UAT — automated clean, human tone review outstanding)
 - [ ] Close out v1.0 deferred quality items: 5 open debug sessions, Phase 03/06 UAT scenarios, Phase 02/04/06 human verification (see STATE.md Deferred Items)
@@ -58,6 +75,8 @@ A local Vietnamese household member can open the app and go from "what do we eat
 - Replacing the tech stack (React/RTK/Ant Design) — refactor is UX/copy-led, not a rewrite
 - New domain features beyond what exists — this milestone reframes existing capability, it doesn't add new domains
 - Multi-language support beyond Vietnamese — Vietnamese is the target audience
+- Haptics and spring-motion transitions (v1.1) — deferred to keep v1.1 focused on sheet-picker conversion + layout, not motion polish
+- Full iOS system-aesthetic reskin (system fonts, segmented controls, inset-grouped tables) (v1.1) — v1.1 defines a lightweight token baseline, not a wholesale visual language swap
 
 ## Context
 
@@ -98,6 +117,12 @@ A local Vietnamese household member can open the app and go from "what do we eat
 
 | Adopt a typed `AppCopy` source of truth before rewording any screens | Avoid hand-editing ~408 inline strings twice; make a bad key a build error | Validated in Phase 1: Copy Infrastructure |
 
+| v1.1 = native iOS feel via sheet-picker conversion, not a re-platform | App works but pickers (AntD Select/DatePicker/Dropdown) feel like a web admin tool, not a native phone app | — Pending (v1.1) |
+| Build a reusable sheet-picker layer (SheetSelect/MultiSelect/DatePicker/ActionMenu) on existing `@components/Sheet` rather than ad-hoc per site | ~80 Select + 17 DatePicker + 17 Dropdown sites — a shared layer keeps conversion consistent and cuts per-site work | — Pending (v1.1) |
+| Convert all picker sites app-wide (high-traffic first), not just user-facing screens | User asked for app-wide native feel; partial conversion leaves jarring web/native mix | — Pending (v1.1) |
+| Define iOS visual tokens in-milestone (no external design reference) | No Figma/reference exists; lightweight token baseline (spacing/radius/type/sheet styling) is enough for "hands-on + visual" goal | — Pending (v1.1) |
+| Defer haptics/spring-motion and full system-aesthetic reskin out of v1.1 | Keep scope on the high-impact picker+layout conversion; motion/full reskin are separate polish efforts | — Pending (v1.1) |
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
@@ -116,4 +141,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-19 after v1.0 UI/UX Refactor milestone*
+*Last updated: 2026-06-19 — v1.1 Native iOS Feel milestone started*
