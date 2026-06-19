@@ -1,112 +1,101 @@
 # Stack Research
 
-**Domain:** UI/UX refactor of an existing local-first household/meal-planning PWA (React 18 + Ant Design 5 + Redux Toolkit). Focus: guided mobile wizard, single-locale (Vietnamese) copy management, mobile-first interaction patterns.
-**Researched:** 2026-06-14
-**Confidence:** HIGH
+**Domain:** Native-iOS-feel sheet-picker conversion for an existing local-first meal-planning PWA (React 18 + Ant Design 5 + RTK, CRACO, Workbox, GitHub Pages, iOS-focused)
+**Researched:** 2026-06-19
+**Confidence:** HIGH (codebase-verified; existing Sheet/FastOverlay primitive read in full)
 
-> **Scope note:** This milestone is a UX/copy refactor on a FIXED stack. The headline recommendation is **add almost nothing** — the existing stack already contains everything the three goals need. New dependencies are the exception, not the rule. Where this doc lists a "technology," it is most often an existing primitive (antd `Steps`, antd `Drawer`, RTK slice, `ConfigProvider` tokens) being applied to a new purpose, not a new install.
+> **Headline: add ZERO runtime dependencies.** The existing `@components/Sheet` (a `createPortal` bottom-anchored overlay in `src/Components/FastOverlay/FastOverlay.tsx`) already provides backdrop, z-index stacking tokens, body-scroll-lock, escape-close, and a CSS keyframe entrance animation. Drag-to-dismiss, snap points, a grabber handle, and safe-area insets are all achievable with React pointer events + CSS `env()` — no gesture/animation library is justified for a PWA where bundle size is a stated constraint. The date picker is the only place a small library is even worth *considering*, and the recommendation is still to avoid one.
 
 ## Recommended Stack
 
-### Core Technologies
+### Core Technologies (all already installed)
 
 | Technology | Version | Purpose | Why Recommended |
 |------------|---------|---------|-----------------|
-| Ant Design `Steps` | 5.16.1 (already installed) | Visual step indicator for the meal-planning wizard | First-party, already themed via `ConfigProvider`. Supports `items[]`, `current`, `onChange`, `responsive` (auto-switches to vertical <532px — ideal mobile fallback), `type="inline"`, `size="small"`, and `progressDot` for compact phone display. No new dependency, no theming drift. |
-| Ant Design `Drawer` (`placement="bottom"`) | 5.16.1 (already installed) | Mobile bottom-sheet for pickers, confirmations, step detail overlays | The canonical antd 5 bottom-sheet. `placement="bottom"` + `height` prop (default 378, accepts number/string) gives a native-feeling sheet. Already used across the shell, so behavior/theming is consistent. |
-| RTK slice (wizard state) | `@reduxjs/toolkit` 2.2.3 (already installed) | Orchestrate wizard step/answers, persist & resume offline | Reuse the existing `personal` persisted root so a half-finished "what to cook" flow survives reload/offline — a real win for a PWA. Matches the existing `createSlice` + selector convention exactly. No new library. |
-| Centralized strings module (plain TS) | n/a (new source file, no dependency) | Single source of truth for Vietnamese user-facing copy | For a single-locale app, a typed `const` strings object is the right tool. Matches the codebase's "PascalCase Helper object with camelCase members" convention (e.g. `DateHelpers`). Type-safe, zero runtime cost, zero new dependency, trivially greppable. |
+| React | 18.2 | Pointer-event handlers (`onPointerDown/Move/Up`) drive drag-to-dismiss + snap; `setPointerCapture` keeps drag tracking off-element | Already the runtime; Pointer Events unify mouse/touch and work in iOS Safari 13+ |
+| Ant Design | 5.16 | Source of the components being replaced (`Select`, `DatePicker`, `Dropdown`) and the `Form` the new pickers must bind to | Constraint: no re-platform. New pickers replace AntD controls but keep AntD `Form` validation |
+| dayjs | 1.11 | AntD 5's native date type. `SheetDatePicker` value type MUST stay `Dayjs` to be a drop-in for AntD `DatePicker` | AntD 5 already uses dayjs internally; staying on it avoids a value-type mismatch at every call site |
+| CSS `env(safe-area-inset-*)` + `100dvh`/`100svh` | native | iOS safe-area insets (notch/home indicator) and the iOS-Safari URL-bar viewport bug | Zero-dependency, the iOS-correct approach; requires `<meta viewport ... viewport-fit=cover>` |
+| TypeScript | 4.9 | Typed picker props | Note: `strict:false`, `target:es5` (see PITFALLS — null-safety not compiler-enforced) |
 
 ### Supporting Libraries
 
 | Library | Version | Purpose | When to Use |
 |---------|---------|---------|-------------|
-| Ant Design `Segmented` | 5.16.1 (installed) | Large-touch single-choice toggles inside wizard steps (e.g. "bữa sáng / trưa / tối") | When a step offers 2–4 mutually exclusive options. Bigger touch target and clearer state than radio buttons on mobile. |
-| Ant Design `FloatButton` / `FloatButton.Group` | 5.16.1 (installed) | Persistent primary action ("Bắt đầu nấu", "Tiếp tục") | When the hero CTA must stay reachable with a thumb during scroll. |
-| Ant Design `Result` | 5.16.1 (installed, already wrapped in `@components/Result`) | Wizard completion / empty-state screens | End-of-wizard "đã lên thực đơn" confirmation and friendly empty states. Already wrapped locally. |
-| Ant Design `App` context (`message`/`modal`/`notification`) | 5.16.1 (installed, already wired in `App.tsx`) | Step feedback toasts | Already in the provider stack — reuse, don't add a toast lib. |
+| (none required) | — | — | The conversion needs no new runtime dep. Resist adding one. |
+| @use-gesture/react | 10.x (`/pmndrs/use-gesture`) | Richer drag/inertia binding | ONLY if hand-rolled pointer-drag proves insufficient for momentum/inertia (it won't for tap-to-select sheets). ~5–8KB gz. Deferred. |
+| vaul | 1.x | Pre-built React drag-to-dismiss bottom sheet | Considered and rejected: a parallel sheet implementation that would duplicate/fight the existing FastOverlay portal + z-index stacking. Adopting it means re-doing v1.0's Sheet work. |
 
-### Development Tools
+### Development Tools (already configured)
 
 | Tool | Purpose | Notes |
 |------|---------|-------|
-| TypeScript `const`-assertion + keyof types | Compile-time safety for the strings module | Type the strings object `as const` and derive a `CopyKey` union so missing/typo'd keys fail at build (`enableTypeChecking: true` is already on in `craco.config.js`). No tooling install. |
-| Existing path alias (`@common/*`) | Home for the strings module | Place copy under `src/Common/Constants` or `src/Common/Copy` to match the SCREAMING_SNAKE/Helper conventions and keep imports alias-based. |
+| Playwright (e2e) | The safety net for a ~118-site conversion | Existing specs in `tests/e2e/`; add per-picker-type interaction specs before mass migration |
+| Jest + RTL | Component-level proof for the new picker layer | `Sheet.test.tsx` is the existing pattern to follow |
+| CRACO / react-scripts 5 | Build | No config change needed for pointer events or `env()` CSS |
 
-## Installation
+## Picker-by-picker stack decision
 
-```bash
-# Core: NOTHING to install. All three goals are met with the existing stack.
-# (antd 5.16.1, @reduxjs/toolkit 2.2.3, react-redux 9.1.0 are already present.)
+| Replacing | Count (tags) | New component | Underlying tech |
+|-----------|-------|---------------|-----------------|
+| `<Select>` single | ~80 total `<Select` | `SheetSelect` | Sheet + scrollable option list, tap row → check |
+| `<Select mode="multiple"/"tags">` | (subset of above) | `SheetMultiSelect` | Sheet + checkbox rows + "Xong" confirm |
+| `<DatePicker>` | ~23 | `SheetDatePicker` | Sheet hosting AntD inline calendar (or native `<input type=date>`); value stays `Dayjs` |
+| `<Dropdown>` (overflow/action menus) | ~15 | `SheetActionMenu` | Sheet + action rows + destructive styling + separate "Hủy" |
 
-# Supporting: NOTHING to install.
+## Date/time picker — the one real decision
 
-# Dev dependencies: NOTHING to install.
-```
+The app has BOTH `moment` (used in `src/Common/Helpers/DateHelper.ts`) and `dayjs` (AntD 5's type). **`SheetDatePicker` must accept/emit `Dayjs`** to match AntD `DatePicker` call sites; do NOT introduce a third date idiom. Three viable hosts inside the sheet, in preference order:
 
-> If the team later decides true multi-locale is in scope (currently **out of scope** per PROJECT.md), revisit i18next — see "Alternatives Considered."
+1. **AntD `DatePicker` rendered `open` + inline inside the sheet body** (`getPopupContainer` → the sheet) — reuses AntD's dayjs calendar, zero new dep, preserves min/max/format props. *Recommended.*
+2. **Native `<input type="date">` / `datetime-local`** — true iOS wheel UI for free, but value is a string (needs `dayjs()` parse/format at the boundary) and loses AntD format/locale control.
+3. A JS wheel-picker library — rejected (new dep, another date model).
 
 ## Alternatives Considered
 
 | Recommended | Alternative | When to Use Alternative |
 |-------------|-------------|-------------------------|
-| Centralized typed strings module | `i18next` 26.3.1 + `react-i18next` 17.0.8 | Only if real multi-locale (e.g. add English) becomes a requirement, OR you need ICU pluralization/interpolation across hundreds of keys with translator tooling. For a single Vietnamese locale this is overhead: extra deps, a provider, async namespace loading, and JSON files that lose TS type-safety — all to solve a problem (runtime language switching) you don't have. |
-| RTK slice for wizard orchestration | `react-use-wizard` 2.3.0 | If you want a ready-made `useWizard()` (next/prev/goto/active) and don't need persistence. **Caveat:** last published Feb 2024 (low maintenance signal) and its in-memory state would NOT survive reload — losing the offline-resume benefit. Reasonable only for a throwaway/ephemeral flow. |
-| RTK slice for wizard state | `useReducer` + Context (local) | Fine if the wizard is fully self-contained, never needs to resume after reload, and no other screen reads its state. Simpler, but you give up redux-persist resume and the established selector pattern. |
-| antd `Drawer placement="bottom"` | `react-spring-bottom-sheet` / `vaul` | Only if you need gesture-driven snap points and velocity physics. Adds a dependency and a second styling system that won't inherit `ConfigProvider` tokens. Not worth it for picker/confirm sheets. |
-| antd `Steps` | `react-step-wizard`, custom CSS stepper | If you need an exotic visual the antd `Steps` variants (`default`/`dot`/`inline`/`navigation`) can't express. Unlikely here. |
+| Hand-rolled pointer-drag on existing Sheet | `@use-gesture/react` + react-spring | Only if you later need flick/inertia physics; overkill for select/action sheets |
+| Extend existing `@components/Sheet` | `vaul` bottom-sheet library | Never here — would duplicate FastOverlay and re-litigate z-index stacking |
+| AntD inline calendar in a sheet | Native `<input type=date>` | If you want the literal iOS system wheel and can absorb string↔Dayjs conversion |
+| CSS `env()` safe-area | JS-measured insets | Never — `env()` is the supported, repaint-free path |
 
 ## What NOT to Use
 
 | Avoid | Why | Use Instead |
 |-------|-----|-------------|
-| `antd-mobile` | It is a **separate component library** from `antd`, not an add-on. Mixing it with antd 5 means two theming systems, two design languages, duplicated bundle weight, and inconsistent components. The app already standardizes on antd 5 + `ConfigProvider` tokens + local wrappers. | antd 5's own mobile-capable primitives: `Drawer placement="bottom"`, `Steps responsive`, `Segmented`, `FloatButton`, plus responsive layout + larger control-height tokens. |
-| `i18next` / `react-i18next` (for this milestone) | Multi-language is explicitly out of scope (PROJECT.md). A full i18n runtime adds a provider, async loading, and untyped JSON for a single-locale app — pure overhead with no payoff. | Typed centralized strings module (`as const` + derived key union). |
-| `react-use-wizard` | Unmaintained signal (last publish Feb 2024) and in-memory only — a reload mid-flow loses progress, which contradicts the offline-first PWA goal. | RTK slice persisted in the `personal` root + antd `Steps` for the indicator. |
-| Adding `formik` / `react-hook-form` | The app already has a typed form abstraction (`SmartForm`/`useSmartForm`) over antd Form. A second form library fragments patterns. | Reuse `SmartForm` for per-step inputs; antd `Form` instance per step or one form spanning steps. |
-| New CSS/styling system (styled-components, Tailwind, CSS Modules) for touch targets | The app themes via antd `ConfigProvider` token overrides + Less. Introducing another styling layer fragments the design system. | Tune `ConfigProvider` tokens (`controlHeight`, `controlHeightLG`, `sizeStep`, `fontSize`) and use antd `size="large"` on interactive controls. |
-| Replacing/duplicating the date lib | `moment` and `dayjs` already coexist; adding a third or swapping is churn unrelated to UX. | Match the date lib already used in the file you touch (convention). |
+| `vaul` / `react-spring-bottom-sheet` | Parallel sheet stack; duplicates FastOverlay portal + z-index singletons built in v1.0 | Extend `@components/Sheet` |
+| A JS date-wheel library | Third date model on top of moment+dayjs; new bundle weight | AntD inline calendar (Dayjs) inside the sheet |
+| `100vh` for full-height sheets | iOS Safari URL bar makes `100vh` overflow under the toolbar | `100dvh` with `min(85dvh, …)`; `svh` fallback |
+| Adding `framer-motion` | ~30KB+ for animations the CSS keyframes already cover; motion polish is OUT OF SCOPE this milestone | Existing `@keyframes` in FastOverlay + CSS transitions |
+| Migrating `moment`→`dayjs` as part of this milestone | Big risky cross-cutting change unrelated to pickers | Keep DateHelper on moment; new pickers speak Dayjs (matches AntD) |
 
 ## Stack Patterns by Variant
 
-**If the wizard must resume after reload/offline (recommended default for this PWA):**
-- Use a dedicated RTK slice (e.g. `MealPlanWizardReducer.ts`) in the `personal` persisted root, with selectors in `Selectors.ts`.
-- antd `Steps` reads `current` from the slice; step components dispatch answer actions.
-- Because `serializableCheck` is already disabled and selectors defensively default missing slices (`?? {}`), a new slice is migration-safe against older persisted blobs.
+**If a picker is inside an AntD `Form.Item` (SmartForm):**
+- The new control must expose `value` + `onChange` (and ideally accept `id`, `status`) so `Form.Item` binds it like any custom control.
+- Because `SmartFormItem` is a thin pass-through to `AntForm.Item`, no SmartForm change is needed — only the picker must honor the controlled contract.
 
-**If the wizard is intentionally ephemeral (no resume):**
-- `useReducer` + Context inside the wizard route subtree.
-- Still drive the antd `Steps` indicator from that local state.
-
-**For mobile step layout:**
-- Phone-first: render one step per full screen; use `Steps type="dot"`/`progressDot` or `size="small"` as a slim top progress indicator rather than a wide horizontal stepper.
-- Rely on `Steps responsive` (auto-vertical <532px) only as a fallback; prefer the compact dot indicator for hero flows.
-- Put secondary pickers (date, member count, dish choice) in a bottom `Drawer` so the primary question stays in view.
-
-**For touch-target sizing:**
-- Set `size="large"` on `Button`, `Select`, `Input`, `Segmented` inside the wizard.
-- Bump `ConfigProvider` tokens (`controlHeightLG`) so the existing local wrappers inherit larger targets without per-component edits. Target ~44px minimum touch height.
-
-**For the Vietnamese copy pass:**
-- One `Copy`/strings module per domain or one app-wide module with nested namespaces, typed `as const`.
-- Keep keys semantic (`mealWizard.startCta`), values Vietnamese. This makes the cross-cutting copy audit a single-file review and prevents English/jargon leftovers from hiding in JSX.
+**If a picker is standalone (not Form-bound):**
+- Same `value`/`onChange` contract; the call site owns state. Most ScheduledMeal/ShoppingList pickers are this shape.
 
 ## Version Compatibility
 
 | Package A | Compatible With | Notes |
 |-----------|-----------------|-------|
-| antd 5.16.1 | React 18.2 | Already running in production. `Steps`, `Drawer placement="bottom"`, `Segmented`, `FloatButton`, `Result` all available in 5.16.x. (Note: antd docs site now shows v6.x — do NOT follow v6 prop changes like `orientation`/`size` height semantics; stay on the 5.x API: `direction`, `progressDot`, `Drawer height`.) |
-| @reduxjs/toolkit 2.2.3 | redux-persist 6.0.0, react-redux 9.1.0 | Existing wiring; a new wizard slice plugs into the established `personal` persisted root with no version work. |
-| TypeScript 4.9.5 | `as const` strings + `keyof typeof` | Const assertions and key-union derivation fully supported; build-time type checking already enabled in CRACO. |
-| (if ever adopted) react-i18next 17.0.8 | i18next 26.3.1, React 18 | Compatible, but out of scope — listed only for the future multi-locale contingency. |
+| antd@5.16 | dayjs@1.11 | AntD 5 date components are dayjs-native; keep `SheetDatePicker` on Dayjs |
+| react@18.2 | Pointer Events | `onPointerDown/Move/Up` + `setPointerCapture` work in iOS Safari 13+ |
+| CRACO/react-scripts 5 | CSS `env()` / `dvh` | No build change; `dvh`/`svh` need iOS 15.4+ (acceptable for iOS-focused PWA), keep `vh` fallback |
 
 ## Sources
 
-- Ant Design v5 `Drawer` docs (`5x.ant.design/components/drawer`) — verified `placement="bottom"`, `height` prop (default 378, string|number) — HIGH
-- Ant Design v5 `Steps` docs (`5x.ant.design/components/steps`) — verified `items`, `current`, `direction`, `progressDot`, `responsive` (<532px vertical), `type` (default/navigation/inline), `size`, `onChange` — HIGH
-- npm registry (live query) — antd 5.16.1 (installed), i18next 26.3.1, react-i18next 17.0.8, zustand 5.0.14, react-use-wizard 2.3.0 (last modified 2024-02-19, peer React >=16.8) — HIGH
-- Existing codebase docs: `.planning/codebase/STACK.md`, `ARCHITECTURE.md`, `CONVENTIONS.md`, `.planning/PROJECT.md` — fixed stack, conventions, out-of-scope constraints — HIGH
+- `src/Components/FastOverlay/FastOverlay.tsx` — read in full: Sheet/Modal/Drawer shells, z-index stacking tokens, body-scroll-lock, escape-close, keyframe animations (HIGH confidence)
+- `src/Components/Form/DatePicker/DatePicker.tsx`, `src/Components/Form/Select/Select.tsx` — existing AntD wrappers, popup z-index 4200 (HIGH)
+- `package.json` — antd 5.16, dayjs 1.11, moment 2.30, react 18.2, typescript 4.9 (HIGH)
+- `tsconfig.json` — target es5, strict false (HIGH)
+- `/pmndrs/use-gesture` (Context7) — gesture library exists if ever needed; not recommended now
+- iOS Safari `env(safe-area-inset-*)`, `dvh`/`svh` — standard web platform behavior
 
 ---
-*Stack research for: UI/UX refactor — guided wizard + Vietnamese copy + mobile-first patterns on React 18 / antd 5 / RTK*
-*Researched: 2026-06-14*
+*Stack research for: native iOS sheet-picker conversion*
+*Researched: 2026-06-19*

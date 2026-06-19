@@ -1,214 +1,99 @@
 # Feature Research
 
-**Domain:** UX/journey patterns for a local-first household meal-planning PWA ("what to cook tonight") aimed at Vietnamese home cooks
-**Researched:** 2026-06-14
-**Confidence:** MEDIUM
+**Domain:** Native iOS bottom-sheet picker & action-sheet behaviors for a phone-first React PWA
+**Researched:** 2026-06-19
+**Confidence:** HIGH (iOS HIG patterns + existing Sheet primitive verified)
 
-> **Scope note.** This milestone is a **UI/UX refactor of existing capability**, not new domains. Every item below is a *journey/interaction pattern* layered over features that already ship (Dishes, Ingredient, ShoppingList, ScheduledMeal, DishSuggester, Home, CookingSession). Nothing here proposes a new domain feature. "Complexity" is rated for *this codebase* (React 18 + RTK + Ant Design 5, shell in `MasterPage.tsx`, forms via `SmartForm`).
->
-> **Source/confidence caveat.** Live web search and fetch were unavailable in this run, so competitor-by-competitor citations could not be captured. Findings rest on well-established, slow-moving UX patterns (guided wizards, first-run onboarding, microcopy/empty-state conventions, mobile-first interaction). Treat the *pattern guidance* as HIGH confidence and the *competitor-specific* claims as LOW until verified. See Sources + Gaps.
+> **Scope note.** Every item is an *interaction behavior* the new picker layer (SheetSelect / SheetMultiSelect / SheetDatePicker / SheetActionMenu) must replicate to feel native. These replace ~80 `<Select`, ~23 `<DatePicker`, ~15 `<Dropdown` sites. The existing `@components/Sheet` already gives: bottom-anchored panel, backdrop + tap-to-dismiss (`maskClosable`), body-scroll-lock, escape-close, 18px top radius, z-index stacking. It does NOT yet have: grabber handle, drag-to-dismiss, snap/detent points, safe-area padding. OUT OF SCOPE per milestone: haptics, spring-physics motion, full system-aesthetic reskin.
 
-## Feature Landscape
+## Feature Categories
 
-### Table Stakes (Users Expect These)
+### 1. Single-select sheet (`SheetSelect`)
 
-The guided "decide what to cook" journey fails without these. They are the minimum for a first-timer to reach a planned meal unaided.
+| Behavior | Classification | Complexity | Notes |
+|----------|---------------|------------|-------|
+| Tap a row → select → auto-dismiss | TABLE STAKES | Low | The iOS idiom for single choice: no separate confirm. Emit `onChange(value)` then `onClose()` |
+| Selected row shows a trailing checkmark | TABLE STAKES | Low | iOS uses a leading/trailing check, not a radio |
+| Current value highlighted on open + scrolled into view | TABLE STAKES | Low | `scrollIntoView` the selected row |
+| Search/filter field for long option lists | TABLE STAKES (for long lists) | Med | Many of the ~80 Selects have `showSearch`; preserve it. Sticky search at sheet top |
+| Row min-height ≥44px, full-width tap target | TABLE STAKES | Low | Already the v1.0 thumb-zone bar |
+| Disabled options shown dimmed, non-tappable | TABLE STAKES | Low | Map AntD `option.disabled` |
+| Grouped options (section headers) | DIFFERENTIATOR | Med | AntD `OptGroup` exists in some selects; render as sticky group labels |
+| Clearable ("Bỏ chọn" / none row) | DIFFERENTIATOR | Low | Mirror AntD `allowClear` |
+| Virtualized list for very long option sets | DIFFERENTIATOR | Med | `react-window@2.2.7` already installed; use only if a list is >~100 rows |
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| **Single obvious entry point** ("Hôm nay ăn gì?" / "What do we eat today?") on Home | First-timers must not have to guess which admin screen starts the journey. One hero button beats six menu items. | LOW | Add a primary CTA to `Home` module that launches the wizard route. Reuses existing `DishSuggester` underneath. |
-| **Step-by-step wizard with one decision per screen** | Phone-first users can't parse a dense form. One question per step = lower cognitive load, higher completion. | MEDIUM | New wizard screen(s) in a module (e.g. extend `DishSuggester` or `ScheduledMeal`). Each step is a thin UI over existing selectors; no new state domain. |
-| **Visible progress + back navigation** | Users need to know "how many steps left" and to undo a choice without losing the flow. | LOW | Ant Design `Steps`/progress dots + per-step local state. Back must not reset earlier answers. |
-| **Sensible defaults / skippable steps** | A tired cook wants to reach a result in 2 taps. Every step must have a "skip / no preference" path. | LOW | Each input optional; wizard produces a result even with zero answers (falls back to current `DishSuggester` behavior). |
-| **A concrete result the user can act on** (a suggested dish → "Add to today's meals") | The journey only succeeds if it ends in a *scheduled meal*, not a list to ponder. | MEDIUM | Wire wizard result → existing `ScheduledMeal` add action. This is the success metric ("reach a planned meal"). |
-| **Empty states that teach, not scold** | First run, every list is empty. "No data" looks broken; "Chưa có món nào — thêm món đầu tiên nhé" invites action. | LOW | App-wide empty-state copy pass using Ant Design `Empty` with custom description + primary action. |
-| **Friendly, familiar Vietnamese labels (no English/jargon)** | "Inventory", "Schedule", "Suggester" read as admin software. Home cooks expect kitchen language. | MEDIUM (breadth) | App-wide copy pass across all modules + nav. High effort = surface area, not difficulty. See Vietnamese microcopy section below. |
-| **Mobile-first touch targets & layout** | It's a phone-first PWA. Tap targets, bottom-reachable CTAs, no hover-only affordances. | MEDIUM | Audit `MasterPage` shell + wizard. Primary action within thumb reach; min 44px targets. |
-| **Resume / don't-lose-progress on a multi-step flow** | Mobile users get interrupted. Re-opening shouldn't dump them back at step 1 with answers gone. | MEDIUM | Hold wizard answers in component/RTK transient state; survive route changes within the flow. Full persistence across app restart is a differentiator, not table stakes. |
-| **Clear confirmation after the action** | "Đã thêm vào bữa hôm nay" closes the loop so the user knows they succeeded. | LOW | Reuse existing `Message` toast provider + a result screen state. |
+### 2. Multi-select sheet (`SheetMultiSelect`)
 
-### Differentiators (Make It Feel Delightful/Intuitive)
+| Behavior | Classification | Complexity | Notes |
+|----------|---------------|------------|-------|
+| Checkbox/check rows, tap toggles without dismissing | TABLE STAKES | Low | Differs from single: sheet STAYS open |
+| Explicit "Xong" (Done) confirm to commit + dismiss | TABLE STAKES | Low | iOS multi-select commits on Done, not per-tap |
+| Running count of selected ("Đã chọn (3)") in header | TABLE STAKES | Low | The existing Select wrapper already renders a "Đã chọn (n)" panel — reuse the idea |
+| Cancel discards changes (revert to value-on-open) | TABLE STAKES | Med | Keep a draft array; only emit `onChange` on Done |
+| Search/filter for long lists | TABLE STAKES (long lists) | Med | Preserve `showSearch` from `mode="multiple"/"tags"` |
+| Select-all / Clear-all affordance | DIFFERENTIATOR | Low | Useful for tag pickers |
+| "tags" mode: create a new free-text value | DIFFERENTIATOR | Med | A subset of Selects use `mode="tags"`; support add-new or document deferral |
 
-Not required for the journey to work, but these turn "admin tool" into "friendly kitchen helper" — directly serving the Core Value.
+### 3. Date/time picker sheet (`SheetDatePicker`)
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| **"Who's eating?" step driving portions** | Cooking for 2 vs 6 changes everything; asking up front feels personal and tunes the suggestion. | MEDIUM | Reuse `normalizeHouseholdMembers` / household config already in state. Step pre-fills from saved household, editable per session. |
-| **"What's in the fridge?" quick-pick step** | Suggesting dishes you can cook *now* (using on-hand ingredients) is the magic moment vs a generic recipe list. | MEDIUM | Read existing inventory/`Ingredient` state; filter `DishSuggester` candidates by available ingredients. No new domain — a new *lens* on existing data. |
-| **"How much time / how lazy today?" step** | Maps to real home-cook mood ("nấu nhanh" vs "nấu kỹ"). Feels human, not like a database query. | LOW-MEDIUM | Needs a time/effort attribute on dishes; if absent, derive a coarse proxy or make it a soft filter. Flag for requirements. |
-| **Conversational, encouraging microcopy** | Wizard prompts phrased as a friendly question ("Nhà mình mấy người ăn?") not field labels make it feel guided. | LOW | Copy work, biggest perceived-quality lever per effort. |
-| **One-tap "Bất kỳ / Tùy bạn" (surprise me) at every step** | Decision fatigue is the core problem; letting the app decide is a feature, not a fallback. | LOW | Same as skip, but framed positively as a deliberate choice. |
-| **Result with light reasoning** ("Gợi ý vì nhà còn đủ nguyên liệu") | A one-line "why" builds trust in the suggestion and teaches how the app thinks. | LOW-MEDIUM | Surface which inputs drove the match. Cheap if the filter already knows. |
-| **Smooth step transitions / momentum** | Subtle forward animation signals progress and makes a multi-step flow feel fast rather than tedious. | LOW | CSS/AntD motion; keep light for PWA perf. |
-| **Inline "add to shopping list" when an ingredient is missing** | If the chosen dish needs something not on hand, offering to add it bridges plan → shop seamlessly. | MEDIUM | Connects wizard result to existing `ShoppingList` add. Reframe, not new domain. |
-| **Remember last session's answers as defaults** | Households cook in patterns; pre-filling yesterday's "who's eating" shaves taps daily. | MEDIUM | Persist last-used wizard inputs in `personal` root. Respect the offline-first persist contract. |
+| Behavior | Classification | Complexity | Notes |
+|----------|---------------|------------|-------|
+| Calendar/wheel hosted IN the bottom sheet, not a popover | TABLE STAKES | Med | Render AntD inline calendar inside the sheet body (Dayjs value) |
+| Value type stays `Dayjs` (drop-in for AntD DatePicker) | TABLE STAKES | Med | Critical — see PITFALLS value-type section |
+| Confirm/"Xong" + Cancel (or tap-day-to-commit) | TABLE STAKES | Low | Day-tap-commits for date; Done for datetime |
+| min/max date constraints preserved | TABLE STAKES | Low | Map AntD `disabledDate` |
+| "Hôm nay" (Today) shortcut | DIFFERENTIATOR | Low | Common iOS convenience |
+| Time selection (hour/minute) where the site needs it | TABLE STAKES (where used) | Med | Only the sites that pass `showTime`; most are date-only |
+| Range selection (RangePicker) | DIFFERENTIATOR / DEFER | High | A few sites use `RangePicker`; can stay AntD initially and convert last |
 
-### Anti-Features (Over-Engineering for a Single-Household Local App)
+### 4. Action menu / iOS action sheet (`SheetActionMenu`)
 
-Things that look like good meal-planning features but are wrong for a *single-household, local-first, no-backend* app. Documenting to prevent scope creep.
+| Behavior | Classification | Complexity | Notes |
+|----------|---------------|------------|-------|
+| Vertical list of action rows, each full-width ≥44px | TABLE STAKES | Low | Replaces `<Dropdown>` overflow menus |
+| Destructive action styled red ("Xóa") | TABLE STAKES | Low | iOS destructive idiom; map a `danger` flag |
+| Cancel as a SEPARATE, visually-detached button | TABLE STAKES | Low | iOS groups Cancel apart from the action list |
+| Optional leading icon per action | DIFFERENTIATOR | Low | Many Dropdowns already carry icons |
+| Optional title/subtitle context header | DIFFERENTIATOR | Low | "What does this menu act on?" |
+| Disabled actions dimmed | TABLE STAKES | Low | Map `disabled` |
 
-| Feature | Why Requested | Why Problematic | Alternative |
-|---------|---------------|-----------------|-------------|
-| **Account login / user profiles in the wizard** | Big meal-planning apps have accounts. | App is explicitly local-first, PIN-only, no backend (PROJECT out-of-scope). Adds friction that *defeats* the "reach a meal without help" goal. | Use device-local household config already in state. No auth in the journey. |
-| **AI/LLM chat to "ask what to cook"** | Trendy, feels smart. | Heavy, needs network (breaks offline-first), unpredictable for a fixed household catalog, large effort vs a 3-step picker. | A deterministic guided wizard over the existing `DishSuggester` is faster, offline, and predictable. |
-| **Nutrition tracking / calorie counting steps** | Common in Western meal apps. | Out of scope (no such domain exists), wrong cultural fit, balloons the wizard, demands data the app doesn't have. | Leave out entirely. Keep the journey about *deciding*, not measuring. |
-| **Multi-week meal calendar / batch planning in the wizard** | "Plan the whole week!" sounds powerful. | The hero journey is *tonight*. Weekly planning is a different, heavier flow; bundling it bloats the first-run path and hurts mobile. | Keep wizard = "what to cook now → schedule it." Existing `ScheduledMeal` already covers planning ahead separately. |
-| **Social / sharing / community recipes** | Recipe apps often have feeds. | Single household, no backend, no audience. Pure complexity, zero value here. | None. Sharing already exists narrowly via admin publish/Gist backup — don't surface it in the cook journey. |
-| **Onboarding tour with multi-slide carousel before first use** | "Teach the user the app." | Intro carousels are widely skipped/ignored; they delay the user from the goal. | Teach *in context*: helpful empty states + the wizard itself is the tutorial. Maybe one optional tip on the hero button. |
-| **Configurable wizard (user reorders/adds steps)** | Power-user flexibility. | Single household doesn't need it; settings UI is admin-feel, the exact thing we're removing. | Opinionated fixed step order chosen by good defaults. |
-| **Mandatory full ingredient inventory before suggesting** | "Need data to suggest." | Forcing data entry up front is the #1 first-run drop-off. The fridge step must be optional. | Suggest from the whole catalog by default; the fridge filter is an optional enhancement step. |
-| **Highly granular per-step validation / error gating** | Form-builder instinct. | Blocking progress on a *preference* wizard is hostile; nothing here is truly required. | Every step skippable; never block forward motion on a non-critical input. |
+### 5. Cross-cutting sheet behaviors (shared base, applies to all four)
 
-## Anatomy of the Guided "Decide What to Cook" Wizard
+| Behavior | Classification | Complexity | Notes |
+|----------|---------------|------------|-------|
+| Grabber handle (pill) at top of sheet | TABLE STAKES | Low | The single biggest "looks native" signal; add to the Sheet base |
+| Drag-down-to-dismiss | TABLE STAKES | Med | Pointer events on the header/grabber; translateY follows finger, release past threshold → close |
+| Backdrop tap-to-dismiss + dimming | DONE (exists) | — | `maskClosable` + `rgba` backdrop already in Sheet |
+| Safe-area bottom padding (home indicator) | TABLE STAKES | Low | `padding-bottom: env(safe-area-inset-bottom)`; sticky CTAs must clear it |
+| Scroll-within-sheet vs drag-the-sheet disambiguation | TABLE STAKES | High | Hardest behavior: only start sheet-drag when content scroll is at top. The known iOS-Safari trap (see PITFALLS) |
+| Snap/detent points (medium vs large height) | DIFFERENTIATOR | High | iOS sheets snap to ~half then full. Nice-to-have; tap-pickers work fine at one height |
+| Sticky header: title + Cancel/Done | TABLE STAKES | Low | Sheet already has a header row with a close button; extend with Done |
+| Rounded top corners | DONE (exists) | — | 18px radius already in Sheet |
+| `prefers-reduced-motion` respect | TABLE STAKES | Low | FastOverlay already honors it |
+| Focus management / keyboard for search field | TABLE STAKES | Med | Focus search on open; avoid iOS keyboard shoving the sheet (PITFALLS) |
 
-Recommended step order (each step: one question, big options, a skip/"tùy bạn" path, visible progress, back enabled):
+## What "done" looks like (per milestone goal)
 
-```
-Step 0  Hero entry on Home: "Hôm nay ăn gì?" → launches wizard
-Step 1  Ai ăn? (Who's eating / how many)      [pre-filled from household, skippable]
-Step 2  Nấu nhanh hay nấu kỹ? (Time / effort)  [skippable — differentiator]
-Step 3  Trong bếp có gì? (What's on hand)       [optional filter — differentiator]
-        (optional) Kiểu món / vị (cuisine/type) [skippable, only if catalog supports it]
-Step 4  Kết quả: suggested dish(es) + one-line "why"
-Step 5  Action: "Thêm vào bữa hôm nay" → ScheduledMeal
-        + optional "Thiếu nguyên liệu? Thêm vào đi chợ" → ShoppingList
-Done    Confirmation toast + clear next step (view today's meals)
-```
+- All four picker components exist, are Form-bindable (`value`/`onChange`), and carry grabber + drag-to-dismiss + safe-area padding from the shared Sheet base.
+- All ~118 picker sites are converted with no lost capability (search, multiple/tags mode, min/max dates, clear).
+- The app reads as "native iOS phone app," not "web admin tool with dropdowns."
 
-Design rules that make it work for first-timers on mobile:
-- **Result reachable from step 1.** If the user skips everything, step 1 → result must still produce a dish.
-- **Forward is always one tap.** Defaults pre-selected; "Tiếp tục / Tùy bạn" always available.
-- **Primary CTA in thumb zone** (bottom), back/skip secondary.
-- **The wizard is the tutorial.** No separate onboarding tour needed.
+## Anti-features (explicitly skip this milestone)
 
-## Onboarding / First-Run Patterns (Get to First Success Fast)
-
-| Pattern | Use here? | Notes |
-|---------|-----------|-------|
-| Single hero CTA as the "start" | **Yes — table stakes** | The first-run path *is* the meal wizard. |
-| Helpful empty states with action | **Yes — table stakes** | Every empty list teaches the next step. |
-| Contextual coachmark on the hero button (1 tip max) | Optional differentiator | Only if testing shows users miss the entry point. |
-| Pre-seeded sample household / defaults | Differentiator | Reduces the "blank app" problem on first open. |
-| Progress persistence within the flow | Table stakes | Don't lose answers on interruption. |
-| Multi-slide intro carousel | **Anti-feature** | Skipped, delays the goal. |
-| Forced data entry before value | **Anti-feature** | #1 drop-off cause; keep inputs optional. |
-
-## Vietnamese Microcopy / Labeling Conventions
-
-Shift from administrative to kitchen-familiar language across all modules. Examples (illustrative, validate with a native target user):
-
-| Current admin-feel | Friendlier home-cook framing |
-|--------------------|------------------------------|
-| "Dishes" / module label | "Món ăn" |
-| "Ingredient" / "Inventory" | "Nguyên liệu" / "Trong bếp" |
-| "Shopping List" | "Đi chợ" / "Cần mua" |
-| "Scheduled Meal" | "Bữa ăn" / "Bữa hôm nay" |
-| "Dish Suggester" | "Hôm nay ăn gì?" |
-| "No data" / empty | "Chưa có gì ở đây — thêm cái đầu tiên nhé" |
-| "Submit" / "Save" | "Xong" / "Lưu lại" |
-| "Add to schedule" | "Thêm vào bữa hôm nay" |
-
-Conventions:
-- Prefer **questions and verbs** the cook would say aloud over noun labels ("Hôm nay ăn gì?" not "Suggestions").
-- **Address the user warmly** ("nhà mình", "nhé") — natural, not corporate.
-- **Empty states invite**, never report failure.
-- **No leftover English or technical jargon** in any user-facing string (incl. errors, toasts, button labels, nav).
-- Keep terms **consistent** across nav, screens, and toasts (one word per concept).
-
-## Feature Dependencies
-
-```
-[Friendly Vietnamese copy pass] ──enables──> [All journey patterns feel coherent]
-
-[Guided wizard]
-    └──requires──> [Single hero entry point on Home]
-    └──requires──> [Existing DishSuggester logic]
-    └──ends in───> [ScheduledMeal add]  (success metric)
-    └──enhanced by─> ["Who's eating" step]   (needs household config)
-    └──enhanced by─> ["Fridge" filter step]  (needs Ingredient/inventory state)
-    └──enhanced by─> ["Time/effort" step]    (needs effort attribute on dishes ← may be missing)
-    └──enhanced by─> [Inline add-to-shopping] (needs ShoppingList add)
-
-[Empty-state copy] ──enhances──> [First-run success]
-[Remember last answers] ──enhances──> [Wizard]  (needs personal persist root)
-
-[Mobile-first shell audit] ──conflicts──> [Oversized MasterPage.tsx]  (refactor pressure)
-```
-
-### Dependency Notes
-- **Wizard requires a hero entry point:** without one obvious launch on Home, first-timers never find the flow.
-- **Wizard must end in ScheduledMeal:** the named success signal is "reach a *planned* meal," so the action step is non-negotiable.
-- **"Time/effort" step depends on a dish attribute that may not exist:** flag for requirements — if dishes carry no effort/time data, this step is deferred or uses a proxy.
-- **Copy pass is cross-cutting and gates perceived quality:** it touches every module + the shell; sequence it so wizard screens are written in the new voice from the start (avoid double work).
-- **Mobile audit collides with `MasterPage.tsx` (>1300 lines):** journey + responsiveness work will pressure the shell; expect extraction of `CookingPill` / `BottomTabNavigator` (see codebase CONCERNS).
-
-## MVP Definition
-
-### Launch With (v1) — the hero journey
-- [ ] Single hero entry on Home ("Hôm nay ăn gì?") — without it the journey is undiscoverable
-- [ ] Step-by-step wizard (one question/screen, progress, back, skip) over existing `DishSuggester` — the core reframe
-- [ ] Result → "Thêm vào bữa hôm nay" (ScheduledMeal add) — the success metric
-- [ ] Friendly Vietnamese copy + inviting empty states across the journey screens — the "not admin" feel
-- [ ] Mobile-first layout for the wizard (thumb-zone CTA, touch targets) — phone-first requirement
-- [ ] In-flow progress preservation — don't lose answers on interruption
-
-### Add After Validation (v1.x)
-- [ ] "Who's eating?" portion step — once household config is comfortably wired
-- [ ] "What's in the fridge?" filter step — once inventory-driven filtering is validated
-- [ ] Inline "add missing ingredient to Đi chợ" — after the plan→shop bridge tests well
-- [ ] Remember last session's answers — after the base flow is stable
-- [ ] One-line "why this dish" reasoning — when filter inputs are exposed
-
-### Future Consideration (v2+)
-- [ ] "Time/effort" step — defer until dishes carry effort/time data
-- [ ] Optional cuisine/type step — only if the catalog supports meaningful categories
-- [ ] Contextual coachmark on hero button — only if usability testing shows users miss it
-
-## Feature Prioritization Matrix
-
-| Feature | User Value | Implementation Cost | Priority |
-|---------|------------|---------------------|----------|
-| Hero entry point on Home | HIGH | LOW | P1 |
-| Step-by-step wizard over DishSuggester | HIGH | MEDIUM | P1 |
-| Result → ScheduledMeal add | HIGH | MEDIUM | P1 |
-| Friendly Vietnamese copy + empty states | HIGH | MEDIUM | P1 |
-| Mobile-first wizard layout | HIGH | MEDIUM | P1 |
-| In-flow progress preservation | MEDIUM | MEDIUM | P1 |
-| "Who's eating?" step | MEDIUM | MEDIUM | P2 |
-| "What's in the fridge?" filter | HIGH | MEDIUM | P2 |
-| Inline add-to-shopping | MEDIUM | MEDIUM | P2 |
-| Remember last answers | MEDIUM | MEDIUM | P2 |
-| "Why this dish" reasoning | MEDIUM | LOW | P2 |
-| "Time/effort" step | MEDIUM | MEDIUM (blocked on data) | P3 |
-| Cuisine/type step | LOW | LOW | P3 |
-| Coachmark on hero | LOW | LOW | P3 |
-
-**Priority key:** P1 = must have for launch · P2 = should have, add when possible · P3 = nice to have / future.
-
-## Competitor Feature Analysis
-
-Live competitor research could not be captured this run (web tools unavailable). The patterns below reflect commonly observed conventions in consumer meal-planning apps and should be **verified** before being treated as authoritative.
-
-| Pattern | Common in consumer meal apps | Our approach |
-|---------|------------------------------|--------------|
-| "What should I cook?" guided picker | Frequently a multi-filter screen or quiz | One-question-per-step wizard, fully skippable, offline |
-| Cook-with-what-you-have | Premium/differentiator feature | Optional fridge filter over existing inventory |
-| Onboarding | Often multi-slide carousel | In-context: empty states + wizard *is* the tutorial |
-| Accounts/cloud sync | Standard | Out of scope — local-first, PIN only |
-| AI chat assistant | Emerging trend | Deliberate anti-feature here (offline, deterministic catalog) |
+| Skip | Why |
+|------|-----|
+| Haptic feedback on selection | Out of scope (haptics deferred); PWA haptic support on iOS is unreliable anyway |
+| Spring/inertia physics on drag | Out of scope (motion polish deferred); a linear translate + threshold close is enough |
+| iOS system font stack / segmented controls / inset-grouped tables | Out of scope (full reskin deferred); v1.1 defines only lightweight tokens |
+| Multi-detent snap as a hard requirement | Differentiator, not table stakes; single-height sheets are acceptable |
 
 ## Sources
 
-- Established UX pattern knowledge: guided/wizard flow design, first-run onboarding, microcopy and empty-state conventions, mobile-first interaction (e.g. Nielsen Norman Group guidance on wizards, onboarding, and empty states). *Confidence: HIGH for pattern guidance.*
-- Project + codebase context: `.planning/PROJECT.md`, `.planning/codebase/ARCHITECTURE.md`, `.planning/codebase/STRUCTURE.md`. *Confidence: HIGH.*
-- Competitor-specific claims: **NOT verified this run** — live web search/fetch were unavailable. *Confidence: LOW; verify before relying.*
-
-## Gaps to Address (need verification or phase research)
-- **Live competitor review** of "what to cook" apps (step inventories, result framing) — couldn't fetch; do a targeted pass when web tools are available.
-- **Native Vietnamese copy validation** — the microcopy table is illustrative; confirm phrasing/tone with a target household user.
-- **Dish effort/time data** — does the `Dishes` model carry a time or effort attribute? Determines whether the "nấu nhanh/nấu kỹ" step is v1.x or v2+.
-- **Fridge-filter feasibility** — confirm inventory state granularity supports "can cook now" filtering of `DishSuggester` candidates.
+- Apple HIG — Sheets, Pickers, Action Sheets (interaction idioms)
+- `src/Components/FastOverlay/FastOverlay.tsx` — what the Sheet base already provides vs what's missing (HIGH)
+- `src/Components/Form/Select/Select.tsx` — existing "Đã chọn (n)" multi-select panel, showSearch/tags usage (HIGH)
+- `src/Modules/` — picker usage patterns (ScheduledMeal dates, dish/ingredient category selects, tag multi-selects, overflow Dropdowns)
 
 ---
-*Feature research for: UX/journey refactor of an existing Vietnamese household meal-planning PWA*
-*Researched: 2026-06-14*
+*Feature research for: native iOS sheet-picker behaviors*
+*Researched: 2026-06-19*
