@@ -70,33 +70,33 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SHEET-01 | TBD | Pending |
-| SHEET-02 | TBD | Pending |
-| SHEET-03 | TBD | Pending |
-| SHEET-04 | TBD | Pending |
-| SHEET-05 | TBD | Pending |
-| SHEET-06 | TBD | Pending |
-| PICK-01 | TBD | Pending |
-| PICK-02 | TBD | Pending |
-| PICK-03 | TBD | Pending |
-| PICK-04 | TBD | Pending |
-| PICK-05 | TBD | Pending |
-| PICK-06 | TBD | Pending |
-| PICK-07 | TBD | Pending |
-| PICK-08 | TBD | Pending |
-| IOS-01 | TBD | Pending |
-| IOS-02 | TBD | Pending |
-| IOS-03 | TBD | Pending |
-| CONV-01 | TBD | Pending |
-| CONV-02 | TBD | Pending |
-| CONV-03 | TBD | Pending |
-| CONV-04 | TBD | Pending |
-| CONV-05 | TBD | Pending |
+| SHEET-01 | Phase 7 | Pending |
+| SHEET-02 | Phase 7 | Pending |
+| SHEET-03 | Phase 7 | Pending |
+| SHEET-04 | Phase 7 | Pending |
+| SHEET-05 | Phase 7 | Pending |
+| SHEET-06 | Phase 7 | Pending |
+| PICK-01 | Phase 8 | Pending |
+| PICK-02 | Phase 8 | Pending |
+| PICK-03 | Phase 8 | Pending |
+| PICK-04 | Phase 8 | Pending |
+| PICK-05 | Phase 8 | Pending |
+| PICK-06 | Phase 8 | Pending |
+| PICK-07 | Phase 8 | Pending |
+| PICK-08 | Phase 8 | Pending |
+| IOS-01 | Phase 9 | Pending |
+| IOS-02 | Phase 9 | Pending |
+| IOS-03 | Phase 9 | Pending |
+| CONV-01 | Phase 10 & 11 | Pending |
+| CONV-02 | Phase 10 & 11 | Pending |
+| CONV-03 | Phase 10 & 11 | Pending |
+| CONV-04 | Phase 10 | Pending |
+| CONV-05 | Phase 11 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 22 total
-- Mapped to phases: 0 (set during roadmap)
-- Unmapped: 22 ⚠️ (resolved by roadmapper)
+- Mapped to phases: 22
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-19*

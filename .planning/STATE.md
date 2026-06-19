@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-14)
 
 **Core value:** A local Vietnamese household member can open the app and go from "what do we eat?" to a planned meal quickly, in familiar language, without it feeling like an admin tool.
-**Current focus:** Phase 06 — differentiator-enhancements
+**Current focus:** Phase 07 — Native Sheet Foundation (v1.1)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Not started (roadmap defined)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-19 — Milestone v1.1 started
+Status: Ready to plan Phase 7
+Last activity: 2026-06-19 — Milestone v1.1 roadmap approved (5 phases, 7-11)
 
 ## Performance Metrics
 
