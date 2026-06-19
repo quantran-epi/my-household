@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
+status: Awaiting next milestone
 stopped_at: Phase 6 complete; ready for deployment
-last_updated: "2026-06-19T03:26:42.022Z"
-last_activity: 2026-06-19 -- Phase 06 execution started
+last_updated: "2026-06-19T07:10:15.759Z"
+last_activity: 2026-06-19 — Milestone v1.0 completed and archived
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 27
-  completed_plans: 25
-  percent: 83
+  completed_plans: 27
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,10 @@ See: .planning/PROJECT.md (updated 2026-06-14)
 
 ## Current Position
 
-Phase: 06 (differentiator-enhancements) — EXECUTING
-Plan: 1 of 5
-Status: Executing Phase 06
-Last activity: 2026-06-19 -- Phase 06 execution started
-
-Progress: [▓▓▓▓▓▓▓▓▓▓] 100%
+Phase: Milestone v1.0 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-19 — Milestone v1.0 completed and archived
 
 ## Performance Metrics
 
@@ -107,9 +105,25 @@ Items acknowledged and carried forward from previous milestone close:
 |----------|------|--------|-------------|
 | Wizard step | "Time/effort" step (nấu nhanh/nấu kỹ) — blocked on dish data | Deferred (v2+/P3) | 2026-06-14 |
 | Differentiators | WIZ2-01..05 (portions, fridge filter, inline shopping, remembered defaults, "why this dish") | Complete in Phase 6 | 2026-06-14 |
+| debug | add-to-new-shopping-list-option | diagnosed | 2026-06-19 |
+| debug | clear-defaults-confirm-and-layout | diagnosed | 2026-06-19 |
+| debug | cook-now-single-group | investigating | 2026-06-19 |
+| debug | member-selection-layout | diagnosed | 2026-06-19 |
+| debug | suggested-dish-sheet-overflow | investigating | 2026-06-19 |
+| uat_gap | Phase 03 — 03-UAT.md (2 pending scenarios) | testing | 2026-06-19 |
+| uat_gap | Phase 06 — 06-UAT.md (4 pending scenarios) | testing | 2026-06-19 |
+| verification_gap | Phase 02 — 02-VERIFICATION.md | human_needed | 2026-06-19 |
+| verification_gap | Phase 04 — 04-VERIFICATION.md | human_needed | 2026-06-19 |
+| verification_gap | Phase 06 — 06-VERIFICATION.md | human_needed | 2026-06-19 |
+
+10 items acknowledged and deferred as tech debt at v1.0 milestone close on 2026-06-19.
 
 ## Session Continuity
 
 Last session: 2026-06-18T16:28:00Z
 Stopped at: Phase 6 complete; ready for deployment
 Resume file: None
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone

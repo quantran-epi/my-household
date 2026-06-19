@@ -34,16 +34,23 @@ A local Vietnamese household member can open the app and go from "what do we eat
 - ✓ Guided meal-planning journey — Phase 4 (Home hero, persisted wizard UI, add-to-meal result flow, route reachability)
 - ✓ Phone-first high-traffic copy rollout — Phase 5 (journey/shell/shopping/scheduled-meal/dish-suggester/dishes/ingredient surfaces migrated to `AppCopy` and Sheet patterns; native-speaker copy UAT remains follow-up)
 
+<!-- v1.0 UI/UX Refactor requirements — shipped 2026-06-19 -->
+
+- ✓ Reframe the app from "admin tool" to a guided customer journey — v1.0 (NAV-01)
+- ✓ Step-by-step guided meal-planning wizard (one question per screen, progress, back, skippable) — v1.0 (WIZ-01..05)
+- ✓ First-time user reaches a scheduled meal unaided from empty data — v1.0 (WIZ-07, cold-start E2E)
+- ✓ Phone-first journey layout with thumb-zone CTAs and ~44px touch targets, bottom-sheet pickers — v1.0 (MOB-01..03)
+- ✓ High-traffic Vietnamese copy migration with friendly empty-states — v1.0 (COPY-03..05)
+- ✓ Top-level error boundary + shell decomposition out of `MasterPage.tsx` — v1.0 (FND-01, FND-02)
+- ✓ All pre-refactor routes stay reachable; global search + bottom-nav center into wizard — v1.0 (NAV-02..04)
+- ✓ v2 differentiators (portions, cook-now filter, inline shopping, remembered defaults, "why this dish") — v1.0 Phase 6 (WIZ2-01..05)
+
 ### Active
 
-<!-- First milestone: UI/UX refactor. Hypotheses until shipped. -->
+<!-- v2 milestone not yet scoped — define via /gsd-new-milestone -->
 
-- [ ] Reframe the app from "admin tool" to a guided customer journey
-- [ ] Turn meal planning ("what to cook") into a step-by-step guided wizard flow
-- [ ] A first-time user can reach a scheduled meal without touching anything that feels like admin
-- [ ] App-wide pass on labels, descriptions, and empty-states so all user-facing copy reads natural to a local Vietnamese user (no English/jargon leftovers)
-- [ ] The guided flow works smoothly on mobile (phone-first PWA)
-- [ ] Preserve all existing capability — reframe entry points, don't remove features
+- [ ] Native Vietnamese household-user copy sign-off (Phase 5 follow-up UAT — automated clean, human tone review outstanding)
+- [ ] Close out v1.0 deferred quality items: 5 open debug sessions, Phase 03/06 UAT scenarios, Phase 02/04/06 human verification (see STATE.md Deferred Items)
 
 ### Out of Scope
 
@@ -54,9 +61,11 @@ A local Vietnamese household member can open the app and go from "what do we eat
 
 ## Context
 
+- **v1.0 UI/UX Refactor shipped 2026-06-19** — 6 phases, 27 plans, 63 tasks over 197 commits (2026-06-14 → 2026-06-19). The app is reframed from an admin-style tool into a guided "Hôm nay ăn gì?" journey: Home hero CTA → step-by-step skippable wizard → scheduled meal, all phone-first with bottom-sheet pickers and migrated Vietnamese copy. Closed with 10 acknowledged tech-debt items (see STATE.md Deferred Items).
 - Phase 1 complete (2026-06-14): typed `AppCopy` copy foundation under `src/Common/Copy/` (`@common/Copy`) — source of truth, build-gated `CopyKey` union, review-only glossary. App-wide copy *migration* is Phase 5.
 - Phase 3 complete (2026-06-16): wizard progress/answers persist under the existing `personal` redux-persist root through a `wizard` RTK slice, with `selectWizard*` as the defensive read path and DishScorer characterization tests pinning result behavior before UI wiring.
 - Phase 5 complete (2026-06-17): phone-first journey polish and high-traffic Vietnamese copy migration are automated-verified; `AppCopy` final key count is 476 after a review-time wrapper subtitle fix; native Vietnamese household-user sign-off remains the main follow-up risk.
+- Phase 6 complete (2026-06-19): v2 differentiators landed — remembered wizard defaults, skippable servings/member step, optional cook-now grouped results with one-line reasons, and inline add-missing-ingredient to Đi chợ.
 - Brownfield project. Existing codebase mapped under `.planning/codebase/` (ARCHITECTURE, STACK, STRUCTURE, CONVENTIONS, INTEGRATIONS, TESTING, CONCERNS).
 - Stack: React 18, Redux Toolkit, React Router 6, Ant Design 5, TypeScript, CRACO build, Workbox PWA. UI is built on local wrappers in `src/Components` over Ant Design.
 - Feature modules (vertical slices) live in `src/Modules`: Dishes, Ingredient, ShoppingList, ScheduledMeal, DishSuggester, Home.
@@ -76,14 +85,16 @@ A local Vietnamese household member can open the app and go from "what do we eat
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Adopt GSD to plan/track future changes | Existing app needs structured, tracked evolution | — Pending |
-| First milestone = UI/UX refactor (not new features) | App is feature-rich but not intuitive/friendly enough | — Pending |
-| Meal planning ("what to cook") is the first journey to make intuitive | It's the journey that hurts most today | — Pending |
-| Use a guided wizard flow as the "customer journey" model | Reframes admin-style screens into ask-and-answer steps | — Pending |
-| App-wide Vietnamese copy pass this milestone (not just meal planning) | Friendly, familiar language is a cross-cutting need | — Pending |
+| Adopt GSD to plan/track future changes | Existing app needs structured, tracked evolution | ✓ Good — drove v1.0 to ship across 6 tracked phases |
+| First milestone = UI/UX refactor (not new features) | App is feature-rich but not intuitive/friendly enough | ✓ Good — shipped v1.0 |
+| Meal planning ("what to cook") is the first journey to make intuitive | It's the journey that hurts most today | ✓ Good — guided wizard validated by cold-start E2E |
+| Use a guided wizard flow as the "customer journey" model | Reframes admin-style screens into ask-and-answer steps | ✓ Good — Phases 4-6 |
+| App-wide Vietnamese copy pass this milestone (not just meal planning) | Friendly, familiar language is a cross-cutting need | ⚠️ Revisit — high-traffic scope migrated (D-01), native-speaker tone UAT still outstanding |
 | Typed `AppCopy` module as single source of truth for copy (build-gated keys, named-arg interpolation, review-only glossary) | Avoids hand-editing ~408 inline strings twice; makes a bad key a build error | ✓ Built in Phase 1 |
 | Keep wizard state under the existing `personal` persisted root and expose it through selectors | Preserves local user data and avoids a new persist root while making Phase 4 UI reload-safe | ✓ Built in Phase 3 |
 | Treat Phase 5 native-speaker copy review as follow-up UAT, not a deploy blocker | The user explicitly requested deployment in this run; automated copy/build/e2e gates passed, but tone still benefits from household-user review | ✓ Recorded in Phase 5 verification |
+| Retire MOB-04 (desktop no-regression gate) | Phone-only user; desktop no longer protected per Phase 5 CONTEXT D-07 | ✓ Good — scope focused on phone |
+| Close v1.0 with 10 open quality items acknowledged as tech debt | User requested milestone close; all phases/plans complete, gaps are UAT/verification/debug follow-ups not capability gaps | — Pending — tracked in STATE.md Deferred Items |
 
 | Adopt a typed `AppCopy` source of truth before rewording any screens | Avoid hand-editing ~408 inline strings twice; make a bad key a build error | Validated in Phase 1: Copy Infrastructure |
 
@@ -105,4 +116,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-17 after Phase 5: Mobile Tuning & Copy Rollout*
+*Last updated: 2026-06-19 after v1.0 UI/UX Refactor milestone*
