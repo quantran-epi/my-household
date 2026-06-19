@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 06-differentiator-enhancements
 source:
   - 06-01-SUMMARY.md
@@ -63,31 +63,69 @@ skipped: 0
   reason: "User reported: pass but the layout of member not good, i want each member selection is a card, stretch full width, consist of member name, member status and short description"
   severity: cosmetic
   test: 1
-  artifacts: []
-  missing: []
+  root_cause: "WizardServingsStep renders each member as a thin single-line <button> showing only member.name + check icon. No status/description rendered. status is not on HouseholdMemberProfile — it lives in HouseholdMemberHealthProfile.status (HouseholdHealthReducer), and there is no description field (compose from notes or the 'X thích · Y tránh · Z chặn' preference summary). A full-width member-card pattern already exists in HouseholdProfiles.screen.tsx (avatar + name + summary + HouseholdHealthStatusTag)."
+  artifacts:
+    - path: "src/Modules/MealPlanning/Screens/WizardServingsStep.widget.tsx"
+      issue: "Member rendered as single-line name button; status/description not wired"
+    - path: "src/Store/Selectors.ts"
+      issue: "selectHouseholdHealthProfiles / selectMemberHealthProfile available to source status"
+    - path: "src/Modules/Home/Screens/HouseholdHealth.widget.tsx"
+      issue: "Reusable HouseholdHealthStatusTag for the status pill"
+  missing:
+    - "Replace single-line member button with full-width card (column layout, md padding, accent #7436dc selected state, >=44px tap target)"
+    - "Render name + status (via HouseholdHealthStatusTag fed from health-profile map, default 'neutral') + short description (notes or preference summary)"
+    - "Add any new visible strings to AppCopy.wizard"
+  debug_session: .planning/debug/member-selection-layout.md
 
 - truth: "Clearing remembered defaults asks for confirmation (no silent deletion), and the remembered-defaults hint with its two actions is laid out clearly."
   status: failed
   reason: "User reported: clearing not ask for confirm, and the layout of subtle hint and the 2 buttons is condensed, the title should above and two button below"
   severity: major
   test: 2
-  artifacts: []
-  missing: []
+  root_cause: "Two issues in the remembered-defaults hint block of Wizard.screen.tsx (06-01). (1) Clear button wires onClick directly to dispatch(clearWizardDefaults()) — no confirmation gate, violating UI-SPEC 'Destructive confirmation / no silent deletion'. (2) Hint container Box uses single-row flex (justifyContent: space-between) forcing title + both buttons onto one line. A reusable confirm pattern exists via useModal().confirm (see DishesDetail.screen.tsx). AppCopy.wizard lacks confirm title/body keys."
+  artifacts:
+    - path: "src/Modules/MealPlanning/Screens/Wizard.screen.tsx"
+      issue: "Clear button dispatches without confirm; hint Box is row flex (cramped)"
+    - path: "src/Common/Copy/AppCopy.ts"
+      issue: "Missing destructive-confirm title/body copy keys in wizard block"
+  missing:
+    - "Gate clear-defaults behind useModal().confirm with danger okButton, okText=clearDefaultsAction, cancel text, onOk dispatches clearWizardDefaults"
+    - "Add AppCopy.wizard confirm title + body keys"
+    - "Change hint Box to flexDirection column, alignItems flex-start, drop space-between so title sits above the two-button row (gap 8 / sm token)"
+  debug_session: .planning/debug/clear-defaults-confirm-and-layout.md
 
 - truth: "With cook-now enabled and inventory present, results show all three groups (Nấu ngay, Cần mua thêm ít, Dự phòng) as appropriate, never collapsing to a single group."
   status: failed
   reason: "User reported: only \"need buy a bit\" section show up"
   severity: major
   test: 4
-  artifacts: []
-  missing: []
+  root_cause: "Bug is in DishScorer, not the render layer. (1) 'Nấu ngay' (group 0) is gated on missingIngredientIds.length === 0, but scoreCookNow scales required amounts by servingCount/baseServings (baseServings defaults 2). With servingCount > 2 (normal household), scaled requirements exceed stock so missing is never 0 — group 0 stays empty. scoreWithInventory/group do NOT apply this scaling, which is why standard grouping shows a ready group but cook-now never does. (2) 'Dự phòng' (group 2) rarely populates because the middle-bucket condition includes '|| cookNowScore >= 0.58' and cookNowScore carries a ~0.5+ fixed baseline from speed/preference/nutrition/budget weights, so low-readiness dishes still clear it; only dishes with >3 missing fall to backup. Unit test masks this by feeding synthetic score/missing values instead of running the real scoreCookNow→groupCookNow pipeline."
+  artifacts:
+    - path: "src/Modules/DishSuggester/Helpers/DishScorer.ts"
+      issue: "groupCookNow requires missing===0 against serving-scaled amounts (group 0 never fills); middle/backup split leans on high-baseline cookNowScore >= 0.58"
+    - path: "src/Modules/DishSuggester/Helpers/DishScorer.test.ts"
+      issue: "Test uses synthetic inputs, never exercises real scaling pipeline — masks the bug"
+  missing:
+    - "Decouple 'Nấu ngay' readiness from serving-scaled amounts (base zero-missing on unscaled requirements or allow a small shortfall tolerance)"
+    - "Re-tune middle/backup boundary so cookNowScore baseline doesn't swallow low-readiness dishes (drop '|| cookNowScore >= 0.58' or split on inventory readiness instead of composite score)"
+    - "Add a test running real scoreCookNow→groupCookNow with servingCount > baseServings to pin the three-bucket distribution"
+  debug_session: .planning/debug/cook-now-single-group.md
 
 - truth: "When adding missing ingredients, the user can choose to add them to a brand-new shopping list instead of being forced into the existing open list."
   status: failed
   reason: "User reported: pass. but need option to add to a brand new shopping list if user dont want to add to existing open shopping list"
   severity: minor
   test: 6
-  artifacts: []
-  missing: []
+  root_cause: "Missing UI affordance, not a defect. confirmAddMissingIngredients derives targetList purely from getLatestIncompleteShoppingList existence and only dispatches addShoppingList in the !targetList branch; the Sheet body shows a static 'adding to {name}' label when an active list exists and only reveals the create-list Input when none exists. Reducer already supports create-then-append (addShoppingList + addIngredientGroupsToShoppingList), so the gap is purely UI wiring."
+  artifacts:
+    - path: "src/Modules/MealPlanning/Screens/WizardResult.widget.tsx"
+      issue: "Target list chosen by existence, not user input; create-list Input unreachable while an open list exists"
+    - path: "src/Common/Copy/AppCopy.ts"
+      issue: "Needs selector option labels (add-to-existing / create-new)"
+  missing:
+    - "Add missingTargetMode state ('existing' | 'new'), default 'existing' when active list exists else 'new'"
+    - "In Sheet body, when an open list exists render a selector (Radio/Segmented) for 'Thêm vào {name}' vs 'Tạo danh sách mới', revealing the name Input on 'new'"
+    - "Branch confirmAddMissingIngredients on chosen mode (force addShoppingList + append on 'new'); key footer label off mode; reset mode in openMissingSheet"
+  debug_session: .planning/debug/add-to-new-shopping-list-option.md
 
 
