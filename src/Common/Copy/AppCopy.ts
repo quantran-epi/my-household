@@ -94,6 +94,8 @@ export const AppCopy = {
         missingSheetTitle: "Thêm món cần mua",
         missingSheetIntro: "Mình sẽ thêm các nguyên liệu còn thiếu vào lịch Đi chợ đang mở.",
         missingTargetList: (args: { name: string }) => `Thêm vào: ${args.name}`,
+        missingTargetExistingOption: (args: { name: string }) => `Thêm vào ${args.name}`,
+        missingTargetNewOption: "Tạo danh sách mới",
         missingNoActiveList: "Chưa có lịch Đi chợ đang mở. Tạo nhanh một lịch mới ở đây.",
         missingCreateListName: "Đi chợ hôm nay",
         missingCreateListPlaceholder: "Tên lịch Đi chợ",
