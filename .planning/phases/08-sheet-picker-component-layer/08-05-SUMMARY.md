@@ -101,3 +101,9 @@ None - no external service configuration required.
 - The picker component layer's highest-risk surface (calendar embedding) is complete and the de-floating recipe is documented for any future picker that needs to host an AntD popup inside a sheet.
 - Plan 08-06 (and the Phase 10-11 site conversions) can consume `SheetDatePicker` / `SheetDatePicker.RangePicker` directly; values are pure `Dayjs`, so call sites that use moment-based `DateHelper` must convert at the boundary (PITFALLS §B — deferred to conversion phases).
 - No explicit `zIndex` is passed to `<Sheet>`, preserving Phase 7 token stacking for nested sheets.
+
+## Self-Check: PASSED
+
+- All 4 created files verified present on disk (SheetDatePicker.tsx, .test.tsx, .formbind.test.tsx, index.ts).
+- Both task commits verified in git log: `e310d67` (Task 1), `1de3cdb` (Task 2).
+- All 17 tests pass (`CI=true npx react-scripts test` — 13 behavior + 4 form-binding); typecheck clean.
