@@ -119,6 +119,12 @@ export const RootRoutes = {
         // Test-only: mounts the upgraded Sheet in the variants the 07-03 WebKit/iPhone
         // touch e2e needs (basic, scrolling, maskClosable=false, nested A->B). Not
         // linked from any user-facing nav (threat T-07-02: no real data, no PII).
-        SheetGestureFixture: '/__sheet-gesture-fixture'
+        SheetGestureFixture: '/__sheet-gesture-fixture',
+        // Test-only: mounts all four @components/SheetPicker pickers deterministically
+        // so the 08-06 mobile-safari touch e2e can prove tap-commit (PICK-01), "Xong"
+        // commit+count (PICK-03), and "Hủy"/drag-dismiss revert (PICK-04) on real
+        // gestures. Not linked from any user-facing nav (threat T-08-FIX: no real
+        // data, no PII).
+        SheetPickerFixture: '/__sheet-picker-fixture'
     }
 }

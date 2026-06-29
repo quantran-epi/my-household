@@ -56,6 +56,14 @@ const SheetGestureFixtureScreen = React.lazy(() =>
     import("./SheetGestureFixture.screen").then(m => ({ default: m.SheetGestureFixtureScreen })),
 );
 
+// Test-only fixture: mounts all four @components/SheetPicker pickers deterministically
+// for the 08-06 mobile-safari touch e2e (tap-commit, Xong commit+count, Hủy/drag
+// revert). Lazy so it never ships in the product bundle path; NOT linked from any
+// user-facing nav (threat T-08-FIX).
+const SheetPickerFixtureScreen = React.lazy(() =>
+    import("./SheetPickerFixture.screen").then(m => ({ default: m.SheetPickerFixtureScreen })),
+);
+
 const getRouterBasename = (): string => {
     const publicUrl = process.env.PUBLIC_URL;
     if (!publicUrl) return "/";
@@ -109,6 +117,7 @@ export const RootRouter = () => {
                 </Route>
                 <Route path={RootRoutes.StaticRoutes.CrashTest} element={<CrashTestScreen />} />
                 <Route path={RootRoutes.StaticRoutes.SheetGestureFixture} element={<React.Suspense fallback={<RouteLoadingFallback />}><SheetGestureFixtureScreen /></React.Suspense>} />
+                <Route path={RootRoutes.StaticRoutes.SheetPickerFixture} element={<React.Suspense fallback={<RouteLoadingFallback />}><SheetPickerFixtureScreen /></React.Suspense>} />
             </Route>
         </Routes>
     </BrowserRouter>
