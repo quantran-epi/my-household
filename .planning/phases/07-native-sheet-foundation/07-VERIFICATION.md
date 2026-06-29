@@ -1,22 +1,19 @@
 ---
 phase: 07-native-sheet-foundation
 verified: 2026-06-29T05:25:00Z
-status: gaps_found
-score: 3/4 roadmap success criteria verified (SHEET 5/6 requirements satisfied)
-overrides_applied: 0
-gaps:
+status: passed
+score: 4/4 roadmap success criteria verified (SHEET-04 detents accepted via override per D-01)
+overrides_applied: 1
+overrides:
+  - must_have: "Sheets snap to medium/full detents (SHEET-04)"
+    reason: "Detents were deliberately cut at discuss-phase, not silently dropped by planning. 07-CONTEXT.md D-01 locks dismiss-only: multi-detent snap is the #2-ranked jank hazard, research labels it optional, and every current sheet use (pickers, confirms) is short-content — so SHEET-04 is satisfied by content-height + dvh cap rather than a medium/full position machine (YAGNI; do NOT build a forward-looking detents array). The verifier flagged this by comparing against the literal ROADMAP/REQUIREMENTS text without weighting D-01, and itself noted the gap may be intentional. No later milestone phase needs detents; revisit only if a future tall-content sheet needs an intermediate rest position."
+    accepted_by: "tuda2"
+    accepted_at: "2026-06-29T05:36:18Z"
+gaps: []
+resolved_gaps:
   - truth: "Sheets snap to medium/full detents (SHEET-04)"
-    status: failed
-    reason: "No detent/snap behavior exists anywhere in the code. The Sheet renders at a single fixed max-height (min(85dvh,720px) or the explicit `height` prop); dragDecision only returns 'dismiss' | 'spring-back' with no 'snap-to-medium'/'snap-to-full' outcome. The three plans reinterpreted SHEET-04 from its REQUIREMENTS.md/ROADMAP definition ('snap to detent points, e.g. medium then full height') into 'maskClosable drag protection' — a capability that is not described by any SHEET requirement. REQUIREMENTS.md itself still marks SHEET-04 as Pending, confirming the detent feature was never built."
-    artifacts:
-      - path: "src/Components/FastOverlay/dragDecision.ts"
-        issue: "DragOutcome union is only 'dismiss' | 'spring-back'; no detent/snap-point outcome exists"
-      - path: "src/Components/FastOverlay/FastOverlay.tsx"
-        issue: "Sheet section uses a single maxHeight; no medium/full detent state, no snap-on-release logic"
-    missing:
-      - "Detent model (e.g. medium + full snap points) with snap-to-nearest-detent on drag release"
-      - "Sheet height driven by the active detent rather than a single fixed max-height"
-      - "Tests/e2e proving snap-to-medium then snap-to-full behavior"
+    status: accepted-via-override
+    reason: "Accepted via override (see overrides above). Detent feature intentionally not built per D-01 dismiss-only decision."
 ---
 
 # Phase 7: Native Sheet Foundation Verification Report
