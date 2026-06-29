@@ -1,9 +1,11 @@
 {
   "files": {
     "main.css": "/my-household/static/css/main.24287e0d.css",
-    "main.js": "/my-household/static/js/main.b4b0e0f6.js",
+    "main.js": "/my-household/static/js/main.3b38bfda.js",
     "static/js/672.1255a3f4.chunk.js": "/my-household/static/js/672.1255a3f4.chunk.js",
     "static/js/720.aa010600.chunk.js": "/my-household/static/js/720.aa010600.chunk.js",
+    "static/js/377.dc0fe6ec.chunk.js": "/my-household/static/js/377.dc0fe6ec.chunk.js",
+    "static/js/76.e3b0473a.chunk.js": "/my-household/static/js/76.e3b0473a.chunk.js",
     "static/js/128.64d0c806.chunk.js": "/my-household/static/js/128.64d0c806.chunk.js",
     "static/js/206.07467eaa.chunk.js": "/my-household/static/js/206.07467eaa.chunk.js",
     "static/media/noodles.png": "/my-household/static/media/noodles.db502210854831dbe3a0.png",
@@ -41,6 +43,6 @@
   },
   "entrypoints": [
     "static/css/main.24287e0d.css",
-    "static/js/main.b4b0e0f6.js"
+    "static/js/main.3b38bfda.js"
   ]
 }

@@ -63,7 +63,10 @@ export const WizardScreen: React.FC = () => {
             cancelText: AppCopy.common.cancel,
             okButtonProps: { danger: true },
             centered: true,
-            onOk: () => dispatch(clearWizardDefaults()),
+            // async so antd's hook-confirm closes the dialog after the dispatch
+            // settles; a synchronous dispatch here re-renders the tree before
+            // antd runs its close and leaves the modal stuck open.
+            onOk: async () => { dispatch(clearWizardDefaults()); },
         });
     };
 
