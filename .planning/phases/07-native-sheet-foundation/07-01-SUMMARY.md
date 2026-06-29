@@ -85,6 +85,15 @@ None - no external service configuration required.
 - Pure decision logic is verified and ready for 07-02/07-03 to wire into the `Sheet` pointer handlers.
 - No blockers. The gesture/UI integration and WebKit Playwright touch e2e remain in later plans of this phase.
 
+## Self-Check: PASSED
+
+- FOUND: src/Components/FastOverlay/dragDecision.ts
+- FOUND: src/Components/FastOverlay/dragDecision.test.ts
+- FOUND: .planning/phases/07-native-sheet-foundation/07-01-SUMMARY.md
+- FOUND commit 7fc6964 (Task 1 feat)
+- FOUND commit 98e3ff1 (Task 2 test)
+- FOUND commit fa3f710 (SUMMARY docs)
+
 ---
 *Phase: 07-native-sheet-foundation*
 *Completed: 2026-06-29*
