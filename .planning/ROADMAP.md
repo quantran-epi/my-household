@@ -52,13 +52,20 @@ Full v1.0 details archived in [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADM
 4. All four pickers bind to AntD `Form` (value/onChange/id/status) so a Form submit validates and collects their values unchanged.
 
 **Plans:** 6 plans in 3 waves
-
 Plans:
+**Wave 1**
+
 - [ ] 08-01-PLAN.md — Shared primitives: normalizeDiacritics, optionLabel/getTriggerSummary, useSheetPickerField, SheetTrigger (PICK-02, PICK-08)
 - [ ] 08-02-PLAN.md — SheetActionMenu: grouped iOS action sheet, red destructive rows, detached Hủy (PICK-07)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 08-03-PLAN.md — SheetSelect: tap→check→dismiss, diacritic search, "Bỏ chọn" clear + Form-binding (PICK-01, PICK-02, PICK-08)
 - [ ] 08-04-PLAN.md — SheetMultiSelect: checkbox draft, "Xong (N)" commit, "Hủy" revert, drag-protect + Form-binding (PICK-03, PICK-04, PICK-08)
 - [ ] 08-05-PLAN.md — SheetDatePicker: in-sheet AntD panel (de-float spike), Dayjs, "Hôm nay", showTime, RangePicker + Form-binding (PICK-05, PICK-06, PICK-08)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 08-06-PLAN.md — Barrel @components/SheetPicker + fixture route + mobile-safari touch e2e (PICK-01, PICK-03, PICK-04)
 
 #### Phase 9: iOS Visual Baseline & Safe-Area Shell
