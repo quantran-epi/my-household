@@ -1,4 +1,4 @@
-import { defineConfig } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
 const e2ePort = process.env.E2E_PORT ?? '3010';
 const baseURL = `http://localhost:${e2ePort}/my-recipes/`;
@@ -29,6 +29,14 @@ export default defineConfig({
     {
       name: browserChannel ?? 'chromium',
       use: browserChannel ? { channel: browserChannel } : undefined,
+    },
+    {
+      // Real touch-capable WebKit iPhone surface (hasTouch + isMobile) so the
+      // 07-02 pointer-drag reducer receives genuine pointerType="touch" events
+      // (chromium without a mobile/touch context cannot emit them). SHEET-03,
+      // SHEET-05, and SHEET-06 flows run here.
+      name: 'mobile-safari',
+      use: { ...devices['iPhone 13'] },
     },
   ],
 });
