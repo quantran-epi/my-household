@@ -115,6 +115,10 @@ export const RootRoutes = {
         // Test-only: renders a component that throws during render so the e2e suite
         // can prove the top-level ErrorBoundary shows the recovery UI (FND-01).
         // Not linked from any user-facing nav (threat T-02-CT).
-        CrashTest: '/__crash-test'
+        CrashTest: '/__crash-test',
+        // Test-only: mounts the upgraded Sheet in the variants the 07-03 WebKit/iPhone
+        // touch e2e needs (basic, scrolling, maskClosable=false, nested A->B). Not
+        // linked from any user-facing nav (threat T-07-02: no real data, no PII).
+        SheetGestureFixture: '/__sheet-gesture-fixture'
     }
 }

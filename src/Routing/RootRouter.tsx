@@ -48,6 +48,14 @@ const CrashTestScreen = () => {
     throw new Error('crash-test');
 };
 
+// Test-only fixture: mounts the upgraded Sheet in the variants the 07-03
+// WebKit/iPhone touch e2e drives (basic, scrolling, maskClosable=false, nested
+// A->B). Lazy so it never ships in the product bundle path; NOT linked from any
+// user-facing nav (threat T-07-02).
+const SheetGestureFixtureScreen = React.lazy(() =>
+    import("./SheetGestureFixture.screen").then(m => ({ default: m.SheetGestureFixtureScreen })),
+);
+
 const getRouterBasename = (): string => {
     const publicUrl = process.env.PUBLIC_URL;
     if (!publicUrl) return "/";
@@ -100,6 +108,7 @@ export const RootRouter = () => {
                     <Route path={RootRoutes.AuthorizedRoutes.MealPlanningRoutes.Wizard()} element={<WizardScreen />} />
                 </Route>
                 <Route path={RootRoutes.StaticRoutes.CrashTest} element={<CrashTestScreen />} />
+                <Route path={RootRoutes.StaticRoutes.SheetGestureFixture} element={<React.Suspense fallback={<RouteLoadingFallback />}><SheetGestureFixtureScreen /></React.Suspense>} />
             </Route>
         </Routes>
     </BrowserRouter>
