@@ -51,7 +51,7 @@ Full v1.0 details archived in [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADM
 3. SheetActionMenu renders full-width rows, red destructive actions, and a separate "Hủy".
 4. All four pickers bind to AntD `Form` (value/onChange/id/status) so a Form submit validates and collects their values unchanged.
 
-**Plans:** 2/6 plans executed
+**Plans:** 5/6 plans executed
 Plans:
 **Wave 1**
 
@@ -60,9 +60,9 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 08-03-PLAN.md — SheetSelect: tap→check→dismiss, diacritic search, "Bỏ chọn" clear + Form-binding (PICK-01, PICK-02, PICK-08)
-- [ ] 08-04-PLAN.md — SheetMultiSelect: checkbox draft, "Xong (N)" commit, "Hủy" revert, drag-protect + Form-binding (PICK-03, PICK-04, PICK-08)
-- [ ] 08-05-PLAN.md — SheetDatePicker: in-sheet AntD panel (de-float spike), Dayjs, "Hôm nay", showTime, RangePicker + Form-binding (PICK-05, PICK-06, PICK-08)
+- [x] 08-03-PLAN.md — SheetSelect: tap→check→dismiss, diacritic search, "Bỏ chọn" clear + Form-binding (PICK-01, PICK-02, PICK-08)
+- [x] 08-04-PLAN.md — SheetMultiSelect: checkbox draft, "Xong (N)" commit, "Hủy" revert, drag-protect + Form-binding (PICK-03, PICK-04, PICK-08)
+- [x] 08-05-PLAN.md — SheetDatePicker: in-sheet AntD panel (de-float spike), Dayjs, "Hôm nay", showTime, RangePicker + Form-binding (PICK-05, PICK-06, PICK-08)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -115,7 +115,7 @@ Plans:
 | 5. Mobile Tuning & Copy Rollout | v1.0 | 7/7 | Complete | 2026-06-17 |
 | 6. Differentiator Enhancements | v1.0 | 5/5 | Complete | 2026-06-19 |
 | 7. Native Sheet Foundation | v1.1 | 3/3 | Complete   | 2026-06-29 |
-| 8. Sheet-Picker Component Layer | v1.1 | 2/6 | In Progress|  |
+| 8. Sheet-Picker Component Layer | v1.1 | 5/6 | In Progress|  |
 | 9. iOS Visual Baseline & Safe-Area Shell | v1.1 | 0/— | Not started | — |
 | 10. High-Traffic Screen Conversion | v1.1 | 0/— | Not started | — |
 | 11. Long-Tail Conversion & Wrapper Removal | v1.1 | 0/— | Not started | — |
