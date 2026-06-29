@@ -1,6 +1,7 @@
 import { CloseOutlined } from "@ant-design/icons";
 import React from "react";
 import { createPortal } from "react-dom";
+import { shouldStartDrag, dragDecision, DragOrigin, DragDirection } from './dragDecision';
 
 type FastOverlaySize = number | string;
 
@@ -120,6 +121,26 @@ const overlayMotionStyles = <style>{`
 }
 `}</style>;
 
+// Sheet-specific CSS that cannot live in the React `style` prop:
+// - the vh -> dvh max-height cascade needs two same-key declarations
+//   (the dvh rule wins on supporting UAs; the vh rule is the fallback);
+// - `env(safe-area-inset-bottom)`, `overscroll-behavior`, and `touch-action`
+//   read more clearly as real CSS and keep the spring-back transition under
+//   the `.my-recipes-fast-overlay` reduced-motion clamp.
+const sheetStyles = <style>{`
+.my-recipes-fast-overlay__sheet {
+  max-height: min(85vh, 720px);
+  max-height: min(85dvh, 720px);
+}
+.my-recipes-fast-overlay__handle {
+  touch-action: none;
+}
+.my-recipes-fast-overlay__body {
+  overscroll-behavior: contain;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+`}</style>;
+
 const closeButtonStyle: React.CSSProperties = {
     width: 34,
     height: 34,
@@ -141,6 +162,27 @@ const shellTitleStyle: React.CSSProperties = {
     gap: 8,
     fontWeight: 650,
     color: "#2f2545",
+};
+
+const grabberStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    padding: "10px 0 4px",
+    border: "none",
+    background: "transparent",
+    cursor: "grab",
+    touchAction: "none",
+    flexShrink: 0,
+};
+
+const grabberPillStyle: React.CSSProperties = {
+    display: "block",
+    width: 40,
+    height: 5,
+    borderRadius: 999,
+    background: "rgba(74, 48, 130, 0.28)",
 };
 
 export const FastModalShell: React.FunctionComponent<FastModalShellProps> = ({
@@ -325,7 +367,157 @@ export const Sheet: React.FunctionComponent<SheetProps> = ({
     useEscapeClose(open && keyboard, onClose);
     const resolvedZIndex = useResolvedOverlayZIndex(open, zIndex, 1200);
 
+    // Local (non-Redux) drag state. `offset` drives the live finger-follow
+    // transform; `dragging` toggles transition:none so the sheet tracks the
+    // finger 1:1, then re-enables the spring-back/dismiss transition on release.
+    const [offset, setOffset] = React.useState(0);
+    const [dragging, setDragging] = React.useState(false);
+    const sectionRef = React.useRef<HTMLElement | null>(null);
+    const bodyRef = React.useRef<HTMLDivElement | null>(null);
+    const triggerRef = React.useRef<Element | null>(null);
+    // Mutable gesture bookkeeping kept in a ref so handlers stay referentially
+    // stable and never trigger re-renders mid-drag.
+    const gesture = React.useRef({
+        active: false,
+        startY: 0,
+        lastY: 0,
+        lastTime: 0,
+        origin: "grabber" as DragOrigin,
+    });
+
+    // Focus trap: capture the trigger on open, move focus into the sheet, and
+    // restore focus to the trigger on close/unmount (SHEET-01).
+    React.useEffect(() => {
+        if (!open) return;
+        triggerRef.current = document.activeElement;
+        const section = sectionRef.current;
+        if (section) {
+            const focusable = section.querySelector<HTMLElement>(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+            );
+            (focusable ?? section).focus();
+        }
+        return () => {
+            const trigger = triggerRef.current as HTMLElement | null;
+            if (trigger && typeof trigger.focus === "function") trigger.focus();
+        };
+    }, [open]);
+
+    const onTrapKeyDown = (event: React.KeyboardEvent) => {
+        if (event.key !== "Tab") return;
+        const section = sectionRef.current;
+        if (!section) return;
+        const focusables = Array.from(
+            section.querySelectorAll<HTMLElement>(
+                'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+            ),
+        ).filter((el) => !el.hasAttribute("disabled"));
+        if (focusables.length === 0) {
+            event.preventDefault();
+            section.focus();
+            return;
+        }
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        const activeEl = document.activeElement;
+        if (event.shiftKey && activeEl === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && activeEl === last) {
+            event.preventDefault();
+            first.focus();
+        }
+    };
+
+    const beginDrag = (origin: DragOrigin) => (event: React.PointerEvent) => {
+        // For the body handle, only start a drag when the scroll body is at the
+        // very top and the user is pulling down (shouldStartDrag B3); otherwise
+        // let native scroll win. Grabber/header are always handles (B1/B2).
+        const scrollTop = bodyRef.current ? bodyRef.current.scrollTop : 0;
+        if (origin === "body" && scrollTop > 0) return;
+        gesture.current = {
+            active: true,
+            startY: event.clientY,
+            lastY: event.clientY,
+            lastTime: event.timeStamp,
+            origin,
+        };
+        try {
+            (event.currentTarget as Element).setPointerCapture(event.pointerId);
+        } catch {
+            // setPointerCapture can throw in jsdom; the gesture still works via
+            // the move/up handlers, so swallow and continue.
+        }
+    };
+
+    const onDragMove = (event: React.PointerEvent) => {
+        const g = gesture.current;
+        if (!g.active) return;
+        const delta = event.clientY - g.startY;
+        // First real move sample decides whether the gesture is allowed. For
+        // the body handle, an upward move at the top is not a dismiss (B4) — let
+        // native scroll take over and abandon the drag.
+        if (!dragging) {
+            const direction: DragDirection = delta < 0 ? "up" : "down";
+            const scrollTop = bodyRef.current ? bodyRef.current.scrollTop : 0;
+            if (!shouldStartDrag(g.origin, scrollTop, direction)) {
+                g.active = false;
+                return;
+            }
+            setDragging(true);
+        }
+        g.lastY = event.clientY;
+        g.lastTime = event.timeStamp;
+        // Clamp to downward-only travel (SHEET-03); upward over-pull is a no-op.
+        setOffset(Math.max(0, delta));
+    };
+
+    const endDrag = (event: React.PointerEvent) => {
+        const g = gesture.current;
+        if (!g.active) return;
+        g.active = false;
+        setDragging(false);
+        const finalOffset = Math.max(0, event.clientY - g.startY);
+        const elapsed = event.timeStamp - g.lastTime;
+        const velocity = elapsed > 0 ? (event.clientY - g.lastY) / elapsed : 0;
+        const sheetHeight = sectionRef.current
+            ? sectionRef.current.getBoundingClientRect().height
+            : 0;
+        const outcome = dragDecision({
+            offset: finalOffset,
+            sheetHeight,
+            velocity,
+            maskClosable,
+        });
+        if (outcome === "dismiss") {
+            // Animate the section out then close. The transition lives under
+            // .my-recipes-fast-overlay so reduced-motion users get an instant
+            // dismiss (the 1ms clamp).
+            setOffset(sheetHeight || finalOffset);
+            onClose();
+        } else {
+            // Spring back to rest.
+            setOffset(0);
+        }
+    };
+
     if (!open) return null;
+
+    // Backdrop alpha fades from its rest value (0.30) toward 0 as the sheet is
+    // dragged down, giving the iOS "content fades as it leaves" feel (SHEET-01).
+    const sheetHeightForFade = sectionRef.current
+        ? sectionRef.current.getBoundingClientRect().height
+        : 0;
+    const dragProgress = sheetHeightForFade > 0 ? Math.min(1, offset / sheetHeightForFade) : 0;
+    const backdropAlpha = 0.3 * (1 - dragProgress);
+    const dragHandleProps = (origin: DragOrigin) => ({
+        "data-drag-handle": true,
+        className: "my-recipes-fast-overlay__handle",
+        onPointerDown: beginDrag(origin),
+        onPointerMove: onDragMove,
+        onPointerUp: endDrag,
+        onPointerCancel: endDrag,
+    });
 
     return createPortal(
         <div
@@ -337,8 +529,9 @@ export const Sheet: React.FunctionComponent<SheetProps> = ({
                 display: "flex",
                 alignItems: "flex-end",
                 justifyContent: "center",
-                background: "rgba(16, 24, 40, 0.30)",
-                animation: backdropInAnimation,
+                background: `rgba(16, 24, 40, ${backdropAlpha})`,
+                animation: dragging || offset > 0 ? "none" : backdropInAnimation,
+                transition: dragging ? "none" : "background 220ms " + overlayMotionEase,
                 willChange: "opacity",
             }}
             onMouseDown={(event) => {
@@ -346,10 +539,15 @@ export const Sheet: React.FunctionComponent<SheetProps> = ({
             }}
         >
             {overlayMotionStyles}
+            {sheetStyles}
             <section
+                ref={sectionRef}
+                className="my-recipes-fast-overlay__sheet"
                 role="dialog"
                 aria-modal="true"
+                tabIndex={-1}
                 data-testid={testId}
+                onKeyDown={onTrapKeyDown}
                 style={{
                     width: "100%",
                     maxWidth: 720,
@@ -361,19 +559,41 @@ export const Sheet: React.FunctionComponent<SheetProps> = ({
                     borderRadius: "18px 18px 0 0",
                     background: "linear-gradient(180deg, #f5f0ff 0%, #ffffff 42%)",
                     boxShadow: "0 -16px 48px rgba(74, 48, 130, 0.24)",
-                    animation: sheetInAnimation,
+                    animation: dragging || offset > 0 ? "none" : sheetInAnimation,
+                    transform: `translate3d(0, ${offset}px, 0)`,
+                    transition: dragging ? "none" : "transform 220ms " + overlayMotionEase,
                     transformOrigin: "bottom center",
-                    willChange: "opacity, transform",
+                    willChange: "transform",
+                    outline: "none",
                 }}
                 onMouseDown={(event) => event.stopPropagation()}
             >
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "14px 14px 12px 16px", borderBottom: "1px solid rgba(116, 54, 220, 0.10)", background: "rgba(255,255,255,0.72)" }}>
+                <button
+                    type="button"
+                    aria-label="Kéo để đóng"
+                    style={grabberStyle}
+                    {...dragHandleProps("grabber")}
+                >
+                    <span aria-hidden="true" style={grabberPillStyle} />
+                </button>
+                <div
+                    style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "4px 14px 12px 16px", borderBottom: "1px solid rgba(116, 54, 220, 0.10)", background: "rgba(255,255,255,0.72)" }}
+                    {...dragHandleProps("header")}
+                >
                     <div style={shellTitleStyle}>{title}</div>
                     {closable && <button type="button" aria-label="Đóng" onClick={onClose} style={closeButtonStyle}>
                         <CloseOutlined />
                     </button>}
                 </div>
-                <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: 16, display: "flex", flexDirection: "column" }}>
+                <div
+                    ref={bodyRef}
+                    className="my-recipes-fast-overlay__body"
+                    style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: 16, display: "flex", flexDirection: "column" }}
+                    onPointerDown={beginDrag("body")}
+                    onPointerMove={onDragMove}
+                    onPointerUp={endDrag}
+                    onPointerCancel={endDrag}
+                >
                     {children}
                 </div>
             </section>

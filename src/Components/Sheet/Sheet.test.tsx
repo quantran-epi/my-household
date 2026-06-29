@@ -33,3 +33,33 @@ test('fires onClose when the close button is clicked', () => {
   fireEvent.click(screen.getByLabelText('Đóng'));
   expect(onClose).toHaveBeenCalledTimes(1);
 });
+
+test('renders a grabber drag handle when open', () => {
+  render(
+    <Sheet open title="Bộ chọn" data-testid="smoke-sheet" onClose={noop}>
+      nội dung
+    </Sheet>,
+  );
+  const grabber = screen.getByLabelText('Kéo để đóng');
+  expect(grabber).toBeInTheDocument();
+  expect(grabber).toHaveAttribute('data-drag-handle');
+});
+
+test('grabber exposes its aria-label as an accessible button', () => {
+  render(
+    <Sheet open title="Bộ chọn" data-testid="smoke-sheet" onClose={noop}>
+      nội dung
+    </Sheet>,
+  );
+  const grabber = screen.getByRole('button', { name: 'Kéo để đóng' });
+  expect(grabber).toBeInTheDocument();
+});
+
+test('still renders the grabber when maskClosable is false', () => {
+  render(
+    <Sheet open title="Bộ chọn" data-testid="smoke-sheet" maskClosable={false} onClose={noop}>
+      nội dung
+    </Sheet>,
+  );
+  expect(screen.getByLabelText('Kéo để đóng')).toBeInTheDocument();
+});
