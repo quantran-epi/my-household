@@ -1,8 +1,8 @@
 ---
 phase: 7
 slug: native-sheet-foundation
-status: draft
-nyquist_compliant: false
+status: approved
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-06-29
 ---
@@ -71,11 +71,11 @@ created: 2026-06-29
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references (pure module, webkit install, touch project)
-- [ ] No watch-mode flags (`--watchAll=false` / `CI=true` enforced)
-- [ ] Feedback latency < 15s (units)
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references (pure module, webkit install, touch project)
+- [x] No watch-mode flags (`--watchAll=false` / `CI=true` enforced)
+- [x] Feedback latency < 15s (units); touch e2e (~60s) is the integration-proof layer only (D-08, accepted)
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** approved 2026-06-29
