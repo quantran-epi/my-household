@@ -113,3 +113,10 @@ None - no external service configuration required.
 - `SheetMultiSelect` is in place, individually tested (9 tests across 2 files, all green), and exported via its folder barrel; Wave-3 plans and the conversion phases can import it directly.
 - The matchMedia polyfill pattern is now established for any future picker test that mounts a real AntD `Form`/Grid under jsdom.
 - No explicit `zIndex` is passed anywhere in this component, preserving Phase 7 nested-sheet stacking.
+
+## Self-Check: PASSED
+
+- All 4 created files verified present on disk (`SheetMultiSelect.tsx`, `SheetMultiSelect.test.tsx`, `SheetMultiSelect.formbind.test.tsx`, `index.ts`) plus `08-04-SUMMARY.md`.
+- All 5 commits verified in git log: `a3b0e02` (test RED), `a4f2118` (feat GREEN), `35b3285` (test form-bind), `36662fd` (feat barrel), `5f9d141` (docs).
+- Both test suites green: 9 tests passed across `SheetMultiSelect.test.tsx` (7) and `SheetMultiSelect.formbind.test.tsx` (2).
+- TDD gate compliance: `test(...)` RED commit precedes `feat(...)` GREEN commit for the behavior feature.
