@@ -385,6 +385,16 @@ export const Sheet: React.FunctionComponent<SheetProps> = ({
         origin: "grabber" as DragOrigin,
     });
 
+    // Reset drag state when the sheet closes so a mount-and-toggle host
+    // (open prop flips, component stays mounted) reopens at rest instead of
+    // rendering off-screen with the dismiss offset still applied.
+    React.useEffect(() => {
+        if (!open) {
+            setOffset(0);
+            setDragging(false);
+        }
+    }, [open]);
+
     // Focus trap: capture the trigger on open, move focus into the sheet, and
     // restore focus to the trigger on close/unmount (SHEET-01).
     React.useEffect(() => {

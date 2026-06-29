@@ -63,3 +63,33 @@ test('still renders the grabber when maskClosable is false', () => {
   );
   expect(screen.getByLabelText('Kéo để đóng')).toBeInTheDocument();
 });
+
+// jsdom does not carry clientY through a constructed PointerEvent, so build a
+// plain bubbling event with the coordinate assigned as an own property — React
+// reads nativeEvent.clientY off it.
+const pointer = (type: string, clientY: number) =>
+  Object.assign(new Event(type, { bubbles: true }), { clientY, pointerId: 1 });
+
+test('resets the drag offset when reopened after a drag (mount-and-toggle host)', () => {
+  const { rerender } = render(
+    <Sheet open title="Bộ chọn" data-testid="smoke-sheet" onClose={noop}>
+      nội dung
+    </Sheet>,
+  );
+  const grabber = screen.getByLabelText('Kéo để đóng');
+  fireEvent(grabber, pointer('pointerdown', 0));
+  fireEvent(grabber, pointer('pointermove', 240));
+  expect(screen.getByTestId('smoke-sheet').style.transform).toBe('translate3d(0, 240px, 0)');
+
+  rerender(
+    <Sheet open={false} title="Bộ chọn" data-testid="smoke-sheet" onClose={noop}>
+      nội dung
+    </Sheet>,
+  );
+  rerender(
+    <Sheet open title="Bộ chọn" data-testid="smoke-sheet" onClose={noop}>
+      nội dung
+    </Sheet>,
+  );
+  expect(screen.getByTestId('smoke-sheet').style.transform).toBe('translate3d(0, 0px, 0)');
+});
