@@ -99,6 +99,11 @@ None - no external service configuration required.
 - Shared primitives are in place and individually tested; Wave 2-3 pickers (SheetSelect, SheetMultiSelect, SheetDatePicker, SheetActionMenu) can compose `useSheetPickerField` + `SheetTrigger` + `getTriggerSummary` + `normalizeDiacritics` directly.
 - No explicit zIndex is passed anywhere in this layer, preserving Phase 7 stacking for nested sheets.
 
+## Self-Check: PASSED
+
+- All 7 created files verified present on disk.
+- All 3 commits verified in git log: `9e5e718` (Task 1), `2896d48` (Task 2), `6066d48` (docs).
+
 ---
 *Phase: 08-sheet-picker-component-layer*
 *Completed: 2026-06-29*
