@@ -182,6 +182,10 @@ const SheetDatePickerBase: React.FunctionComponent<SheetDatePickerProps> = ({
                             popupStyle={{ position: 'static', zIndex: 'auto', boxShadow: 'none' }}
                             disabledDate={disabledDate}
                             showTime={showTime as any}
+                            // For showTime, suppress AntD's inline OK footer so the panel
+                            // fires onChange on each cell tap into singleDraft; the unified
+                            // "Xong" then commits (sheet consistency over AntD's OK button).
+                            needConfirm={showTime ? false : undefined}
                             picker={picker}
                             format={fmt}
                             inputReadOnly
@@ -207,4 +211,125 @@ const SheetDatePickerBase: React.FunctionComponent<SheetDatePickerProps> = ({
     );
 };
 
-export const SheetDatePicker = SheetDatePickerBase;
+// --- RangePicker sub-export (D-09) ---------------------------------------
+// Mirrors Form/DatePicker.tsx's Object.assign sub-export shape. Range drives a
+// draft and commits ONLY on "Xong" via SheetActions so a half-picked range can
+// never escape; "Hủy"/drag-dismiss reverts. Value stays a [Dayjs, Dayjs] tuple.
+
+type RangeValue = [Dayjs | null, Dayjs | null] | null;
+
+export type SheetRangePickerProps = {
+    value?: RangeValue;
+    onChange?: (value: RangeValue) => void;
+    picker?: SheetDatePickerPicker;
+    showTime?: boolean | object;
+    disabledDate?: (current: Dayjs) => boolean;
+    format?: string;
+    placeholder?: string;
+    disabled?: boolean;
+    allowClear?: boolean;
+    id?: string;
+    status?: SheetFieldStatus;
+};
+
+const rangeComplete = (v: RangeValue): v is [Dayjs, Dayjs] =>
+    !!v && !!v[0] && !!v[1];
+
+const RangePicker: React.FunctionComponent<SheetRangePickerProps> = ({
+    value,
+    onChange,
+    picker,
+    showTime,
+    disabledDate,
+    format,
+    placeholder,
+    disabled,
+    allowClear = true,
+    id,
+    status,
+}) => {
+    const [open, setOpen] = React.useState(false);
+    const [bodyEl, setBodyEl] = React.useState<HTMLDivElement | null>(null);
+    const [draft, setDraft] = React.useState<RangeValue>(value ?? null);
+
+    // Re-seed the draft from the committed value on each open (never persist a
+    // draft across opens — RESEARCH §Pattern 3).
+    React.useEffect(() => {
+        if (open) setDraft(value ?? null);
+    }, [open, value]);
+
+    const fmt = format ?? defaultFormat(picker, showTime);
+    const fieldStatus: SheetFieldStatus = status ?? '';
+    const title = placeholder ?? 'Chọn khoảng ngày';
+
+    const summary = rangeComplete(value)
+        ? `${value[0].format(fmt)} – ${value[1].format(fmt)}`
+        : undefined;
+
+    // dirty = a half/edited range that differs from the committed value. Drives
+    // maskClosable so an accidental drag-dismiss springs back (Pitfall 2).
+    const dirty = (() => {
+        const a = value ?? null;
+        const b = draft ?? null;
+        const key = (v: RangeValue) => (v ? `${v[0]?.valueOf() ?? ''}|${v[1]?.valueOf() ?? ''}` : '');
+        return key(a) !== key(b);
+    })();
+
+    const commit = () => {
+        // Only commit a complete range; "Xong" stays disabled otherwise.
+        if (!rangeComplete(draft)) return;
+        onChange?.(draft);
+        setOpen(false);
+    };
+
+    const cancel = () => {
+        // Discard the draft, never call onChange.
+        setOpen(false);
+    };
+
+    return (
+        <>
+            <SheetTrigger
+                id={id}
+                status={fieldStatus}
+                disabled={disabled}
+                placeholder={title}
+                summary={summary}
+                allowClear={allowClear}
+                onClear={() => onChange?.(null)}
+                onOpen={() => setOpen(true)}
+                glyph={<CalendarOutlined />}
+            />
+            <Sheet open={open} onClose={cancel} title={title} maskClosable={!dirty}>
+                {deFloatStyles}
+                <div data-testid="sheet-range-body" ref={setBodyEl} style={{ minHeight: 0 }}>
+                    {bodyEl && (
+                        <AntDatePicker.RangePicker
+                            open={open}
+                            value={draft as any}
+                            onChange={(next) => setDraft(next as RangeValue)}
+                            getPopupContainer={() => bodyEl}
+                            popupClassName="sheet-date-popup"
+                            popupStyle={{ position: 'static', zIndex: 'auto', boxShadow: 'none' }}
+                            disabledDate={disabledDate}
+                            showTime={showTime as any}
+                            picker={picker as any}
+                            format={fmt}
+                            inputReadOnly
+                            allowClear={false}
+                            style={{ width: '100%' }}
+                        />
+                    )}
+                    <SheetActions style={{ marginTop: 12 }}>
+                        <Button onClick={cancel}>Hủy</Button>
+                        <Button type="primary" disabled={!rangeComplete(draft)} onClick={commit}>
+                            Xong
+                        </Button>
+                    </SheetActions>
+                </div>
+            </Sheet>
+        </>
+    );
+};
+
+export const SheetDatePicker = Object.assign(SheetDatePickerBase, { RangePicker });
