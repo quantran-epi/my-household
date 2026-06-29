@@ -430,6 +430,11 @@ export const Sheet: React.FunctionComponent<SheetProps> = ({
     };
 
     const beginDrag = (origin: DragOrigin) => (event: React.PointerEvent) => {
+        // Stop the pointerdown from bubbling through the React tree to an
+        // ancestor Sheet's drag handlers. A nested Sheet B renders as a React
+        // child of Sheet A's body, so without this an interaction on B would
+        // also start A's body drag and dismiss both sheets together (SHEET-06).
+        event.stopPropagation();
         // For the body handle, only start a drag when the scroll body is at the
         // very top and the user is pulling down (shouldStartDrag B3); otherwise
         // let native scroll win. Grabber/header are always handles (B1/B2).
@@ -442,12 +447,13 @@ export const Sheet: React.FunctionComponent<SheetProps> = ({
             lastTime: event.timeStamp,
             origin,
         };
-        try {
-            (event.currentTarget as Element).setPointerCapture(event.pointerId);
-        } catch {
-            // setPointerCapture can throw in jsdom; the gesture still works via
-            // the move/up handlers, so swallow and continue.
-        }
+        // Pointer capture is intentionally NOT taken here. Capturing on
+        // pointerdown retargets the subsequent pointerup (and its compatibility
+        // click) to the handle element, which swallows taps on interactive
+        // children rendered inside the sheet body/header (e.g. a button that
+        // opens a nested sheet, or the close control). Capture is deferred to
+        // onDragMove, taken only once a real drag is confirmed, so a plain tap
+        // still dispatches its click to the actual target.
     };
 
     const onDragMove = (event: React.PointerEvent) => {
@@ -463,6 +469,17 @@ export const Sheet: React.FunctionComponent<SheetProps> = ({
             if (!shouldStartDrag(g.origin, scrollTop, direction)) {
                 g.active = false;
                 return;
+            }
+            // A real drag is now confirmed (not a tap). Capture the pointer so
+            // the finger continues to drive the sheet even if it slides off the
+            // handle element. Deferring capture to this point (rather than
+            // pointerdown) lets a plain tap fall through to its real target,
+            // so interactive children inside the sheet stay clickable.
+            try {
+                (event.currentTarget as Element).setPointerCapture(event.pointerId);
+            } catch {
+                // setPointerCapture can throw in jsdom; the gesture still works
+                // via the move/up handlers, so swallow and continue.
             }
             setDragging(true);
         }
