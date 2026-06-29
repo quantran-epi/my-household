@@ -97,7 +97,7 @@ Full v1.0 details archived in [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADM
 | 4. Wizard UI & Hero Entry | v1.0 | 6/6 | Complete | 2026-06-16 |
 | 5. Mobile Tuning & Copy Rollout | v1.0 | 7/7 | Complete | 2026-06-17 |
 | 6. Differentiator Enhancements | v1.0 | 5/5 | Complete | 2026-06-19 |
-| 7. Native Sheet Foundation | v1.1 | 2/3 | In Progress|  |
+| 7. Native Sheet Foundation | v1.1 | 3/3 | Complete   | 2026-06-29 |
 | 8. Sheet-Picker Component Layer | v1.1 | 0/— | Not started | — |
 | 9. iOS Visual Baseline & Safe-Area Shell | v1.1 | 0/— | Not started | — |
 | 10. High-Traffic Screen Conversion | v1.1 | 0/— | Not started | — |

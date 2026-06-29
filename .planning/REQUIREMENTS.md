@@ -10,10 +10,10 @@
 
 - [ ] **SHEET-01**: User sees a grabber handle at the top of every bottom sheet
 - [ ] **SHEET-02**: User can drag a sheet down to dismiss it, with the backdrop dimming as it moves
-- [ ] **SHEET-03**: Dragging within a sheet scrolls its content; the sheet only drags-to-dismiss when its content is scrolled to the top (no scroll/drag conflict)
+- [x] **SHEET-03**: Dragging within a sheet scrolls its content; the sheet only drags-to-dismiss when its content is scrolled to the top (no scroll/drag conflict)
 - [ ] **SHEET-04**: Sheets snap to detent points (e.g. medium then full height) rather than a single fixed height
-- [ ] **SHEET-05**: Sheet content and sticky actions respect the iOS safe area (home indicator) and full-height sheets use `dvh` so nothing hides under the Safari toolbar
-- [ ] **SHEET-06**: A sheet opened from within another sheet stacks above it and dismisses independently (nested-sheet z-index correct)
+- [x] **SHEET-05**: Sheet content and sticky actions respect the iOS safe area (home indicator) and full-height sheets use `dvh` so nothing hides under the Safari toolbar
+- [x] **SHEET-06**: A sheet opened from within another sheet stacks above it and dismisses independently (nested-sheet z-index correct)
 
 ### PICK — Reusable sheet-picker layer (`@components/SheetPicker`)
 
@@ -72,10 +72,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | SHEET-01 | Phase 7 | Pending |
 | SHEET-02 | Phase 7 | Pending |
-| SHEET-03 | Phase 7 | Pending |
+| SHEET-03 | Phase 7 | Complete |
 | SHEET-04 | Phase 7 | Pending |
-| SHEET-05 | Phase 7 | Pending |
-| SHEET-06 | Phase 7 | Pending |
+| SHEET-05 | Phase 7 | Complete |
+| SHEET-06 | Phase 7 | Complete |
 | PICK-01 | Phase 8 | Pending |
 | PICK-02 | Phase 8 | Pending |
 | PICK-03 | Phase 8 | Pending |
@@ -94,6 +94,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CONV-05 | Phase 11 | Pending |
 
 **Coverage:**
+
 - v1.1 requirements: 22 total
 - Mapped to phases: 22
 - Unmapped: 0 ✓
