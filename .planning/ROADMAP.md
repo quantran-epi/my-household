@@ -51,12 +51,12 @@ Full v1.0 details archived in [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADM
 3. SheetActionMenu renders full-width rows, red destructive actions, and a separate "Hủy".
 4. All four pickers bind to AntD `Form` (value/onChange/id/status) so a Form submit validates and collects their values unchanged.
 
-**Plans:** 6 plans in 3 waves
+**Plans:** 2/6 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 08-01-PLAN.md — Shared primitives: normalizeDiacritics, optionLabel/getTriggerSummary, useSheetPickerField, SheetTrigger (PICK-02, PICK-08)
-- [ ] 08-02-PLAN.md — SheetActionMenu: grouped iOS action sheet, red destructive rows, detached Hủy (PICK-07)
+- [x] 08-01-PLAN.md — Shared primitives: normalizeDiacritics, optionLabel/getTriggerSummary, useSheetPickerField, SheetTrigger (PICK-02, PICK-08)
+- [x] 08-02-PLAN.md — SheetActionMenu: grouped iOS action sheet, red destructive rows, detached Hủy (PICK-07)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -115,7 +115,7 @@ Plans:
 | 5. Mobile Tuning & Copy Rollout | v1.0 | 7/7 | Complete | 2026-06-17 |
 | 6. Differentiator Enhancements | v1.0 | 5/5 | Complete | 2026-06-19 |
 | 7. Native Sheet Foundation | v1.1 | 3/3 | Complete   | 2026-06-29 |
-| 8. Sheet-Picker Component Layer | v1.1 | 0/6 | Planned | — |
+| 8. Sheet-Picker Component Layer | v1.1 | 2/6 | In Progress|  |
 | 9. iOS Visual Baseline & Safe-Area Shell | v1.1 | 0/— | Not started | — |
 | 10. High-Traffic Screen Conversion | v1.1 | 0/— | Not started | — |
 | 11. Long-Tail Conversion & Wrapper Removal | v1.1 | 0/— | Not started | — |
