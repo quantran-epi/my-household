@@ -120,4 +120,23 @@ test.describe('SheetPicker touch gestures (WebKit/iPhone)', () => {
     await expect(sheet).toBeVisible();
     await expect(sheet.getByRole('button', { name: /^Xong/ })).toHaveText('Xong (1)');
   });
+
+  test('touch targets: trigger + sheet row render >= 44px on WebKit/iPhone (IOS-03)', async ({ page }) => {
+    // IOS-03 / D-08-D-09: the touchTarget.min (44px) bar must hold as a REAL rendered
+    // height on a true WebKit/iPhone descriptor — the home-indicator/thumb-zone proof
+    // jsdom's layout-less DOM cannot give. Scope is the shared picker layer only
+    // (trigger + sheet rows); per-feature-screen targets are audited in Phases 10-11.
+    const triggerButton = page.getByTestId('select-field').getByRole('button');
+    const triggerBox = await triggerButton.boundingBox();
+    expect(triggerBox, 'select trigger should have a box').not.toBeNull();
+    expect(triggerBox!.height).toBeGreaterThanOrEqual(44);
+
+    // Open the sheet and measure a selectable option row.
+    await triggerButton.click();
+    await expect(page.locator(OVERLAY)).toHaveCount(1);
+    const row = page.getByRole('option', { name: 'Phở bò' });
+    const rowBox = await row.boundingBox();
+    expect(rowBox, 'option row should have a box').not.toBeNull();
+    expect(rowBox!.height).toBeGreaterThanOrEqual(44);
+  });
 });
