@@ -6,7 +6,7 @@ const { Content: AntContent } = AntLayout;
 
 // Sticky chrome the scrollable content box sits between: fixed header + safe-area-raised
 // bottom nav. Read from tokens so the height math and the nav stay single-sourced (D-05/D-07).
-const chrome = iosTokens.layout.headerHeight + iosTokens.layout.bottomNavHeight;
+const chrome = iosTokens.layout.headerHeight + iosTokens.layout.bottomNavContainerMinHeight;
 
 // vh→dvh cascade via a scoped <style> block (FastOverlay precedent): a single inline style
 // object cannot carry two `height` keys (JS overwrites), so the 100vh fallback is declared

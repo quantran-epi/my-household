@@ -55,7 +55,7 @@ export const CookingPill = () => {
             data-testid="active-cooking-floating-button"
             style={{
                 position: 'fixed',
-                bottom: safeAreaInset.bottom(iosTokens.layout.bottomNavHeight),
+                bottom: safeAreaInset.bottom(iosTokens.layout.bottomNavContainerMinHeight),
                 left: '50%',
                 transform: 'translateX(-50%)',
                 background: 'linear-gradient(135deg, #1f1f1f 0%, #3b2a1d 48%, #d46b08 100%)',
