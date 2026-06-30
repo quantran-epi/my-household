@@ -13,6 +13,7 @@ import { MessageProvider } from '@components/Message';
 import { ModalProvider } from '@components/Modal/ModalProvider';
 import { AppInitializer } from '@components/AppInitializer/AppInitializer';
 import { ErrorBoundary } from '@components/ErrorBoundary';
+import { iosTokens } from '@theme';
 
 dayjs.locale('vi');
 moment.locale('vi');
@@ -21,13 +22,14 @@ function App() {
   return (
     <ConfigProvider locale={viVN} theme={{
       token: {
-        colorPrimary: "#7436dc",
-        colorPrimaryHover: "#8f46f7",
-        colorPrimaryActive: "#5e2bbf",
-        colorLink: "#7436dc",
-        colorBorderSecondary: "#d9d9d9",
-        fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
-        fontSize: 18,
+        colorPrimary: iosTokens.color.primary,
+        colorPrimaryHover: iosTokens.color.primaryHover,
+        colorPrimaryActive: iosTokens.color.primaryActive,
+        colorLink: iosTokens.color.primary,
+        colorBorderSecondary: iosTokens.color.borderIdle,
+        fontFamily: iosTokens.type.fontFamily,
+        fontSize: iosTokens.type.body.fontSize,
+        borderRadius: iosTokens.radius.md,
         zIndexPopupBase: 4000,
       },
       components: {
