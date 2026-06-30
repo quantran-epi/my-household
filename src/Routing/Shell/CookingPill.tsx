@@ -4,6 +4,7 @@ import { DeferredModalContent, Modal } from "@components/Modal";
 import { Typography } from "@components/Typography";
 import { CookingSessionWidget } from "@modules/Dishes/Screens/CookingSession.widget";
 import { selectCookingSessions, selectDishesById } from "@store/Selectors";
+import { iosTokens, safeAreaInset } from "@theme";
 import { Flex } from "antd";
 import React from "react";
 import { useSelector } from "react-redux";
@@ -54,17 +55,17 @@ export const CookingPill = () => {
             data-testid="active-cooking-floating-button"
             style={{
                 position: 'fixed',
-                bottom: 76,
+                bottom: safeAreaInset.bottom(iosTokens.layout.bottomNavHeight),
                 left: '50%',
                 transform: 'translateX(-50%)',
                 background: 'linear-gradient(135deg, #1f1f1f 0%, #3b2a1d 48%, #d46b08 100%)',
                 color: '#fff',
-                borderRadius: 999,
+                borderRadius: iosTokens.radius.pill,
                 padding: '9px 16px 9px 10px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 10,
-                minHeight: 52,
+                minHeight: iosTokens.touchTarget.comfortable,
                 border: '1px solid rgba(255,255,255,0.72)',
                 boxShadow: '0 10px 28px rgba(31,31,31,0.26), 0 0 0 4px rgba(250,140,22,0.16)',
                 cursor: 'pointer',

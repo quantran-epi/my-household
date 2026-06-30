@@ -1,5 +1,6 @@
 import { Image } from "@components/Image";
 import { Typography } from "@components/Typography";
+import { iosTokens, safeAreaInset } from "@theme";
 import React from "react";
 import { useLocation } from "react-router-dom";
 import DietPlanIcon from "../../../assets/icons/diet-plan.png";
@@ -33,8 +34,8 @@ export const BottomTabNavigator = () => {
             left: 0,
             right: 0,
             width: "100%",
-            minHeight: 88,
-            padding: "16px 10px calc(8px + env(safe-area-inset-bottom))",
+            minHeight: iosTokens.layout.bottomNavContainerMinHeight,
+            padding: `16px 10px ${safeAreaInset.bottom(iosTokens.spacing.sm)}`,
             boxSizing: "border-box",
             overflow: "visible",
             zIndex: 900,
@@ -56,9 +57,9 @@ export const BottomTabNavigator = () => {
             padding: "6px 8px",
             boxSizing: "border-box",
             border: "1px solid rgba(116, 54, 220, 0.14)",
-            borderRadius: 20,
+            borderRadius: iosTokens.radius.xxl,
             background: "rgba(255,255,255,0.98)",
-            boxShadow: "0 14px 34px rgba(74, 48, 130, 0.18), 0 5px 12px rgba(74, 48, 130, 0.08)",
+            boxShadow: iosTokens.surface.shadowNav,
             pointerEvents: "auto",
             overflow: "visible",
         }
@@ -76,11 +77,11 @@ export const BottomTabNavigator = () => {
             alignItems: "center",
             justifyContent: "center",
             gap: 2,
-            height: 52,
+            height: iosTokens.touchTarget.comfortable,
             border: 0,
-            borderRadius: 14,
-            background: active ? "rgba(116, 54, 220, 0.10)" : "transparent",
-            color: active ? "#2f2545" : "#6b6478",
+            borderRadius: iosTokens.radius.lg,
+            background: active ? iosTokens.color.accentFill : "transparent",
+            color: active ? iosTokens.color.text : iosTokens.color.textMuted,
             cursor: "pointer",
             font: "inherit",
             padding: "4px 2px 3px",
@@ -120,7 +121,7 @@ export const BottomTabNavigator = () => {
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            borderRadius: 10,
+            borderRadius: iosTokens.radius.md,
             background: active ? "rgba(116, 54, 220, 0.12)" : "transparent",
             flexShrink: 0,
         }
@@ -166,7 +167,7 @@ export const BottomTabNavigator = () => {
     const _labelStyles = (active: boolean): React.CSSProperties => {
         return {
             display: "block",
-            color: active ? "#2f2545" : "#6b6478",
+            color: active ? iosTokens.color.text : iosTokens.color.textMuted,
             fontWeight: active ? 650 : 500,
             fontSize: 10,
             lineHeight: "13px",
@@ -180,7 +181,7 @@ export const BottomTabNavigator = () => {
     const _centerLabelStyles = (): React.CSSProperties => {
         return {
             display: "block",
-            color: "#2f2545",
+            color: iosTokens.color.text,
             fontWeight: 650,
             fontSize: 10,
             lineHeight: "13px",
