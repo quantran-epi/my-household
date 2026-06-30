@@ -93,3 +93,9 @@ Note: the e2e clearance test runs via `--project=mobile-safari` and was not exec
 ## Threat Flags
 
 None — this plan changes only client-side CSS layout values (env()/dvh/calc), token wiring, and test additions. No auth, network, storage, input-handling, or crypto surface touched (matches plan threat_model: T-09-03 accepted, static CSS layout, no ASVS L1 control applies).
+
+## Self-Check: PASSED
+
+- Files: Content.tsx, Content.test.tsx, CookingPill.tsx, BottomTabNavigator.tsx, cooking-pill.spec.ts, 09-03-SUMMARY.md — all FOUND.
+- Commits: 9564c26, 9baf1ae, c7e5390, 3fb77bc — all FOUND in git log.
+- Working tree clean after the SUMMARY commit.
