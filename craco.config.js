@@ -18,7 +18,8 @@ module.exports = {
                 "@modules": path.resolve(__dirname, "src/Modules"),
                 "@store": path.resolve(__dirname, "src/Store"),
                 "@common": path.resolve(__dirname, "src/Common"),
-                "@hooks": path.resolve(__dirname, "src/Hooks/index")
+                "@hooks": path.resolve(__dirname, "src/Hooks/index"),
+                "@theme": path.resolve(__dirname, "src/Theme/index")
             }
             webpackConfig.resolve.plugins = webpackConfig.resolve.plugins.filter(plugin => !(plugin instanceof ModuleScopePlugin));
             return webpackConfig;

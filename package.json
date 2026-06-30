@@ -71,7 +71,8 @@
       "^@routing/(.*)$": "<rootDir>/src/Routing/$1",
       "^@store/(.*)$": "<rootDir>/src/Store/$1",
       "^@common/(.*)$": "<rootDir>/src/Common/$1",
-      "^@hooks$": "<rootDir>/src/Hooks/index"
+      "^@hooks$": "<rootDir>/src/Hooks/index",
+      "^@theme$": "<rootDir>/src/Theme/index"
     }
   },
   "browserslist": {
