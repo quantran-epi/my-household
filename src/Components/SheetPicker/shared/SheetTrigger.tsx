@@ -1,5 +1,6 @@
 import React from 'react';
 import { CloseCircleFilled, DownOutlined } from '@ant-design/icons';
+import { iosTokens } from '@theme';
 
 // Dedicated AntD-input-styled closed trigger (D-03/D-04). It forwards the injected `id` to its
 // root button and renders the AntD error ring when status==='error' (D-02 — keeps existing Form
@@ -17,23 +18,21 @@ export type SheetTriggerProps = {
     glyph?: React.ReactNode;            // idle trailing glyph; defaults to DownOutlined (date passes CalendarOutlined)
 };
 
-const PURPLE = '#7436dc';
-const BORDER_IDLE = '#d9d9d9';
-const ERROR = '#ff4d4f';
+const PURPLE = iosTokens.color.primary;
+const BORDER_IDLE = iosTokens.color.borderIdle;
+const ERROR = iosTokens.color.destructive;
 const PLACEHOLDER = '#bfbfbf';
 
 const baseStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     width: '100%',
-    minHeight: 44,
+    minHeight: iosTokens.touchTarget.min,
     padding: '0 11px',
     border: `1px solid ${BORDER_IDLE}`,
-    borderRadius: 6,
+    borderRadius: iosTokens.radius.sm,
     background: '#fff',
-    fontSize: 16,
-    fontWeight: 400,
-    lineHeight: '22px',
+    ...iosTokens.type.control,
     textAlign: 'left',
     cursor: 'pointer',
     color: 'rgba(0,0,0,0.88)',

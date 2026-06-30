@@ -3,6 +3,7 @@ import { render, screen, fireEvent, renderHook, act } from '@testing-library/rea
 import '@testing-library/jest-dom';
 import { SheetTrigger } from './SheetTrigger';
 import { useSheetPickerField } from './useSheetPickerField';
+import { iosTokens } from '@theme';
 
 describe('SheetTrigger', () => {
     it('forwards the injected id to its root button', () => {
@@ -58,6 +59,18 @@ describe('SheetTrigger', () => {
         render(<SheetTrigger summary="Đỏ" disabled onOpen={onOpen} />);
         fireEvent.click(screen.getByRole('button', { name: /Đỏ/ }));
         expect(onOpen).not.toHaveBeenCalled();
+    });
+
+    it('reads the 44px touch-target token for min-height (IOS-03)', () => {
+        render(<SheetTrigger summary="Đỏ" onOpen={() => {}} />);
+        const button = screen.getByRole('button', { name: /Đỏ/ });
+        expect(button.style.minHeight).toBe(`${iosTokens.touchTarget.min}px`);
+    });
+
+    it('reads the radius.sm token for border-radius (preserves 6px)', () => {
+        render(<SheetTrigger summary="Đỏ" onOpen={() => {}} />);
+        const button = screen.getByRole('button', { name: /Đỏ/ });
+        expect(button.style.borderRadius).toBe(`${iosTokens.radius.sm}px`);
     });
 });
 

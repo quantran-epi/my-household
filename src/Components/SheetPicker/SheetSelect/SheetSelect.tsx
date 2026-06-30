@@ -6,6 +6,7 @@ import { SheetTrigger } from '../shared/SheetTrigger';
 import { useSheetPickerField, SheetFieldStatus } from '../shared/useSheetPickerField';
 import { getTriggerSummary } from '../shared/optionLabel';
 import { normalizeDiacritics } from '../shared/normalizeDiacritics';
+import { iosTokens } from '@theme';
 
 // SheetSelect (PICK-01/02, D-05): single-select sheet picker. Tap an option row ->
 // checkmark on that row -> onChange(value) -> sheet auto-dismisses. A search field
@@ -44,14 +45,12 @@ const rowBaseStyle: React.CSSProperties = {
     display: 'flex',
     alignItems: 'center',
     width: '100%',
-    minHeight: 44,
+    minHeight: iosTokens.touchTarget.min,
     padding: '11px 16px',
     border: 'none',
     borderBottom: '1px solid #f0f0f0',
     background: 'transparent',
-    fontSize: 16,
-    fontWeight: 400,
-    lineHeight: '22px',
+    ...iosTokens.type.control,
     textAlign: 'left',
     cursor: 'pointer',
     boxSizing: 'border-box',

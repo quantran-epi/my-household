@@ -2,6 +2,7 @@ import { CloseOutlined } from "@ant-design/icons";
 import React from "react";
 import { createPortal } from "react-dom";
 import { shouldStartDrag, dragDecision, DragOrigin, DragDirection } from './dragDecision';
+import { iosTokens } from '@theme';
 
 type FastOverlaySize = number | string;
 
@@ -45,7 +46,7 @@ const getOffset = (value: React.CSSProperties["top"], fallback: number): string 
     return `${fallback}px`;
 };
 
-const overlayMotionEase = "cubic-bezier(0.16, 1, 0.3, 1)";
+const overlayMotionEase = iosTokens.motion.ease;
 const backdropInAnimation = `my-recipes-fast-overlay-fade-in 120ms ${overlayMotionEase} both`;
 const modalInAnimation = `my-recipes-fast-modal-in 150ms ${overlayMotionEase} both`;
 const drawerInAnimation = `my-recipes-fast-drawer-in 150ms ${overlayMotionEase} both`;
@@ -148,7 +149,7 @@ const closeButtonStyle: React.CSSProperties = {
     alignItems: "center",
     justifyContent: "center",
     border: "1px solid rgba(116, 54, 220, 0.16)",
-    borderRadius: 10,
+    borderRadius: iosTokens.radius.md,
     background: "#fff",
     color: "#5e2bbf",
     cursor: "pointer",
@@ -327,8 +328,8 @@ export const FastDrawerShell: React.FunctionComponent<FastDrawerShellProps> = ({
                     flexDirection: "column",
                     overflow: "hidden",
                     borderRight: "1px solid rgba(232, 237, 245, 0.96)",
-    borderRadius: "0 18px 18px 0",
-    background: "linear-gradient(180deg, #f5f0ff 0%, #ffffff 42%)",
+    borderRadius: `0 ${iosTokens.radius.xl}px ${iosTokens.radius.xl}px 0`,
+    background: iosTokens.surface.sheetGradient,
     boxShadow: "16px 0 48px rgba(74, 48, 130, 0.24)",
                     animation: drawerInAnimation,
                     transformOrigin: "left center",
@@ -583,8 +584,8 @@ export const Sheet: React.FunctionComponent<SheetProps> = ({
                     flexDirection: "column",
                     overflow: "hidden",
                     borderTop: "1px solid rgba(232, 237, 245, 0.96)",
-                    borderRadius: "18px 18px 0 0",
-                    background: "linear-gradient(180deg, #f5f0ff 0%, #ffffff 42%)",
+                    borderRadius: `${iosTokens.radius.xl}px ${iosTokens.radius.xl}px 0 0`,
+                    background: iosTokens.surface.sheetGradient,
                     boxShadow: "0 -16px 48px rgba(74, 48, 130, 0.24)",
                     animation: dragging || offset > 0 ? "none" : sheetInAnimation,
                     transform: `translate3d(0, ${offset}px, 0)`,
