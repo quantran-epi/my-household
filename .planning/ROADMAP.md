@@ -80,11 +80,11 @@ Plans:
 2. The shell sets `viewport-fit=cover` and sticky bottom chrome (nav, CTAs) clears the home indicator on a notched iOS device.
 3. Converted picker triggers and sheet rows meet the ≥44px thumb-zone bar.
 
-**Plans:** 3/3 plans created
+**Plans:** 1/3 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 09-01-PLAN.md — Typed `iosTokens` module + `safeAreaInset` helper + barrel; register `@theme` alias in tsconfig/craco/jest (IOS-01)
+- [x] 09-01-PLAN.md — Typed `iosTokens` module + `safeAreaInset` helper + barrel; register `@theme` alias in tsconfig/craco/jest (IOS-01)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -127,6 +127,6 @@ Plans:
 | 6. Differentiator Enhancements | v1.0 | 5/5 | Complete | 2026-06-19 |
 | 7. Native Sheet Foundation | v1.1 | 3/3 | Complete   | 2026-06-29 |
 | 8. Sheet-Picker Component Layer | v1.1 | 6/6 | Complete   | 2026-06-29 |
-| 9. iOS Visual Baseline & Safe-Area Shell | v1.1 | 0/3 | Planned | — |
+| 9. iOS Visual Baseline & Safe-Area Shell | v1.1 | 1/3 | In Progress|  |
 | 10. High-Traffic Screen Conversion | v1.1 | 0/— | Not started | — |
 | 11. Long-Tail Conversion & Wrapper Removal | v1.1 | 0/— | Not started | — |
