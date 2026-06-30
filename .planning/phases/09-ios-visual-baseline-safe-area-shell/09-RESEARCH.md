@@ -365,17 +365,15 @@ test('cooking pill clears the bottom nav + home indicator', async ({ page }) => 
 
 **Note:** All token *values* are VERIFIED against source line numbers / UI-SPEC (not assumed). The assumptions above are implementation-latitude choices the planner can lock.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **`vh`→`dvh` fallback for Content.tsx: scoped `<style>` block vs `dvh`-only inline?**
    - What we know: a single inline style object can't hold two `height` keys; FastOverlay already emits a `<style>` block for exactly this cascade (`:118-140`).
-   - What's unclear: whether the planner wants to mirror FastOverlay's `<style>`-injection precedent for Content, or accept `dvh`-only inline (simpler, fine for iOS 15.4+).
-   - Recommendation: mirror the FastOverlay `<style>`/class precedent (consistent, future-proof). If minimizing churn, `dvh`-only inline is acceptable given the target floor (A1).
+   - **RESOLVED:** mirror the FastOverlay `<style>`-injection precedent for Content (consistent, future-proof). Locked by Plan 09-03/T1.
 
 2. **AntD `borderRadius` token exact value (D-04 discretion).**
    - What we know: UI-SPEC says feed `md`(10) or "lg-adjacent," aligned with the 6px trigger / 10px control family.
-   - What's unclear: 6 vs 8 vs 10.
-   - Recommendation: `10` (`radius.md`) — matches the existing close-button/side-icon control family; lowest visual-regression risk. Defer final pick to UI-SPEC authority if it specifies tighter.
+   - **RESOLVED:** `10` (`radius.md`) — matches the existing close-button/side-icon control family; lowest visual-regression risk. Locked by Plan 09-02/T1.
 
 ## Environment Availability
 
