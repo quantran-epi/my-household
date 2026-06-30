@@ -26,7 +26,8 @@
       "@routing/*": ["./src/Routing/*"],
       "@store/*": ["./src/Store/*"],
       "@common/*": ["./src/Common/*"],
-      "@hooks": ["./src/Hooks/index.ts"]
+      "@hooks": ["./src/Hooks/index.ts"],
+      "@theme": ["./src/Theme/index.ts"]
     }
   },
   "include": [
